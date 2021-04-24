@@ -18,6 +18,7 @@
     "url": "git+https://github.com/kafkas/firescript.git"
   },
   "scripts": {
+    "build": "tsc -p src",
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "bugs": {
