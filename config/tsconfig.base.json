@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "module": "ES2015",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "strict": true,
+    "target": "ES5",
+    "typeRoots": ["../node_modules/@types"]
+  }
+}
