@@ -1,3 +1,1 @@
-export function sayHello() {
-  return 'Hello, World!';
-}
+export { CollectionTraverser, TraversalConfig } from './CollectionTraverser';

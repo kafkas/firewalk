@@ -21,4 +21,11 @@ module.exports = {
     '@typescript-eslint/explicit-module-boundary-types': 0,
     'no-constant-condition': 0,
   },
+  settings: {
+    'import/resolver': {
+      node: {
+        extensions: ['.json', '.js', '.ts'],
+      },
+    },
+  },
 };
