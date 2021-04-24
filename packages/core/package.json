@@ -23,5 +23,11 @@
   },
   "bugs": {
     "url": "https://github.com/kafkas/firesoft/issues"
+  },
+  "peerDependencies": {
+    "firebase-admin": "^9.6.0"
+  },
+  "devDependencies": {
+    "firebase-admin": "^9.6.0"
   }
 }
