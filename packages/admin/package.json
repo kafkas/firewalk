@@ -19,6 +19,7 @@
   },
   "scripts": {
     "build": "tsc -p src",
+    "build:tests": "tsc -p __tests__",
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "bugs": {

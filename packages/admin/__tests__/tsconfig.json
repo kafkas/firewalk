@@ -1,6 +1,6 @@
 {
   "extends": "../../../config/tsconfig.base",
   "compilerOptions": {
-    "noEmit": true
+    "outDir": "../lib"
   }
 }
