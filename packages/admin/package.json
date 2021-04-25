@@ -29,8 +29,5 @@
   },
   "publishConfig": {
     "access": "public"
-  },
-  "devDependencies": {
-    "firebase-admin": "^9.6.0"
   }
 }
