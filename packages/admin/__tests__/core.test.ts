@@ -8,6 +8,7 @@ const traverser = new CollectionTraverser(firestore().collection('users'), {
   sleepTimeBetweenBatches: 1000,
 });
 
+const aaa = new Array<number>().filter((val, idx) => {});
 const { updatedDocCount } = await traverser.update(
   (snapshot) => ({
     isAdmin: false,
