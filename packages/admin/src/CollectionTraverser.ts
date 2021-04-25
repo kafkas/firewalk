@@ -6,6 +6,10 @@ export interface TraversalConfig {
   sleepTimeBetweenBatches: number;
 }
 
+export interface TraverseEachConfig {
+  sleepTimeBetweenDocs: number;
+}
+
 interface TraversalResult {
   batchCount: number;
   docCount: number;
@@ -31,11 +35,15 @@ export class CollectionTraverser<T = firestore.DocumentData> {
    * @returns The number of batches and documents retrieved.
    */
   public async traverseEach(
-    callback: (snapshot: firestore.QueryDocumentSnapshot<T>) => Promise<void>
+    callback: (snapshot: firestore.QueryDocumentSnapshot<T>) => Promise<void>,
+    config: Partial<TraverseEachConfig> = {}
   ): Promise<TraversalResult> {
+    const { sleepTimeBetweenDocs = 0 } = config;
+
     const { batchCount, docCount } = await this.traverse(async (docSnapshots) => {
       for (let i = 0; i < docSnapshots.length; i++) {
         await callback(docSnapshots[i]);
+        await sleep(sleepTimeBetweenDocs);
       }
     });
 
