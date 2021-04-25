@@ -20,7 +20,7 @@ export class CollectionMigrator<T> extends CollectionTraverser<T> {
    * @returns The number of batches and documents updated.
    */
   public update(
-    getUpdateData: (snapshot: firestore.QueryDocumentSnapshot<T>) => firestore.UpdateData,
+    getUpdateData: UpdateDataGetter<T>,
     predicate?: UpdatePredicate<T>
   ): Promise<UpdateResult>;
 
@@ -53,13 +53,9 @@ export class CollectionMigrator<T> extends CollectionTraverser<T> {
   ): Promise<UpdateResult>;
 
   public async update(
-    arg1:
-      | firestore.UpdateData
-      | string
-      | firestore.FieldPath
-      | ((snapshot: firestore.QueryDocumentSnapshot<T>) => firestore.UpdateData),
+    arg1: firestore.UpdateData | string | firestore.FieldPath | UpdateDataGetter<T>,
     arg2?: any,
-    arg3?: (snapshot: firestore.QueryDocumentSnapshot<T>) => boolean
+    arg3?: UpdatePredicate<T>
   ): Promise<UpdateResult> {
     const argCount = [arg1, arg2, arg3].filter((a) => a !== undefined).length;
     const batch = this.collectionOrQuery.firestore.batch();
