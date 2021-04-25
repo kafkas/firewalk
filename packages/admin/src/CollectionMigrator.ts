@@ -42,7 +42,7 @@ export class CollectionMigrator<T> extends CollectionTraverser<T> {
    * the entire batch will fail if a single update isn't successful. This method uses the `.traverse()`
    * method internally to traverse the entire collection.
    * @param field - The field to update in each document.
-   * @param value - The value with which to update the specified field in each document.
+   * @param value - The value with which to update the specified field in each document. Must not be `undefined`.
    * @param predicate - Optional. A function that returns a boolean indicating whether to update the current document. Takes the `QueryDocumentSnapshot` corresponding to the document as its first argument. If this is not provided, all documents will be updated.
    * @returns The number of batches and documents updated.
    */
@@ -74,7 +74,15 @@ export class CollectionMigrator<T> extends CollectionTraverser<T> {
           if (shouldUpdate) {
             batch.update(snapshot.ref, getUpdateData(snapshot));
           }
-        } else if (argCount === 2 && typeof arg2 !== 'function') {
+        } else if (argCount < 2 || typeof arg2 === 'function') {
+          // Signature 2
+          const updateData = arg1 as firestore.UpdateData;
+          const predicate = arg2 as UpdatePredicate<T> | undefined;
+          const shouldUpdate = predicate?.(snapshot) ?? true;
+          if (shouldUpdate) {
+            batch.update(snapshot.ref, updateData);
+          }
+        } else {
           // Signature 3
           const field = arg1 as string | firestore.FieldPath;
           const value = arg2 as any;
@@ -82,14 +90,6 @@ export class CollectionMigrator<T> extends CollectionTraverser<T> {
           const shouldUpdate = predicate?.(snapshot) ?? true;
           if (shouldUpdate) {
             batch.update(snapshot.ref, field, value);
-          }
-        } else {
-          // Signature 2
-          const updateData = arg1 as firestore.UpdateData;
-          const predicate = arg2 as UpdatePredicate<T> | undefined;
-          const shouldUpdate = predicate?.(snapshot) ?? true;
-          if (shouldUpdate) {
-            batch.update(snapshot.ref, updateData);
           }
         }
       });
