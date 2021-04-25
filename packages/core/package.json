@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "description": "> TODO: description",
   "author": "Anar Kafkas <anarkafkas@gmail.com>",
-  "homepage": "https://github.com/kafkas/firesoft#readme",
+  "homepage": "https://github.com/kafkas/firecode#readme",
   "license": "MIT",
   "main": "lib/core.js",
   "directories": {
@@ -15,14 +15,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kafkas/firesoft.git"
+    "url": "git+https://github.com/kafkas/firecode.git"
   },
   "scripts": {
     "build": "tsc -p src",
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "bugs": {
-    "url": "https://github.com/kafkas/firesoft/issues"
+    "url": "https://github.com/kafkas/firecode/issues"
   },
   "peerDependencies": {
     "firebase-admin": "^9.6.0"
