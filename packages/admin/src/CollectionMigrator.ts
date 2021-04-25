@@ -1,8 +1,18 @@
 import type { firestore } from 'firebase-admin';
 import { CollectionTraverser } from './CollectionTraverser';
 
+/**
+ * An object that facilitates Firestore collection migrations.
+ */
 interface UpdateResult {
+  /**
+   * The number of batches that have been retrieved in this traversal.
+   */
   batchCount: number;
+
+  /**
+   * The number of documents that have been updated in this migration.
+   */
   updatedDocCount: number;
 }
 
@@ -10,6 +20,9 @@ type UpdatePredicate<T> = (snapshot: firestore.QueryDocumentSnapshot<T>) => bool
 
 type UpdateDataGetter<T> = (snapshot: firestore.QueryDocumentSnapshot<T>) => firestore.UpdateData;
 
+/**
+ * An object that facilitates Firestore collection migrations.
+ */
 export class CollectionMigrator<T> extends CollectionTraverser<T> {
   /**
    * Updates all documents in this collection with the provided update data. Uses batch writes so

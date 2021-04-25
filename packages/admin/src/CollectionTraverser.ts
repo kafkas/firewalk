@@ -2,19 +2,39 @@ import type { firestore } from 'firebase-admin';
 import { sleep } from './utils';
 
 export interface TraversalConfig {
+  /**
+   * The number of documents that will be retrieved in each call to Firestore. Defaults to 100.
+   */
   batchSize: number;
+
+  /**
+   * The amount of time (in ms) to "sleep" before moving on to the next batch. Defaults to 1000.
+   */
   sleepTimeBetweenBatches: number;
 }
 
 export interface TraverseEachConfig {
+  /**
+   * The amount of time (in ms) to "sleep" before moving on to the next doc. Defaults to 0.
+   */
   sleepTimeBetweenDocs: number;
 }
 
 interface TraversalResult {
+  /**
+   * The number of batches that have been retrieved in this traversal.
+   */
   batchCount: number;
+
+  /**
+   * The number of documents that have been retrieved in this traversal.
+   */
   docCount: number;
 }
 
+/**
+ * An object that facilitates Firestore collection traversals.
+ */
 export class CollectionTraverser<T = firestore.DocumentData> {
   private readonly config: TraversalConfig;
 
