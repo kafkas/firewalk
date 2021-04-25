@@ -1,10 +1,10 @@
 import type { firestore } from 'firebase-admin';
 import { sleep } from './utils';
 
-export type TraversalConfig = {
+export interface TraversalConfig {
   batchSize: number;
   sleepTimeBetweenBatches: number;
-};
+}
 
 export class CollectionTraverser<T = firestore.DocumentData> {
   private readonly config: TraversalConfig;
@@ -21,7 +21,10 @@ export class CollectionTraverser<T = firestore.DocumentData> {
   }
 
   /**
-   * Updates all docs in this collection. Uses batch updates.
+   * Updates all documents in this collection with the provided update data. Uses batch writes so
+   * the entire batch will fail if a single update isn't successful. This method uses the `.traverse()`
+   * method internally to traverse the entire collection.
+   * @returns The number of batches and documents updated.
    */
   public async update(
     updateData: (snapshot: firestore.QueryDocumentSnapshot<T>) => firestore.UpdateData,
@@ -29,21 +32,13 @@ export class CollectionTraverser<T = firestore.DocumentData> {
   ) {
     const writeBatch = this.collectionOrQuery.firestore.batch();
 
-    const { batchCount, docCount: updatedDocCount } = await this.traverseInBatches(
-      async (snapshots) => {
-        const batchDocCount = snapshots.length;
-
-        console.log(
-          `Retrieved ${batchDocCount} documents in this batch. Proceeding to update them.`
-        );
-
-        snapshots.forEach((snapshot) => {
-          if (condition(snapshot)) {
-            writeBatch.update(snapshot.ref, updateData(snapshot));
-          }
-        });
-      }
-    );
+    const { batchCount, docCount: updatedDocCount } = await this.traverse(async (snapshots) => {
+      snapshots.forEach((snapshot) => {
+        if (condition(snapshot)) {
+          writeBatch.update(snapshot.ref, updateData(snapshot));
+        }
+      });
+    });
 
     await writeBatch.commit();
 
@@ -51,22 +46,28 @@ export class CollectionTraverser<T = firestore.DocumentData> {
   }
 
   /**
-   * A slower method.
+   * Traverses the entire collection in batches of size `TraversalConfig.batchSize`. Invokes the
+   * specified callback for each document snapshot in each batch.
+   * @returns The number of batches and documents retrieved.
    */
-  public async traverseSequentially(
+  public async traverseEach(
     callback: (snapshot: firestore.QueryDocumentSnapshot<T>) => Promise<void>
   ) {
-    const { batchCount, docCount } = await this.traverseInBatches(async (docSnapshots) => {
+    const { batchCount, docCount } = await this.traverse(async (docSnapshots) => {
       for (let i = 0; i < docSnapshots.length; i++) {
-        const snapshot = docSnapshots[i];
-        await callback(snapshot);
+        await callback(docSnapshots[i]);
       }
     });
 
     return { batchCount, docCount };
   }
 
-  public async traverseInBatches(
+  /**
+   * Traverses the entire collection in batches of size `TraversalConfig.batchSize`. Invokes the
+   * specified callback for each batch of document snapshots.
+   * @returns The number of batches and documents retrieved.
+   */
+  public async traverse(
     callback: (batchSnapshots: firestore.QueryDocumentSnapshot<T>[]) => Promise<void>
   ) {
     let batchCount = 0;
