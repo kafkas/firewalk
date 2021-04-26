@@ -3,7 +3,7 @@ import { sleep } from './utils';
 
 export interface TraversalConfig {
   /**
-   * The number of documents that will be retrieved in each call to Firestore. Defaults to 100.
+   * The number of documents that will be traversed in each batch. Defaults to 100.
    */
   batchSize: number;
 
@@ -11,6 +11,11 @@ export interface TraversalConfig {
    * The amount of time (in ms) to "sleep" before moving on to the next batch. Defaults to 1000.
    */
   sleepTimeBetweenBatches: number;
+
+  /**
+   * The maximum number of documents that will be traversed. Defaults to `Infinity`.
+   */
+  maxDocCount: number;
 }
 
 export interface TraverseEachConfig {
@@ -36,17 +41,19 @@ interface TraversalResult {
  * An object that facilitates Firestore collection traversals.
  */
 export class CollectionTraverser<T = firestore.DocumentData> {
+  private static defaultConfig: TraversalConfig = {
+    batchSize: 100,
+    sleepTimeBetweenBatches: 1_000,
+    maxDocCount: Infinity,
+  };
+
   private readonly config: TraversalConfig;
 
   public constructor(
     protected readonly collectionOrQuery: firestore.CollectionReference<T> | firestore.Query<T>,
     config: Partial<TraversalConfig> = {}
   ) {
-    this.config = {
-      batchSize: 100,
-      sleepTimeBetweenBatches: 1000,
-      ...config,
-    };
+    this.config = { ...CollectionTraverser.defaultConfig, ...config };
   }
 
   /**
@@ -78,9 +85,11 @@ export class CollectionTraverser<T = firestore.DocumentData> {
   public async traverse(
     callback: (batchSnapshots: firestore.QueryDocumentSnapshot<T>[]) => Promise<void>
   ): Promise<TraversalResult> {
+    const { batchSize, maxDocCount } = this.config;
+
     let batchCount = 0;
     let docCount = 0;
-    let query = this.collectionOrQuery.limit(this.config.batchSize);
+    let query = this.collectionOrQuery.limit(Math.min(batchSize, maxDocCount));
 
     while (true) {
       const { docs: batchDocSnapshots } = await query.get();
@@ -95,7 +104,12 @@ export class CollectionTraverser<T = firestore.DocumentData> {
       await callback(batchDocSnapshots);
 
       const lastDocInBatch = batchDocSnapshots[batchDocSnapshots.length - 1];
-      query = query.startAfter(lastDocInBatch);
+
+      if (docCount === maxDocCount) {
+        break;
+      }
+
+      query = query.startAfter(lastDocInBatch).limit(Math.min(maxDocCount - docCount, batchSize));
 
       await sleep(this.config.sleepTimeBetweenBatches);
     }
