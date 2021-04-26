@@ -8,6 +8,11 @@ export interface TraversalConfig {
   batchSize: number;
 
   /**
+   * Whether to sleep between batches. Defaults to `true`.
+   */
+  sleepBetweenBatches: boolean;
+
+  /**
    * The amount of time (in ms) to "sleep" before moving on to the next batch. Defaults to 1000.
    */
   sleepTimeBetweenBatches: number;
@@ -20,7 +25,12 @@ export interface TraversalConfig {
 
 export interface TraverseEachConfig {
   /**
-   * The amount of time (in ms) to "sleep" before moving on to the next doc. Defaults to 0.
+   * Whether to sleep between moving on to the next doc. Defaults to `false`.
+   */
+  sleepBetweenDocs: boolean;
+
+  /**
+   * The amount of time (in ms) to "sleep" before moving on to the next doc. Defaults to 500.
    */
   sleepTimeBetweenDocs: number;
 }
@@ -43,8 +53,14 @@ interface TraversalResult {
 export class CollectionTraverser<T = firestore.DocumentData> {
   private static defaultConfig: TraversalConfig = {
     batchSize: 100,
+    sleepBetweenBatches: true,
     sleepTimeBetweenBatches: 1_000,
     maxDocCount: Infinity,
+  };
+
+  private static defaultTraverseEachConfig: TraverseEachConfig = {
+    sleepBetweenDocs: false,
+    sleepTimeBetweenDocs: 500,
   };
 
   private readonly config: TraversalConfig;
@@ -65,12 +81,17 @@ export class CollectionTraverser<T = firestore.DocumentData> {
     callback: (snapshot: firestore.QueryDocumentSnapshot<T>) => Promise<void>,
     config: Partial<TraverseEachConfig> = {}
   ): Promise<TraversalResult> {
-    const { sleepTimeBetweenDocs = 0 } = config;
+    const { sleepBetweenDocs, sleepTimeBetweenDocs } = {
+      ...CollectionTraverser.defaultTraverseEachConfig,
+      ...config,
+    };
 
     const { batchCount, docCount } = await this.traverse(async (docSnapshots) => {
       for (let i = 0; i < docSnapshots.length; i++) {
         await callback(docSnapshots[i]);
-        await sleep(sleepTimeBetweenDocs);
+        if (sleepBetweenDocs) {
+          await sleep(sleepTimeBetweenDocs);
+        }
       }
     });
 
@@ -85,7 +106,7 @@ export class CollectionTraverser<T = firestore.DocumentData> {
   public async traverse(
     callback: (batchSnapshots: firestore.QueryDocumentSnapshot<T>[]) => Promise<void>
   ): Promise<TraversalResult> {
-    const { batchSize, maxDocCount } = this.config;
+    const { batchSize, sleepBetweenBatches, sleepTimeBetweenBatches, maxDocCount } = this.config;
 
     let batchCount = 0;
     let docCount = 0;
@@ -111,7 +132,9 @@ export class CollectionTraverser<T = firestore.DocumentData> {
 
       query = query.startAfter(lastDocInBatch).limit(Math.min(maxDocCount - docCount, batchSize));
 
-      await sleep(this.config.sleepTimeBetweenBatches);
+      if (sleepBetweenBatches) {
+        await sleep(sleepTimeBetweenBatches);
+      }
     }
 
     return { batchCount, docCount };
