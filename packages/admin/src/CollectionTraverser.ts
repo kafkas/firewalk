@@ -124,12 +124,11 @@ export class CollectionTraverser<T = firestore.DocumentData> {
 
       await callback(batchDocSnapshots);
 
-      const lastDocInBatch = batchDocSnapshots[batchDocSnapshots.length - 1];
-
       if (docCount === maxDocCount) {
         break;
       }
 
+      const lastDocInBatch = batchDocSnapshots[batchDocSnapshots.length - 1];
       query = query.startAfter(lastDocInBatch).limit(Math.min(maxDocCount - docCount, batchSize));
 
       if (sleepBetweenBatches) {
