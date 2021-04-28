@@ -72,8 +72,9 @@ export class CollectionMigrator<T> extends CollectionTraverser<T> {
   ): Promise<UpdateResult> {
     const argCount = [arg1, arg2, arg3].filter((a) => a !== undefined).length;
     const batch = this.collectionOrQuery.firestore.batch();
+    let updatedDocCount = 0;
 
-    const { batchCount, docCount: updatedDocCount } = await this.traverse(async (snapshots) => {
+    const { batchCount } = await this.traverse(async (snapshots) => {
       snapshots.forEach((snapshot) => {
         if (typeof arg1 === 'function') {
           // Signature 1
@@ -82,6 +83,7 @@ export class CollectionMigrator<T> extends CollectionTraverser<T> {
           const shouldUpdate = predicate?.(snapshot) ?? true;
           if (shouldUpdate) {
             batch.update(snapshot.ref, getUpdateData(snapshot));
+            updatedDocCount++;
           }
         } else if (argCount < 2 || typeof arg2 === 'function') {
           // Signature 2
@@ -90,6 +92,7 @@ export class CollectionMigrator<T> extends CollectionTraverser<T> {
           const shouldUpdate = predicate?.(snapshot) ?? true;
           if (shouldUpdate) {
             batch.update(snapshot.ref, updateData);
+            updatedDocCount++;
           }
         } else {
           // Signature 3
@@ -99,6 +102,7 @@ export class CollectionMigrator<T> extends CollectionTraverser<T> {
           const shouldUpdate = predicate?.(snapshot) ?? true;
           if (shouldUpdate) {
             batch.update(snapshot.ref, field, value);
+            updatedDocCount++;
           }
         }
       });
