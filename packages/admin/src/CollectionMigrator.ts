@@ -8,6 +8,11 @@ interface MigrationResult {
   batchCount: number;
 
   /**
+   * The number of documents that have been retrieved in this traversal.
+   */
+  traversedDocCount: number;
+
+  /**
    * The number of documents that have been migrated.
    */
   migratedDocCount: number;
@@ -68,7 +73,7 @@ export class CollectionMigrator<T> extends CollectionTraverser<T> {
     const batch = this.col.firestore.batch();
     let migratedDocCount = 0;
 
-    const { batchCount } = await this.traverse(async (snapshots) => {
+    const { batchCount, docCount: traversedDocCount } = await this.traverse(async (snapshots) => {
       snapshots.forEach((snapshot) => {
         const data = (() => {
           if (typeof dataOrGetData === 'function') {
@@ -92,7 +97,7 @@ export class CollectionMigrator<T> extends CollectionTraverser<T> {
 
     await batch.commit();
 
-    return { batchCount, migratedDocCount };
+    return { batchCount, traversedDocCount, migratedDocCount };
   }
 
   /**
@@ -145,7 +150,7 @@ export class CollectionMigrator<T> extends CollectionTraverser<T> {
     const batch = this.col.firestore.batch();
     let migratedDocCount = 0;
 
-    const { batchCount } = await this.traverse(async (snapshots) => {
+    const { batchCount, docCount: traversedDocCount } = await this.traverse(async (snapshots) => {
       snapshots.forEach((snapshot) => {
         if (typeof arg1 === 'function') {
           // Signature 1
@@ -181,6 +186,6 @@ export class CollectionMigrator<T> extends CollectionTraverser<T> {
 
     await batch.commit();
 
-    return { batchCount, migratedDocCount };
+    return { batchCount, traversedDocCount, migratedDocCount };
   }
 }
