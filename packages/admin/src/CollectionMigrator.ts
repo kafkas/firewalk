@@ -8,9 +8,9 @@ interface MigrationResult {
   batchCount: number;
 
   /**
-   * The number of documents that have been updated in this migration.
+   * The number of documents that have been migrated.
    */
-  updatedDocCount: number;
+  migratedDocCount: number;
 }
 
 type Predicate<T> = (snapshot: firestore.QueryDocumentSnapshot<T>) => boolean;
@@ -66,7 +66,7 @@ export class CollectionMigrator<T> extends CollectionTraverser<T> {
     predicate?: Predicate<T>
   ): Promise<MigrationResult> {
     const batch = this.col.firestore.batch();
-    let updatedDocCount = 0;
+    let migratedDocCount = 0;
 
     const { batchCount } = await this.traverse(async (snapshots) => {
       snapshots.forEach((snapshot) => {
@@ -85,14 +85,14 @@ export class CollectionMigrator<T> extends CollectionTraverser<T> {
 
         if (shouldMigrate) {
           batch.set(snapshot.ref, data, options as any);
-          updatedDocCount++;
+          migratedDocCount++;
         }
       });
     });
 
     await batch.commit();
 
-    return { batchCount, updatedDocCount };
+    return { batchCount, migratedDocCount };
   }
 
   /**
@@ -143,7 +143,7 @@ export class CollectionMigrator<T> extends CollectionTraverser<T> {
   ): Promise<MigrationResult> {
     const argCount = [arg1, arg2, arg3].filter((a) => a !== undefined).length;
     const batch = this.col.firestore.batch();
-    let updatedDocCount = 0;
+    let migratedDocCount = 0;
 
     const { batchCount } = await this.traverse(async (snapshots) => {
       snapshots.forEach((snapshot) => {
@@ -154,7 +154,7 @@ export class CollectionMigrator<T> extends CollectionTraverser<T> {
           const shouldUpdate = predicate?.(snapshot) ?? true;
           if (shouldUpdate) {
             batch.update(snapshot.ref, getUpdateData(snapshot));
-            updatedDocCount++;
+            migratedDocCount++;
           }
         } else if (argCount < 2 || typeof arg2 === 'function') {
           // Signature 2
@@ -163,7 +163,7 @@ export class CollectionMigrator<T> extends CollectionTraverser<T> {
           const shouldUpdate = predicate?.(snapshot) ?? true;
           if (shouldUpdate) {
             batch.update(snapshot.ref, updateData);
-            updatedDocCount++;
+            migratedDocCount++;
           }
         } else {
           // Signature 3
@@ -173,7 +173,7 @@ export class CollectionMigrator<T> extends CollectionTraverser<T> {
           const shouldUpdate = predicate?.(snapshot) ?? true;
           if (shouldUpdate) {
             batch.update(snapshot.ref, field, value);
-            updatedDocCount++;
+            migratedDocCount++;
           }
         }
       });
@@ -181,6 +181,6 @@ export class CollectionMigrator<T> extends CollectionTraverser<T> {
 
     await batch.commit();
 
-    return { batchCount, updatedDocCount };
+    return { batchCount, migratedDocCount };
   }
 }
