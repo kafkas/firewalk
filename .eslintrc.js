@@ -18,7 +18,12 @@ module.exports = {
   },
   plugins: ['@typescript-eslint', 'import', 'prettier'],
   rules: {
-    '@typescript-eslint/explicit-function-return-type': 2,
+    '@typescript-eslint/explicit-function-return-type': [
+      2,
+      {
+        allowExpressions: true,
+      },
+    ],
     '@typescript-eslint/explicit-module-boundary-types': 0,
     '@typescript-eslint/no-explicit-any': 0,
     'no-constant-condition': 0,

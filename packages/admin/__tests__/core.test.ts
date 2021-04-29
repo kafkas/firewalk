@@ -8,7 +8,7 @@ function doStuff(obj: Record<string, number>, condition: string): void;
 function doStuff(
   param1: ((nowTimestamp: number) => void) | Record<string, number>,
   condition?: string
-) {
+): void {
   // ...
 }
 
