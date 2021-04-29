@@ -66,7 +66,10 @@ export class CollectionTraverser<T = firestore.DocumentData> {
   private readonly config: TraversalConfig;
 
   public constructor(
-    protected readonly collectionOrQuery: firestore.CollectionReference<T> | firestore.Query<T>,
+    protected readonly col:
+      | firestore.CollectionReference<T>
+      | firestore.CollectionGroup<T>
+      | firestore.Query<T>,
     config: Partial<TraversalConfig> = {}
   ) {
     this.config = { ...CollectionTraverser.defaultConfig, ...config };
@@ -110,7 +113,7 @@ export class CollectionTraverser<T = firestore.DocumentData> {
 
     let batchCount = 0;
     let docCount = 0;
-    let query = this.collectionOrQuery.limit(Math.min(batchSize, maxDocCount));
+    let query = this.col.limit(Math.min(batchSize, maxDocCount));
 
     while (true) {
       const { docs: batchDocSnapshots } = await query.get();

@@ -71,7 +71,7 @@ export class CollectionMigrator<T> extends CollectionTraverser<T> {
     arg3?: UpdatePredicate<T>
   ): Promise<UpdateResult> {
     const argCount = [arg1, arg2, arg3].filter((a) => a !== undefined).length;
-    const batch = this.collectionOrQuery.firestore.batch();
+    const batch = this.col.firestore.batch();
     let updatedDocCount = 0;
 
     const { batchCount } = await this.traverse(async (snapshots) => {
