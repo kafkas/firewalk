@@ -16,7 +16,7 @@ interface UpdateResult {
   updatedDocCount: number;
 }
 
-type UpdatePredicate<T> = (snapshot: firestore.QueryDocumentSnapshot<T>) => boolean;
+type Predicate<T> = (snapshot: firestore.QueryDocumentSnapshot<T>) => boolean;
 
 type UpdateDataGetter<T> = (snapshot: firestore.QueryDocumentSnapshot<T>) => firestore.UpdateData;
 
@@ -34,7 +34,7 @@ export class CollectionMigrator<T> extends CollectionTraverser<T> {
    */
   public update(
     getUpdateData: UpdateDataGetter<T>,
-    predicate?: UpdatePredicate<T>
+    predicate?: Predicate<T>
   ): Promise<UpdateResult>;
 
   /**
@@ -45,10 +45,7 @@ export class CollectionMigrator<T> extends CollectionTraverser<T> {
    * @param predicate - Optional. A function that returns a boolean indicating whether to update the current document. Takes the `QueryDocumentSnapshot` corresponding to the document as its first argument. If this is not provided, all documents will be updated.
    * @returns The number of batches and documents updated.
    */
-  public update(
-    updateData: firestore.UpdateData,
-    predicate?: UpdatePredicate<T>
-  ): Promise<UpdateResult>;
+  public update(updateData: firestore.UpdateData, predicate?: Predicate<T>): Promise<UpdateResult>;
 
   /**
    * Updates all documents in this collection with the provided update data. Uses batch writes so
@@ -62,13 +59,13 @@ export class CollectionMigrator<T> extends CollectionTraverser<T> {
   public update(
     field: string | firestore.FieldPath,
     value: any,
-    predicate?: UpdatePredicate<T>
+    predicate?: Predicate<T>
   ): Promise<UpdateResult>;
 
   public async update(
     arg1: firestore.UpdateData | string | firestore.FieldPath | UpdateDataGetter<T>,
     arg2?: any,
-    arg3?: UpdatePredicate<T>
+    arg3?: Predicate<T>
   ): Promise<UpdateResult> {
     const argCount = [arg1, arg2, arg3].filter((a) => a !== undefined).length;
     const batch = this.col.firestore.batch();
@@ -79,7 +76,7 @@ export class CollectionMigrator<T> extends CollectionTraverser<T> {
         if (typeof arg1 === 'function') {
           // Signature 1
           const getUpdateData = arg1 as UpdateDataGetter<T>;
-          const predicate = arg2 as UpdatePredicate<T> | undefined;
+          const predicate = arg2 as Predicate<T> | undefined;
           const shouldUpdate = predicate?.(snapshot) ?? true;
           if (shouldUpdate) {
             batch.update(snapshot.ref, getUpdateData(snapshot));
@@ -88,7 +85,7 @@ export class CollectionMigrator<T> extends CollectionTraverser<T> {
         } else if (argCount < 2 || typeof arg2 === 'function') {
           // Signature 2
           const updateData = arg1 as firestore.UpdateData;
-          const predicate = arg2 as UpdatePredicate<T> | undefined;
+          const predicate = arg2 as Predicate<T> | undefined;
           const shouldUpdate = predicate?.(snapshot) ?? true;
           if (shouldUpdate) {
             batch.update(snapshot.ref, updateData);
@@ -98,7 +95,7 @@ export class CollectionMigrator<T> extends CollectionTraverser<T> {
           // Signature 3
           const field = arg1 as string | firestore.FieldPath;
           const value = arg2 as any;
-          const predicate = arg3 as UpdatePredicate<T> | undefined;
+          const predicate = arg3 as Predicate<T> | undefined;
           const shouldUpdate = predicate?.(snapshot) ?? true;
           if (shouldUpdate) {
             batch.update(snapshot.ref, field, value);
