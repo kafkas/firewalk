@@ -1,51 +1,6 @@
 import type { firestore } from 'firebase-admin';
+import type { Traversable, TraversalConfig, TraverseEachConfig, TraversalResult } from './types';
 import { sleep } from './utils';
-
-export interface TraversalConfig {
-  /**
-   * The number of documents that will be traversed in each batch. Defaults to 100.
-   */
-  batchSize: number;
-
-  /**
-   * Whether to sleep between batches. Defaults to `true`.
-   */
-  sleepBetweenBatches: boolean;
-
-  /**
-   * The amount of time (in ms) to "sleep" before moving on to the next batch. Defaults to 1000.
-   */
-  sleepTimeBetweenBatches: number;
-
-  /**
-   * The maximum number of documents that will be traversed. Defaults to `Infinity`.
-   */
-  maxDocCount: number;
-}
-
-export interface TraverseEachConfig {
-  /**
-   * Whether to sleep between moving on to the next doc. Defaults to `false`.
-   */
-  sleepBetweenDocs: boolean;
-
-  /**
-   * The amount of time (in ms) to "sleep" before moving on to the next doc. Defaults to 500.
-   */
-  sleepTimeBetweenDocs: number;
-}
-
-interface TraversalResult {
-  /**
-   * The number of batches that have been retrieved in this traversal.
-   */
-  batchCount: number;
-
-  /**
-   * The number of documents that have been retrieved in this traversal.
-   */
-  docCount: number;
-}
 
 /**
  * An object that facilitates Firestore collection traversals.
@@ -66,10 +21,7 @@ export class CollectionTraverser<T = firestore.DocumentData> {
   private readonly config: TraversalConfig;
 
   public constructor(
-    protected readonly col:
-      | firestore.CollectionReference<T>
-      | firestore.CollectionGroup<T>
-      | firestore.Query<T>,
+    protected readonly traversable: Traversable<T>,
     config: Partial<TraversalConfig> = {}
   ) {
     this.config = { ...CollectionTraverser.defaultConfig, ...config };
@@ -113,7 +65,7 @@ export class CollectionTraverser<T = firestore.DocumentData> {
 
     let batchCount = 0;
     let docCount = 0;
-    let query = this.col.limit(Math.min(batchSize, maxDocCount));
+    let query = this.traversable.limit(Math.min(batchSize, maxDocCount));
 
     while (true) {
       const { docs: batchDocSnapshots } = await query.get();

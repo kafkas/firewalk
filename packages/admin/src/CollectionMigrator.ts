@@ -1,24 +1,8 @@
 import type { firestore } from 'firebase-admin';
+import type { Traversable, TraversalConfig, MigrationResult } from './types';
 import { CollectionTraverser } from './CollectionTraverser';
 
-interface MigrationResult {
-  /**
-   * The number of batches that have been retrieved in this traversal.
-   */
-  batchCount: number;
-
-  /**
-   * The number of documents that have been retrieved in this traversal.
-   */
-  traversedDocCount: number;
-
-  /**
-   * The number of documents that have been migrated.
-   */
-  migratedDocCount: number;
-}
-
-type Predicate<T> = (snapshot: firestore.QueryDocumentSnapshot<T>) => boolean;
+type MigrationPredicate<T> = (snapshot: firestore.QueryDocumentSnapshot<T>) => boolean;
 
 type UpdateDataGetter<T> = (snapshot: firestore.QueryDocumentSnapshot<T>) => firestore.UpdateData;
 
@@ -34,7 +18,16 @@ type SetDataGetter<T, M> = (snapshot: firestore.QueryDocumentSnapshot<T>) => Set
 /**
  * An object that facilitates Firestore collection migrations.
  */
-export class CollectionMigrator<T> extends CollectionTraverser<T> {
+export class CollectionMigrator<T = firestore.DocumentData> {
+  private traverser: CollectionTraverser<T>;
+
+  public constructor(
+    private readonly traversable: Traversable<T>,
+    traversalConfig?: Partial<TraversalConfig>
+  ) {
+    this.traverser = new CollectionTraverser<T>(traversable, traversalConfig);
+  }
+
   /**
    * Sets all documents in this collection with the provided update data. Uses batch writes so
    * the entire batch will fail if a single update isn't successful. This method uses the `.traverse()`
@@ -47,7 +40,7 @@ export class CollectionMigrator<T> extends CollectionTraverser<T> {
   public set<M extends boolean | undefined>(
     getData: SetDataGetter<T, M>,
     options?: SetOptions<M>,
-    predicate?: Predicate<T>
+    predicate?: MigrationPredicate<T>
   ): Promise<MigrationResult>;
 
   /**
@@ -62,38 +55,40 @@ export class CollectionMigrator<T> extends CollectionTraverser<T> {
   public set<M extends boolean | undefined>(
     data: SetData<T, M>,
     options?: SetOptions<M>,
-    predicate?: Predicate<T>
+    predicate?: MigrationPredicate<T>
   ): Promise<MigrationResult>;
 
   public async set<M extends boolean | undefined>(
     dataOrGetData: SetData<T, M> | SetDataGetter<T, M>,
     options?: SetOptions<M>,
-    predicate?: Predicate<T>
+    predicate?: MigrationPredicate<T>
   ): Promise<MigrationResult> {
-    const batch = this.col.firestore.batch();
+    const batch = this.traversable.firestore.batch();
     let migratedDocCount = 0;
 
-    const { batchCount, docCount: traversedDocCount } = await this.traverse(async (snapshots) => {
-      snapshots.forEach((snapshot) => {
-        const data = (() => {
-          if (typeof dataOrGetData === 'function') {
-            // Signature 1
-            const getData = dataOrGetData as SetDataGetter<T, M>;
-            return getData(snapshot);
-          } else {
-            // Signature 2
-            return dataOrGetData as SetData<T, M>;
+    const { batchCount, docCount: traversedDocCount } = await this.traverser.traverse(
+      async (snapshots) => {
+        snapshots.forEach((snapshot) => {
+          const data = (() => {
+            if (typeof dataOrGetData === 'function') {
+              // Signature 1
+              const getData = dataOrGetData as SetDataGetter<T, M>;
+              return getData(snapshot);
+            } else {
+              // Signature 2
+              return dataOrGetData as SetData<T, M>;
+            }
+          })();
+
+          const shouldMigrate = predicate?.(snapshot) ?? true;
+
+          if (shouldMigrate) {
+            batch.set(snapshot.ref, data, options as any);
+            migratedDocCount++;
           }
-        })();
-
-        const shouldMigrate = predicate?.(snapshot) ?? true;
-
-        if (shouldMigrate) {
-          batch.set(snapshot.ref, data, options as any);
-          migratedDocCount++;
-        }
-      });
-    });
+        });
+      }
+    );
 
     await batch.commit();
 
@@ -110,7 +105,7 @@ export class CollectionMigrator<T> extends CollectionTraverser<T> {
    */
   public update(
     getUpdateData: UpdateDataGetter<T>,
-    predicate?: Predicate<T>
+    predicate?: MigrationPredicate<T>
   ): Promise<MigrationResult>;
 
   /**
@@ -123,7 +118,7 @@ export class CollectionMigrator<T> extends CollectionTraverser<T> {
    */
   public update(
     updateData: firestore.UpdateData,
-    predicate?: Predicate<T>
+    predicate?: MigrationPredicate<T>
   ): Promise<MigrationResult>;
 
   /**
@@ -138,51 +133,53 @@ export class CollectionMigrator<T> extends CollectionTraverser<T> {
   public update(
     field: string | firestore.FieldPath,
     value: any,
-    predicate?: Predicate<T>
+    predicate?: MigrationPredicate<T>
   ): Promise<MigrationResult>;
 
   public async update(
     arg1: firestore.UpdateData | string | firestore.FieldPath | UpdateDataGetter<T>,
     arg2?: any,
-    arg3?: Predicate<T>
+    arg3?: MigrationPredicate<T>
   ): Promise<MigrationResult> {
     const argCount = [arg1, arg2, arg3].filter((a) => a !== undefined).length;
-    const batch = this.col.firestore.batch();
+    const batch = this.traversable.firestore.batch();
     let migratedDocCount = 0;
 
-    const { batchCount, docCount: traversedDocCount } = await this.traverse(async (snapshots) => {
-      snapshots.forEach((snapshot) => {
-        if (typeof arg1 === 'function') {
-          // Signature 1
-          const getUpdateData = arg1 as UpdateDataGetter<T>;
-          const predicate = arg2 as Predicate<T> | undefined;
-          const shouldUpdate = predicate?.(snapshot) ?? true;
-          if (shouldUpdate) {
-            batch.update(snapshot.ref, getUpdateData(snapshot));
-            migratedDocCount++;
+    const { batchCount, docCount: traversedDocCount } = await this.traverser.traverse(
+      async (snapshots) => {
+        snapshots.forEach((snapshot) => {
+          if (typeof arg1 === 'function') {
+            // Signature 1
+            const getUpdateData = arg1 as UpdateDataGetter<T>;
+            const predicate = arg2 as MigrationPredicate<T> | undefined;
+            const shouldUpdate = predicate?.(snapshot) ?? true;
+            if (shouldUpdate) {
+              batch.update(snapshot.ref, getUpdateData(snapshot));
+              migratedDocCount++;
+            }
+          } else if (argCount < 2 || typeof arg2 === 'function') {
+            // Signature 2
+            const updateData = arg1 as firestore.UpdateData;
+            const predicate = arg2 as MigrationPredicate<T> | undefined;
+            const shouldUpdate = predicate?.(snapshot) ?? true;
+            if (shouldUpdate) {
+              batch.update(snapshot.ref, updateData);
+              migratedDocCount++;
+            }
+          } else {
+            // Signature 3
+            const field = arg1 as string | firestore.FieldPath;
+            const value = arg2 as any;
+            const predicate = arg3 as MigrationPredicate<T> | undefined;
+            const shouldUpdate = predicate?.(snapshot) ?? true;
+            if (shouldUpdate) {
+              batch.update(snapshot.ref, field, value);
+              migratedDocCount++;
+            }
           }
-        } else if (argCount < 2 || typeof arg2 === 'function') {
-          // Signature 2
-          const updateData = arg1 as firestore.UpdateData;
-          const predicate = arg2 as Predicate<T> | undefined;
-          const shouldUpdate = predicate?.(snapshot) ?? true;
-          if (shouldUpdate) {
-            batch.update(snapshot.ref, updateData);
-            migratedDocCount++;
-          }
-        } else {
-          // Signature 3
-          const field = arg1 as string | firestore.FieldPath;
-          const value = arg2 as any;
-          const predicate = arg3 as Predicate<T> | undefined;
-          const shouldUpdate = predicate?.(snapshot) ?? true;
-          if (shouldUpdate) {
-            batch.update(snapshot.ref, field, value);
-            migratedDocCount++;
-          }
-        }
-      });
-    });
+        });
+      }
+    );
 
     await batch.commit();
 
