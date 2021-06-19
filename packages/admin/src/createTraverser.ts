@@ -1,7 +1,7 @@
 import type { firestore } from 'firebase-admin';
 import type { CollectionTraverser } from './CollectionTraverser';
 import type { Traversable, TraversalConfig, TraverseEachConfig, TraversalResult } from './types';
-import { sleep } from './utils';
+import { sleep } from './_utils';
 
 const defaultTraversalConfig: TraversalConfig = {
   batchSize: 100,

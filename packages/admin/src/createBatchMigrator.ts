@@ -8,7 +8,7 @@ import type {
   SetDataGetter,
 } from './CollectionMigrator';
 import type { Traversable, TraversalConfig, MigrationResult } from './types';
-import { createTraverser } from './traverser';
+import { createTraverser } from './createTraverser';
 
 /**
  * Creates a migrator object that facilitates Firestore collection migrations. Uses batch writes when writing
