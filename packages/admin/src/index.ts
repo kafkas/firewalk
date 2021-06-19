@@ -3,10 +3,4 @@ export { CollectionTraverser } from './CollectionTraverser';
 export { createBatchMigrator } from './createBatchMigrator';
 export { createTraverser } from './createTraverser';
 
-export type {
-  Traversable,
-  TraversalConfig,
-  TraverseEachConfig,
-  TraversalResult,
-  MigrationResult,
-} from './types';
+export * from './types';
