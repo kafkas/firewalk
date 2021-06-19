@@ -18,9 +18,7 @@ export type SetDataGetter<T, M> = (snapshot: firestore.QueryDocumentSnapshot<T>)
 
 export interface CollectionMigrator<T = firestore.DocumentData> {
   /**
-   * Sets all documents in this collection with the provided update data. Uses batch writes so
-   * the entire batch will fail if a single update isn't successful. This method uses the `.traverse()`
-   * method internally to traverse the entire collection.
+   * Sets all documents in this collection with the provided update data.
    * @param getData - A function that returns an object with which to set each document.
    * @param options - Optional. An object to configure the set behavior.
    * @param predicate - Optional. A function that returns a boolean indicating whether to migrate the current document. Takes the `QueryDocumentSnapshot` corresponding to the document as its first argument. If this is not provided, all documents will be migrated.
@@ -33,9 +31,7 @@ export interface CollectionMigrator<T = firestore.DocumentData> {
   ): Promise<MigrationResult>;
 
   /**
-   * Sets all documents in this collection with the provided update data. Uses batch writes so
-   * the entire batch will fail if a single set isn't successful. This method uses the `.traverse()`
-   * method internally to traverse the entire collection.
+   * Sets all documents in this collection with the provided update data.
    * @param data - The data with which to set each document.
    * @param options - Optional. An object to configure the set behavior.
    * @param predicate - Optional. A function that returns a boolean indicating whether to migrate the current document. Takes the `QueryDocumentSnapshot` corresponding to the document as its first argument. If this is not provided, all documents will be migrated.
@@ -48,9 +44,7 @@ export interface CollectionMigrator<T = firestore.DocumentData> {
   ): Promise<MigrationResult>;
 
   /**
-   * Updates all documents in this collection with the provided update data. Uses batch writes so
-   * the entire batch will fail if a single update isn't successful. This method uses the `.traverse()`
-   * method internally to traverse the entire collection.
+   * Updates all documents in this collection with the provided update data.
    * @param getUpdateData - A function that returns an object with which to update each document (i.e. the `updateData` object).
    * @param predicate - Optional. A function that returns a boolean indicating whether to update the current document. Takes the `QueryDocumentSnapshot` corresponding to the document as its first argument. If this is not provided, all documents will be updated.
    * @returns The number of batches and documents updated.
@@ -61,9 +55,7 @@ export interface CollectionMigrator<T = firestore.DocumentData> {
   ): Promise<MigrationResult>;
 
   /**
-   * Updates all documents in this collection with the provided update data. Uses batch writes so
-   * the entire batch will fail if a single update isn't successful. This method uses the `.traverse()`
-   * method internally to traverse the entire collection.
+   * Updates all documents in this collection with the provided update data.
    * @param updateData - The data with which to update each document. Must be a non-empty object.
    * @param predicate - Optional. A function that returns a boolean indicating whether to update the current document. Takes the `QueryDocumentSnapshot` corresponding to the document as its first argument. If this is not provided, all documents will be updated.
    * @returns The number of batches and documents updated.
@@ -74,9 +66,7 @@ export interface CollectionMigrator<T = firestore.DocumentData> {
   ): Promise<MigrationResult>;
 
   /**
-   * Updates all documents in this collection with the provided update data. Uses batch writes so
-   * the entire batch will fail if a single update isn't successful. This method uses the `.traverse()`
-   * method internally to traverse the entire collection.
+   * Updates all documents in this collection with the provided update data.
    * @param field - The field to update in each document.
    * @param value - The value with which to update the specified field in each document. Must not be `undefined`.
    * @param predicate - Optional. A function that returns a boolean indicating whether to update the current document. Takes the `QueryDocumentSnapshot` corresponding to the document as its first argument. If this is not provided, all documents will be updated.
