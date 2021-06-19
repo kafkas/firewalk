@@ -1,33 +1,22 @@
 import type { firestore } from 'firebase-admin';
-import type { Traversable, TraversalConfig, MigrationResult } from './types';
-import { CollectionTraverser } from './CollectionTraverser';
+import type { MigrationResult } from './types';
 
-type MigrationPredicate<T> = (snapshot: firestore.QueryDocumentSnapshot<T>) => boolean;
+export type MigrationPredicate<T> = (snapshot: firestore.QueryDocumentSnapshot<T>) => boolean;
 
-type UpdateDataGetter<T> = (snapshot: firestore.QueryDocumentSnapshot<T>) => firestore.UpdateData;
+export type UpdateDataGetter<T> = (
+  snapshot: firestore.QueryDocumentSnapshot<T>
+) => firestore.UpdateData;
 
-type SetData<T, M> = undefined extends M ? T : false extends M ? T : Partial<T>;
+export type SetData<T, M> = undefined extends M ? T : false extends M ? T : Partial<T>;
 
-type SetOptions<M> = {
+export type SetOptions<M> = {
   merge?: M;
   mergeFields?: (string | firestore.FieldPath)[];
 };
 
-type SetDataGetter<T, M> = (snapshot: firestore.QueryDocumentSnapshot<T>) => SetData<T, M>;
+export type SetDataGetter<T, M> = (snapshot: firestore.QueryDocumentSnapshot<T>) => SetData<T, M>;
 
-/**
- * An object that facilitates Firestore collection migrations.
- */
-export class CollectionMigrator<T = firestore.DocumentData> {
-  private traverser: CollectionTraverser<T>;
-
-  public constructor(
-    private readonly traversable: Traversable<T>,
-    traversalConfig?: Partial<TraversalConfig>
-  ) {
-    this.traverser = new CollectionTraverser<T>(traversable, traversalConfig);
-  }
-
+export interface CollectionMigrator<T = firestore.DocumentData> {
   /**
    * Sets all documents in this collection with the provided update data. Uses batch writes so
    * the entire batch will fail if a single update isn't successful. This method uses the `.traverse()`
@@ -37,7 +26,7 @@ export class CollectionMigrator<T = firestore.DocumentData> {
    * @param predicate - Optional. A function that returns a boolean indicating whether to migrate the current document. Takes the `QueryDocumentSnapshot` corresponding to the document as its first argument. If this is not provided, all documents will be migrated.
    * @returns The number of batches and documents migrated.
    */
-  public set<M extends boolean | undefined>(
+  set<M extends boolean | undefined>(
     getData: SetDataGetter<T, M>,
     options?: SetOptions<M>,
     predicate?: MigrationPredicate<T>
@@ -52,48 +41,11 @@ export class CollectionMigrator<T = firestore.DocumentData> {
    * @param predicate - Optional. A function that returns a boolean indicating whether to migrate the current document. Takes the `QueryDocumentSnapshot` corresponding to the document as its first argument. If this is not provided, all documents will be migrated.
    * @returns The number of batches and documents migrated.
    */
-  public set<M extends boolean | undefined>(
+  set<M extends boolean | undefined>(
     data: SetData<T, M>,
     options?: SetOptions<M>,
     predicate?: MigrationPredicate<T>
   ): Promise<MigrationResult>;
-
-  public async set<M extends boolean | undefined>(
-    dataOrGetData: SetData<T, M> | SetDataGetter<T, M>,
-    options?: SetOptions<M>,
-    predicate?: MigrationPredicate<T>
-  ): Promise<MigrationResult> {
-    const batch = this.traversable.firestore.batch();
-    let migratedDocCount = 0;
-
-    const { batchCount, docCount: traversedDocCount } = await this.traverser.traverse(
-      async (snapshots) => {
-        snapshots.forEach((snapshot) => {
-          const data = (() => {
-            if (typeof dataOrGetData === 'function') {
-              // Signature 1
-              const getData = dataOrGetData as SetDataGetter<T, M>;
-              return getData(snapshot);
-            } else {
-              // Signature 2
-              return dataOrGetData as SetData<T, M>;
-            }
-          })();
-
-          const shouldMigrate = predicate?.(snapshot) ?? true;
-
-          if (shouldMigrate) {
-            batch.set(snapshot.ref, data, options as any);
-            migratedDocCount++;
-          }
-        });
-      }
-    );
-
-    await batch.commit();
-
-    return { batchCount, traversedDocCount, migratedDocCount };
-  }
 
   /**
    * Updates all documents in this collection with the provided update data. Uses batch writes so
@@ -103,7 +55,7 @@ export class CollectionMigrator<T = firestore.DocumentData> {
    * @param predicate - Optional. A function that returns a boolean indicating whether to update the current document. Takes the `QueryDocumentSnapshot` corresponding to the document as its first argument. If this is not provided, all documents will be updated.
    * @returns The number of batches and documents updated.
    */
-  public update(
+  update(
     getUpdateData: UpdateDataGetter<T>,
     predicate?: MigrationPredicate<T>
   ): Promise<MigrationResult>;
@@ -116,7 +68,7 @@ export class CollectionMigrator<T = firestore.DocumentData> {
    * @param predicate - Optional. A function that returns a boolean indicating whether to update the current document. Takes the `QueryDocumentSnapshot` corresponding to the document as its first argument. If this is not provided, all documents will be updated.
    * @returns The number of batches and documents updated.
    */
-  public update(
+  update(
     updateData: firestore.UpdateData,
     predicate?: MigrationPredicate<T>
   ): Promise<MigrationResult>;
@@ -130,59 +82,9 @@ export class CollectionMigrator<T = firestore.DocumentData> {
    * @param predicate - Optional. A function that returns a boolean indicating whether to update the current document. Takes the `QueryDocumentSnapshot` corresponding to the document as its first argument. If this is not provided, all documents will be updated.
    * @returns The number of batches and documents updated.
    */
-  public update(
+  update(
     field: string | firestore.FieldPath,
     value: any,
     predicate?: MigrationPredicate<T>
   ): Promise<MigrationResult>;
-
-  public async update(
-    arg1: firestore.UpdateData | string | firestore.FieldPath | UpdateDataGetter<T>,
-    arg2?: any,
-    arg3?: MigrationPredicate<T>
-  ): Promise<MigrationResult> {
-    const argCount = [arg1, arg2, arg3].filter((a) => a !== undefined).length;
-    const batch = this.traversable.firestore.batch();
-    let migratedDocCount = 0;
-
-    const { batchCount, docCount: traversedDocCount } = await this.traverser.traverse(
-      async (snapshots) => {
-        snapshots.forEach((snapshot) => {
-          if (typeof arg1 === 'function') {
-            // Signature 1
-            const getUpdateData = arg1 as UpdateDataGetter<T>;
-            const predicate = arg2 as MigrationPredicate<T> | undefined;
-            const shouldUpdate = predicate?.(snapshot) ?? true;
-            if (shouldUpdate) {
-              batch.update(snapshot.ref, getUpdateData(snapshot));
-              migratedDocCount++;
-            }
-          } else if (argCount < 2 || typeof arg2 === 'function') {
-            // Signature 2
-            const updateData = arg1 as firestore.UpdateData;
-            const predicate = arg2 as MigrationPredicate<T> | undefined;
-            const shouldUpdate = predicate?.(snapshot) ?? true;
-            if (shouldUpdate) {
-              batch.update(snapshot.ref, updateData);
-              migratedDocCount++;
-            }
-          } else {
-            // Signature 3
-            const field = arg1 as string | firestore.FieldPath;
-            const value = arg2 as any;
-            const predicate = arg3 as MigrationPredicate<T> | undefined;
-            const shouldUpdate = predicate?.(snapshot) ?? true;
-            if (shouldUpdate) {
-              batch.update(snapshot.ref, field, value);
-              migratedDocCount++;
-            }
-          }
-        });
-      }
-    );
-
-    await batch.commit();
-
-    return { batchCount, traversedDocCount, migratedDocCount };
-  }
 }
