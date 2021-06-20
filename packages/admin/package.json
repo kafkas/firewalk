@@ -1,11 +1,22 @@
 {
   "name": "@firecode/admin",
   "version": "0.2.1",
-  "description": "",
+  "description": "A collection traversal library for Firestore",
+  "keywords": [
+    "Firecode",
+    "firecode",
+    "firecode admin",
+    "Firebase",
+    "firebase",
+    "TypeScript",
+    "typescript",
+    "cloud firestore"
+  ],
   "author": "Anar Kafkas <anarkafkas@gmail.com>",
   "homepage": "https://github.com/kafkas/firecode#readme",
   "license": "MIT",
   "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
   "directories": {
     "lib": "lib",
     "test": "__tests__"
