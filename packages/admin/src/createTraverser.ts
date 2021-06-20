@@ -1,7 +1,7 @@
 import type { firestore } from 'firebase-admin';
 import type { CollectionTraverser } from './CollectionTraverser';
 import type { Traversable, TraversalConfig, TraverseEachConfig, TraversalResult } from './types';
-import { sleep } from './_utils';
+import { sleep, isPositiveInteger } from './_utils';
 
 const defaultTraversalConfig: TraversalConfig = {
   batchSize: 100,
@@ -15,6 +15,23 @@ const defaultTraverseEachConfig: TraverseEachConfig = {
   sleepTimeBetweenDocs: 500,
 };
 
+function assertPositiveIntegerInConfig(
+  num: number | undefined,
+  field: keyof TraversalConfig
+): asserts num {
+  if (typeof num === 'number' && !isPositiveInteger(num)) {
+    throw new Error(`The '${field}' field in traversal config must be a positive integer.`);
+  }
+}
+
+function validateTraversalConfig(c: Partial<TraversalConfig> = {}): void {
+  const { batchSize, sleepTimeBetweenBatches, maxDocCount } = c;
+
+  assertPositiveIntegerInConfig(batchSize, 'batchSize');
+  assertPositiveIntegerInConfig(sleepTimeBetweenBatches, 'sleepTimeBetweenBatches');
+  assertPositiveIntegerInConfig(maxDocCount, 'maxDocCount');
+}
+
 /**
  * Creates a traverser object that facilitates Firestore collection traversals.
  */
@@ -22,10 +39,13 @@ export function createTraverser<T = firestore.DocumentData>(
   traversable: Traversable<T>,
   config: Partial<TraversalConfig> = {}
 ): CollectionTraverser<T> {
+  validateTraversalConfig(config);
+
   class DefaultCollectionTraverser implements CollectionTraverser<T> {
     private traversalConfig: TraversalConfig = { ...defaultTraversalConfig, ...config };
 
     public setConfig(c: Partial<TraversalConfig>): CollectionTraverser<T> {
+      validateTraversalConfig(c);
       this.traversalConfig = { ...this.traversalConfig, ...c };
       return this;
     }
