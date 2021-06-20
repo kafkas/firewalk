@@ -37,6 +37,47 @@ Then run
 npm install @firecode/admin
 ```
 
+## Quick Start
+
+Suppose we want to send an email to all our users. We have a `users` collection that needs to be traversed. The following piece of code uses a Firecode traverser to do this simply and efficiently.
+
+```ts
+import { firestore } from 'firebase-admin';
+import { createTraverser } from '@firecode/admin';
+
+const users = firestore().collection('users');
+
+const traverser = createTraverser(users, {
+  // We want each batch to have 500 docs. Obviously, the size of the very last batch may be less than 500
+  batchSize: 500,
+  // We want to wait before moving to the next batch
+  sleepBetweenBatches: true,
+  // We'll wait 500ms before moving to the next batch
+  sleepTimeBetweenBatches: 500,
+});
+
+const { batchCount, docCount } = await traverser.traverse(async (snapshots) => {
+  const batchSize = snapshots.length;
+  const sendEmailToUsers = snapshots.map(async (snapshot) => {
+    const { email, firstName } = snapshot.data();
+    await sendEmail({ to: email, content: `Hello ${firstName}!` });
+  });
+  await Promise.all(sendEmailToUsers);
+
+  console.log(`Sent email to ${batchSize} users in this batch.`);
+});
+
+console.log(`Traversal done! We sent an email to ${docCount} users in ${batchCount} batches!`);
+```
+
+We are doing 3 things here:
+
+1. Create a reference to the `users` collection
+2. Pass that reference to the `createTraverser()` function and create the traverser with our desired configuration
+3. Invoke `.traverse()` with an async callback that is called for each batch of document snapshots
+
+This pretty much sums up the core functionality of this library! The `.traverse()` method returns a Promise that resolves when the entire traversal finishes, which can take a while if you have millions of docs. The Promise resolves with an object containing the traversal details e.g. the number of docs you touched.
+
 ## License
 
 This project is made available under the MIT License.
