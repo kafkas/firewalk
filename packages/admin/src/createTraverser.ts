@@ -82,7 +82,7 @@ export function createTraverser<T = firestore.DocumentData>(
         }
 
         const lastDocInBatch = batchDocSnapshots[batchDocSnapshots.length - 1];
-        query = query.startAfter(lastDocInBatch).limit(Math.min(maxDocCount - docCount, batchSize));
+        query = query.startAfter(lastDocInBatch).limit(Math.min(batchSize, maxDocCount - docCount));
 
         if (sleepBetweenBatches) {
           await sleep(sleepTimeBetweenBatches);

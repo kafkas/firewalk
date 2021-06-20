@@ -10,6 +10,16 @@ import type {
 import type { Traversable, TraversalConfig, MigrationResult } from './types';
 import { createTraverser } from './createTraverser';
 
+const MAX_BATCH_WRITE_DOC_COUNT = 500;
+
+function validateBatchMigratorTraversalConfig(c: Partial<TraversalConfig> = {}): void {
+  if (typeof c.batchSize === 'number' && c.batchSize > MAX_BATCH_WRITE_DOC_COUNT) {
+    throw new Error(
+      `The batch size for a batch migrator cannot exceed ${MAX_BATCH_WRITE_DOC_COUNT}. In Firestore, each transaction or batch of writes can write to a maximum of ${MAX_BATCH_WRITE_DOC_COUNT} documents.`
+    );
+  }
+}
+
 /**
  * Creates a migrator object that facilitates Firestore collection migrations. Uses batch writes when writing
  * to documents so the entire operation will fail if a single write isn't successful. Uses a traverser object
@@ -19,13 +29,13 @@ export function createBatchMigrator<T = firestore.DocumentData>(
   traversable: Traversable<T>,
   traversalConfig?: Partial<TraversalConfig>
 ): CollectionMigrator<T> {
-  // TODO: Throw an error if traversalConfig.batchSize > 500
+  validateBatchMigratorTraversalConfig(traversalConfig);
 
   class CollectionBatchMigrator implements CollectionMigrator<T> {
     private traverser = createTraverser(traversable, traversalConfig);
 
     public setConfig(c: Partial<TraversalConfig>): CollectionMigrator<T> {
-      // TODO: Throw an error if traversalConfig.batchSize > 500
+      validateBatchMigratorTraversalConfig(c);
       this.traverser.setConfig(c);
       return this;
     }
