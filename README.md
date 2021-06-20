@@ -7,12 +7,20 @@ When you have millions of documents in a collection, you can't just get all of t
 Firecode is an extremely light, well-typed, zero-dependency library that is useful in a variety of scenarios. You can use it in database migration scripts (e.g. when you need add a new field to all docs) or a scheduled Cloud Function that needs to check every doc in a collection periodically.
 
 <p>
-    <a href="https://lerna.js.org/" alt="Framework">
-        <img src="https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg" /></a>
+    <a href="https://npmjs.com/package/@firecode/admin" alt="Version">
+        <img src="https://img.shields.io/npm/v/@firecode/admin" /></a>
+    <a href="https://npmjs.com/package/@firecode/admin" alt="Size">
+        <img src="https://img.shields.io/bundlephobia/min/@firecode/admin" /></a>
+    <a href="https://npmjs.com/package/@firecode/admin" alt="Downloads">
+        <img src="https://img.shields.io/npm/dm/@firecode/admin" /></a>
+    <a href="https://" alt="Types">
+        <img src="https://img.shields.io/npm/types/@firecode/admin" /></a>
     <a href="https://github.com/kafkas/firecode" alt="Activity">
         <img src="https://img.shields.io/github/commit-activity/m/kafkas/firecode" /></a>
     <a href="https://" alt="Last Commit">
         <img src="https://img.shields.io/github/last-commit/kafkas/firecode" /></a>
+    <a href="https://lerna.js.org/" alt="Framework">
+        <img src="https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg" /></a>
 </p>
 
 ## Installation
