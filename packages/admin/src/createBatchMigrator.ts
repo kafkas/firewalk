@@ -50,6 +50,7 @@ export function createBatchMigrator<T = firestore.DocumentData>(
       const { batchCount, docCount: traversedDocCount } = await this.traverser.traverse(
         async (snapshots) => {
           const writeBatch = traversable.firestore.batch();
+          let migratableDocCount = 0;
 
           snapshots.forEach((snapshot) => {
             const data = (() => {
@@ -67,11 +68,12 @@ export function createBatchMigrator<T = firestore.DocumentData>(
 
             if (shouldMigrate) {
               writeBatch.set(snapshot.ref, data, options as any);
-              migratedDocCount++;
+              migratableDocCount++;
             }
           });
 
           await writeBatch.commit();
+          migratedDocCount += migratableDocCount;
         }
       );
 
@@ -89,6 +91,7 @@ export function createBatchMigrator<T = firestore.DocumentData>(
       const { batchCount, docCount: traversedDocCount } = await this.traverser.traverse(
         async (snapshots) => {
           const writeBatch = traversable.firestore.batch();
+          let migratableDocCount = 0;
 
           snapshots.forEach((snapshot) => {
             if (typeof arg1 === 'function') {
@@ -98,7 +101,7 @@ export function createBatchMigrator<T = firestore.DocumentData>(
               const shouldMigrate = predicate?.(snapshot) ?? true;
               if (shouldMigrate) {
                 writeBatch.update(snapshot.ref, getUpdateData(snapshot));
-                migratedDocCount++;
+                migratableDocCount++;
               }
             } else if (argCount < 2 || typeof arg2 === 'function') {
               // Signature 2
@@ -107,7 +110,7 @@ export function createBatchMigrator<T = firestore.DocumentData>(
               const shouldMigrate = predicate?.(snapshot) ?? true;
               if (shouldMigrate) {
                 writeBatch.update(snapshot.ref, updateData);
-                migratedDocCount++;
+                migratableDocCount++;
               }
             } else {
               // Signature 3
@@ -117,12 +120,13 @@ export function createBatchMigrator<T = firestore.DocumentData>(
               const shouldMigrate = predicate?.(snapshot) ?? true;
               if (shouldMigrate) {
                 writeBatch.update(snapshot.ref, field, value);
-                migratedDocCount++;
+                migratableDocCount++;
               }
             }
           });
 
           await writeBatch.commit();
+          migratedDocCount += migratableDocCount;
         }
       );
 
