@@ -19,9 +19,14 @@ export function createBatchMigrator<T = firestore.DocumentData>(
   traversable: Traversable<T>,
   traversalConfig?: Partial<TraversalConfig>
 ): CollectionMigrator<T> {
-  const traverser = createTraverser(traversable, traversalConfig);
-
   class CollectionBatchMigrator implements CollectionMigrator<T> {
+    private traverser = createTraverser(traversable, traversalConfig);
+
+    public setConfig(c: Partial<TraversalConfig>): CollectionMigrator<T> {
+      this.traverser.setConfig(c);
+      return this;
+    }
+
     public async set<M extends boolean | undefined>(
       dataOrGetData: SetData<T, M> | SetDataGetter<T, M>,
       options?: SetOptions<M>,
@@ -30,7 +35,7 @@ export function createBatchMigrator<T = firestore.DocumentData>(
       const batch = traversable.firestore.batch();
       let migratedDocCount = 0;
 
-      const { batchCount, docCount: traversedDocCount } = await traverser.traverse(
+      const { batchCount, docCount: traversedDocCount } = await this.traverser.traverse(
         async (snapshots) => {
           snapshots.forEach((snapshot) => {
             const data = (() => {
@@ -68,7 +73,7 @@ export function createBatchMigrator<T = firestore.DocumentData>(
       const batch = traversable.firestore.batch();
       let migratedDocCount = 0;
 
-      const { batchCount, docCount: traversedDocCount } = await traverser.traverse(
+      const { batchCount, docCount: traversedDocCount } = await this.traverser.traverse(
         async (snapshots) => {
           snapshots.forEach((snapshot) => {
             if (typeof arg1 === 'function') {

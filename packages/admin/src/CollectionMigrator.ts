@@ -1,5 +1,5 @@
 import type { firestore } from 'firebase-admin';
-import type { MigrationResult } from './types';
+import type { TraversalConfig, MigrationResult } from './types';
 
 export type MigrationPredicate<T> = (snapshot: firestore.QueryDocumentSnapshot<T>) => boolean;
 
@@ -17,6 +17,13 @@ export type SetOptions<M> = {
 export type SetDataGetter<T, M> = (snapshot: firestore.QueryDocumentSnapshot<T>) => SetData<T, M>;
 
 export interface CollectionMigrator<T = firestore.DocumentData> {
+  /**
+   * Updates the specified keys of the traverser configuration.
+   * @param config Partial traversal configuration.
+   * @returns The migrator object itself.
+   */
+  setConfig(config: Partial<TraversalConfig>): CollectionMigrator<T>;
+
   /**
    * Sets all documents in this collection with the provided update data.
    * @param getData - A function that returns an object with which to set each document.

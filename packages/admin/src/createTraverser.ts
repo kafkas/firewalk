@@ -22,9 +22,14 @@ export function createTraverser<T = firestore.DocumentData>(
   traversable: Traversable<T>,
   config: Partial<TraversalConfig> = {}
 ): CollectionTraverser<T> {
-  const traversalConfig = { ...defaultTraversalConfig, ...config };
-
   class DefaultCollectionTraverser implements CollectionTraverser<T> {
+    private traversalConfig: TraversalConfig = { ...defaultTraversalConfig, ...config };
+
+    public setConfig(c: Partial<TraversalConfig>): CollectionTraverser<T> {
+      this.traversalConfig = { ...this.traversalConfig, ...c };
+      return this;
+    }
+
     public async traverseEach(
       callback: (snapshot: firestore.QueryDocumentSnapshot<T>) => Promise<void>,
       c: Partial<TraverseEachConfig> = {}
@@ -54,7 +59,7 @@ export function createTraverser<T = firestore.DocumentData>(
         sleepBetweenBatches,
         sleepTimeBetweenBatches,
         maxDocCount,
-      } = traversalConfig;
+      } = this.traversalConfig;
 
       let batchCount = 0;
       let docCount = 0;

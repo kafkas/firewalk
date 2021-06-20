@@ -1,7 +1,14 @@
 import type { firestore } from 'firebase-admin';
-import type { TraverseEachConfig, TraversalResult } from './types';
+import type { TraverseEachConfig, TraversalResult, TraversalConfig } from './types';
 
 export interface CollectionTraverser<T = firestore.DocumentData> {
+  /**
+   * Updates the specified keys of the traverser configuration.
+   * @param config Partial traversal configuration.
+   * @returns The traverser object itself.
+   */
+  setConfig(config: Partial<TraversalConfig>): CollectionTraverser<T>;
+
   /**
    * Traverses the entire collection in batches of size `TraversalConfig.batchSize`. Invokes the
    * specified callback sequentially for each document snapshot in each batch.

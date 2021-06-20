@@ -1,5 +1,5 @@
 import { firestore } from 'firebase-admin';
-import { CollectionTraverser, CollectionMigrator } from '../src';
+import { createTraverser, createBatchMigrator } from '../src';
 
 function doStuff(cb: (nowTimestamp: number) => void): void;
 
@@ -18,12 +18,14 @@ doStuff((now) => {
   //
 });
 
-const traverser = new CollectionTraverser(firestore().collection('users'), {
+const traverser = createTraverser(firestore().collection('users'), {
   batchSize: 500,
   sleepTimeBetweenBatches: 1000,
 });
 
-const migrator = new CollectionMigrator(firestore().collection('users'));
+traverser.setConfig({ maxDocCount: 5 });
+
+const migrator = createBatchMigrator(firestore().collection('users'));
 
 (async () => {
   // S1
