@@ -12,7 +12,7 @@ import { createTraverser } from './createTraverser';
 
 /**
  * Creates a migrator object that facilitates Firestore collection migrations. Uses batch writes when writing
- * to documents so the entire operation will fail if a single set isn't successful. Uses a traverser object
+ * to documents so the entire operation will fail if a single write isn't successful. Uses a traverser object
  * internally to traverse the entire collection.
  */
 export function createBatchMigrator<T = firestore.DocumentData>(
