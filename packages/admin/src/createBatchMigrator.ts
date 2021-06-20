@@ -19,10 +19,13 @@ export function createBatchMigrator<T = firestore.DocumentData>(
   traversable: Traversable<T>,
   traversalConfig?: Partial<TraversalConfig>
 ): CollectionMigrator<T> {
+  // TODO: Throw an error if traversalConfig.batchSize > 500
+
   class CollectionBatchMigrator implements CollectionMigrator<T> {
     private traverser = createTraverser(traversable, traversalConfig);
 
     public setConfig(c: Partial<TraversalConfig>): CollectionMigrator<T> {
+      // TODO: Throw an error if traversalConfig.batchSize > 500
       this.traverser.setConfig(c);
       return this;
     }
@@ -32,11 +35,12 @@ export function createBatchMigrator<T = firestore.DocumentData>(
       options?: SetOptions<M>,
       predicate?: MigrationPredicate<T>
     ): Promise<MigrationResult> {
-      const batch = traversable.firestore.batch();
       let migratedDocCount = 0;
 
       const { batchCount, docCount: traversedDocCount } = await this.traverser.traverse(
         async (snapshots) => {
+          const writeBatch = traversable.firestore.batch();
+
           snapshots.forEach((snapshot) => {
             const data = (() => {
               if (typeof dataOrGetData === 'function') {
@@ -52,14 +56,14 @@ export function createBatchMigrator<T = firestore.DocumentData>(
             const shouldMigrate = predicate?.(snapshot) ?? true;
 
             if (shouldMigrate) {
-              batch.set(snapshot.ref, data, options as any);
+              writeBatch.set(snapshot.ref, data, options as any);
               migratedDocCount++;
             }
           });
+
+          await writeBatch.commit();
         }
       );
-
-      await batch.commit();
 
       return { batchCount, traversedDocCount, migratedDocCount };
     }
@@ -70,11 +74,12 @@ export function createBatchMigrator<T = firestore.DocumentData>(
       arg3?: MigrationPredicate<T>
     ): Promise<MigrationResult> {
       const argCount = [arg1, arg2, arg3].filter((a) => a !== undefined).length;
-      const batch = traversable.firestore.batch();
       let migratedDocCount = 0;
 
       const { batchCount, docCount: traversedDocCount } = await this.traverser.traverse(
         async (snapshots) => {
+          const writeBatch = traversable.firestore.batch();
+
           snapshots.forEach((snapshot) => {
             if (typeof arg1 === 'function') {
               // Signature 1
@@ -82,7 +87,7 @@ export function createBatchMigrator<T = firestore.DocumentData>(
               const predicate = arg2 as MigrationPredicate<T> | undefined;
               const shouldMigrate = predicate?.(snapshot) ?? true;
               if (shouldMigrate) {
-                batch.update(snapshot.ref, getUpdateData(snapshot));
+                writeBatch.update(snapshot.ref, getUpdateData(snapshot));
                 migratedDocCount++;
               }
             } else if (argCount < 2 || typeof arg2 === 'function') {
@@ -91,7 +96,7 @@ export function createBatchMigrator<T = firestore.DocumentData>(
               const predicate = arg2 as MigrationPredicate<T> | undefined;
               const shouldMigrate = predicate?.(snapshot) ?? true;
               if (shouldMigrate) {
-                batch.update(snapshot.ref, updateData);
+                writeBatch.update(snapshot.ref, updateData);
                 migratedDocCount++;
               }
             } else {
@@ -101,15 +106,15 @@ export function createBatchMigrator<T = firestore.DocumentData>(
               const predicate = arg3 as MigrationPredicate<T> | undefined;
               const shouldMigrate = predicate?.(snapshot) ?? true;
               if (shouldMigrate) {
-                batch.update(snapshot.ref, field, value);
+                writeBatch.update(snapshot.ref, field, value);
                 migratedDocCount++;
               }
             }
           });
+
+          await writeBatch.commit();
         }
       );
-
-      await batch.commit();
 
       return { batchCount, traversedDocCount, migratedDocCount };
     }
