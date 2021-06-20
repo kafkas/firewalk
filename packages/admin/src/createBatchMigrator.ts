@@ -80,8 +80,8 @@ export function createBatchMigrator<T = firestore.DocumentData>(
               // Signature 1
               const getUpdateData = arg1 as UpdateDataGetter<T>;
               const predicate = arg2 as MigrationPredicate<T> | undefined;
-              const shouldUpdate = predicate?.(snapshot) ?? true;
-              if (shouldUpdate) {
+              const shouldMigrate = predicate?.(snapshot) ?? true;
+              if (shouldMigrate) {
                 batch.update(snapshot.ref, getUpdateData(snapshot));
                 migratedDocCount++;
               }
@@ -89,8 +89,8 @@ export function createBatchMigrator<T = firestore.DocumentData>(
               // Signature 2
               const updateData = arg1 as firestore.UpdateData;
               const predicate = arg2 as MigrationPredicate<T> | undefined;
-              const shouldUpdate = predicate?.(snapshot) ?? true;
-              if (shouldUpdate) {
+              const shouldMigrate = predicate?.(snapshot) ?? true;
+              if (shouldMigrate) {
                 batch.update(snapshot.ref, updateData);
                 migratedDocCount++;
               }
@@ -99,8 +99,8 @@ export function createBatchMigrator<T = firestore.DocumentData>(
               const field = arg1 as string | firestore.FieldPath;
               const value = arg2 as any;
               const predicate = arg3 as MigrationPredicate<T> | undefined;
-              const shouldUpdate = predicate?.(snapshot) ?? true;
-              if (shouldUpdate) {
+              const shouldMigrate = predicate?.(snapshot) ?? true;
+              if (shouldMigrate) {
                 batch.update(snapshot.ref, field, value);
                 migratedDocCount++;
               }
