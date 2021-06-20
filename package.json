@@ -18,8 +18,8 @@
     "format": "prettier --write \"./packages/**/{src,test}/**/*.{ts,tsx,json}\"",
     "format-check": "prettier --check \"./packages/**/{src,test}/**/*.{ts,tsx,json}\"",
     "lint": "npx eslint packages/**/{src,__tests__} --ext .js,.ts",
-    "publish": "npx lerna publish from-git",
-    "version": "npx lerna version"
+    "lerna-publish": "npx lerna publish from-git",
+    "lerna-version": "npx lerna version"
   },
   "dependencies": {
     "@firecode/admin": "file:packages/admin"
