@@ -135,7 +135,7 @@ A migrator object responsible for efficiently traversing collection-like documen
 
 ### Traversable
 
-A collection-like traversable object. Can be one of [CollectionReference](https://googleapis.dev/nodejs/firestore/latest/CollectionReference.html), [CollectionGroup](https://googleapis.dev/nodejs/firestore/latest/CollectionGroup.html) and [Query](https://googleapis.dev/nodejs/firestore/latest/Query.html)
+A collection-like traversable object. Can be one of [CollectionReference](https://googleapis.dev/nodejs/firestore/latest/CollectionReference.html), [CollectionGroup](https://googleapis.dev/nodejs/firestore/latest/CollectionGroup.html) and [Query](https://googleapis.dev/nodejs/firestore/latest/Query.html).
 
 ### TraversalConfig
 
@@ -145,6 +145,13 @@ A plain object representing traversal configuration. The keys allowed are:
 - `sleepBetweenBatches` (boolean): Whether to sleep between batches. Defaults to `true`.
 - `sleepTimeBetweenBatches` (number): The amount of time (in ms) to "sleep" before moving on to the next batch. Defaults to 1000.
 - `maxDocCount` (number): The maximum number of documents that will be traversed. Defaults to `Infinity`.
+
+### TraversalResult
+
+A plain object representing the details of a traversal. Contains the following keys:
+
+- `batchCount` (number): The number of batches that have been retrieved in this traversal.
+- `docCount` (number): The number of documents that have been retrieved in this traversal.
 
 ### Traverser
 
