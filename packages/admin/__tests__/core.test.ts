@@ -1,31 +1,14 @@
 import { firestore } from 'firebase-admin';
 import { createTraverser, createBatchMigrator } from '../src';
 
-function doStuff(cb: (nowTimestamp: number) => void): void;
+const users = firestore().collection('users');
 
-function doStuff(obj: Record<string, number>, condition: string): void;
-
-function doStuff(
-  param1: ((nowTimestamp: number) => void) | Record<string, number>,
-  condition?: string
-): void {
-  // ...
-}
-
-doStuff({}, '');
-
-doStuff((now) => {
-  //
-});
-
-const traverser = createTraverser(firestore().collection('users'), {
+const traverser = createTraverser(users, {
   batchSize: 500,
   sleepTimeBetweenBatches: 1000,
 });
 
-traverser.setConfig({ maxDocCount: 5 });
-
-const migrator = createBatchMigrator(firestore().collection('users'));
+const migrator = createBatchMigrator(users);
 
 (async () => {
   // S1

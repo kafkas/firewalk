@@ -1,5 +1,5 @@
 import type { firestore } from 'firebase-admin';
-import type { CollectionTraverser } from './CollectionTraverser';
+import type { CollectionTraverser, BatchCallback } from './CollectionTraverser';
 import type { Traversable, TraversalConfig, TraverseEachConfig, TraversalResult } from './types';
 import { sleep, isPositiveInteger } from './_utils';
 
@@ -43,11 +43,23 @@ export function createTraverser<T = firestore.DocumentData>(
 
   class DefaultCollectionTraverser implements CollectionTraverser<T> {
     private traversalConfig: TraversalConfig = { ...defaultTraversalConfig, ...config };
+    private registeredCallbacks: {
+      onBeforeBatchStart?: BatchCallback<T>;
+      onAfterBatchComplete?: BatchCallback<T>;
+    } = {};
 
     public setConfig(c: Partial<TraversalConfig>): CollectionTraverser<T> {
       validateTraversalConfig(c);
       this.traversalConfig = { ...this.traversalConfig, ...c };
       return this;
+    }
+
+    public onBeforeBatchStart(callback: BatchCallback<T>): void {
+      this.registeredCallbacks.onBeforeBatchStart = callback;
+    }
+
+    public onAfterBatchComplete(callback: BatchCallback<T>): void {
+      this.registeredCallbacks.onAfterBatchComplete = callback;
     }
 
     public async traverseEach(
@@ -87,21 +99,28 @@ export function createTraverser<T = firestore.DocumentData>(
 
       while (true) {
         const { docs: batchDocSnapshots } = await query.get();
+        const batchDocCount = batchDocSnapshots.length;
 
-        if (batchDocSnapshots.length === 0) {
+        if (batchDocCount === 0) {
           break;
         }
 
+        const batchIndex = batchCount + 1;
+        const lastDocInBatch = batchDocSnapshots[batchDocCount - 1];
+
         batchCount++;
-        docCount += batchDocSnapshots.length;
+        docCount += batchDocCount;
+
+        this.registeredCallbacks.onBeforeBatchStart?.(batchDocSnapshots, batchIndex);
 
         await callback(batchDocSnapshots);
+
+        this.registeredCallbacks.onAfterBatchComplete?.(batchDocSnapshots, batchIndex);
 
         if (docCount === maxDocCount) {
           break;
         }
 
-        const lastDocInBatch = batchDocSnapshots[batchDocSnapshots.length - 1];
         query = query.startAfter(lastDocInBatch).limit(Math.min(batchSize, maxDocCount - docCount));
 
         if (sleepBetweenBatches) {
