@@ -85,7 +85,9 @@ This pretty much sums up the core functionality of this library! The `.traverse(
 
 ## API
 
-You will be using factory functions provided by this library to create traversers and migrators. This library also provides you with the TypeScript types for the important objects that you will be interacting with. Please note that although the Github docs for this project are work-in-progress, the JSDocs and TypeScript types are solid and I'm sure you'll find them useful!
+To create traversers and migrators, you will be using factory functions provided by this library. We also provide you with the TypeScript types for the important objects that you will be interacting with. The generic parameter `T` that we use throughout the docs refers to the shape of the documents in the traversable and defaults to [FirebaseFirestore.DocumentData](https://github.com/googleapis/nodejs-firestore/blob/28d645bd3e368abde592bfa2611de3378ca175a6/types/firestore.d.ts#L28).
+
+Please note that although the Github docs for this project are work-in-progress, the JSDocs and TypeScript types are solid and I'm sure you'll find them useful!
 
 ### createBatchMigrator
 
