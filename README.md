@@ -91,16 +91,16 @@ Creates a batch migrator object that facilitates Firestore collection migrations
 
 #### Signature
 
-createBatchMigrator\<T\>(traversable, traversalConfig)
+`createBatchMigrator<T>(traversable, traversalConfig)`
 
 #### Arguments
 
-1. traversable ([Traversable\<T\>](#Traversable<T>)): A collection-like traversable object.
+1. traversable ([Traversable](#Traversable<T>)): A collection-like traversable object.
 2. traversalConfig ([TraversalConfig](#TraversalConfig)): Optional. The traversal configuration with which the migrator is created.
 
 #### Returns
 
-([CollectionMigrator\<T\>](#CollectionMigrator<T>)) A batch migrator object.
+([CollectionMigrator](#CollectionMigrator<T>)) A batch migrator object.
 
 ### createTraverser
 
@@ -108,20 +108,22 @@ Creates a traverser object that facilitates Firestore collection traversals.
 
 #### Signature
 
-createTraverser\<T\>(traversable, traversalConfig)
+```
+createTraverser<T>(traversable, traversalConfig)
+```
 
 #### Arguments
 
-1. traversable ([Traversable\<T\>](#Traversable<T>)): A collection-like traversable object.
+1. traversable ([Traversable](#Traversable)): A collection-like traversable object.
 2. traversalConfig ([TraversalConfig](#TraversalConfig)): Optional. The traversal configuration with which the traverser is created.
 
 #### Returns
 
-([CollectionTraverser\<T\>](#CollectionTraverser<T>)) A traverser object.
+([CollectionTraverser](#CollectionTraverser)) A traverser object.
 
-### Traversable\<T\>
+### Traversable
 
-A collection-like traversable object. Can be one of [CollectionReference\<T\>](https://googleapis.dev/nodejs/firestore/latest/CollectionReference.html), [CollectionGroup\<T\>](https://googleapis.dev/nodejs/firestore/latest/CollectionGroup.html) and [Query\<T\>](https://googleapis.dev/nodejs/firestore/latest/Query.html)
+A collection-like traversable object. Can be one of [CollectionReference](https://googleapis.dev/nodejs/firestore/latest/CollectionReference.html), [CollectionGroup](https://googleapis.dev/nodejs/firestore/latest/CollectionGroup.html) and [Query](https://googleapis.dev/nodejs/firestore/latest/Query.html)
 
 ### TraversalConfig
 
@@ -132,13 +134,13 @@ A plain object representing traversal configuration. The keys allowed are:
 - `sleepTimeBetweenBatches` (number): The amount of time (in ms) to "sleep" before moving on to the next batch. Defaults to 1000.
 - `maxDocCount` (number): The maximum number of documents that will be traversed. Defaults to `Infinity`.
 
-### CollectionMigrator\<T\>
+### CollectionMigrator
 
 A migrator object responsible for efficiently traversing collection-like document groups (collections, queries, collection groups) and writing to the docs retrieved in each batch. Batch migrators rely on a traverser internally to traverse entire collection.
 
 #### TODO: Methods
 
-### CollectionTraverser\<T\>
+### CollectionTraverser
 
 A traverser object responsible for efficiently traversing collection-like document groups (collections, queries, collection groups).
 
