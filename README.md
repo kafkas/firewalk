@@ -85,13 +85,17 @@ This pretty much sums up the core functionality of this library! The `.traverse(
 
 ## API
 
+You will be using factory functions provided by this library to create traversers and migrators. This library also provides you with the TypeScript types for the important objects that you will be interacting with. Please note that although the Github docs for this project are work-in-progress, the JSDocs and TypeScript types are solid and I'm sure you'll find them useful!
+
 ### createBatchMigrator
 
 Creates a batch migrator object that facilitates Firestore collection migrations. Uses batch writes when writing to docs so the entire operation will fail if a single write isn't successful.
 
 #### Signature
 
-`createBatchMigrator<T>(traversable, traversalConfig)`
+```
+createBatchMigrator<T>(traversable: Traversable<T>, config?: TraversalConfig): CollectionMigrator<T>
+```
 
 #### Arguments
 
@@ -109,7 +113,7 @@ Creates a traverser object that facilitates Firestore collection traversals.
 #### Signature
 
 ```
-createTraverser<T>(traversable, traversalConfig)
+createTraverser<T>(traversable: Traversable<T>, config?: TraversalConfig): CollectionTraverser<T>
 ```
 
 #### Arguments
