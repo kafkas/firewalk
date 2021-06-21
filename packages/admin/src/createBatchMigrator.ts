@@ -1,12 +1,12 @@
 import type { firestore } from 'firebase-admin';
 import type {
-  CollectionMigrator,
+  Migrator,
   MigrationPredicate,
   UpdateDataGetter,
   SetData,
   SetOptions,
   SetDataGetter,
-} from './CollectionMigrator';
+} from './Migrator';
 import type { Traversable, TraversalConfig, MigrationResult } from './types';
 import { createTraverser } from './createTraverser';
 import { isPositiveInteger } from './_utils';
@@ -34,13 +34,13 @@ function validateBatchMigratorTraversalConfig(c: Partial<TraversalConfig> = {}):
 export function createBatchMigrator<T = firestore.DocumentData>(
   traversable: Traversable<T>,
   traversalConfig?: Partial<TraversalConfig>
-): CollectionMigrator<T> {
+): Migrator<T> {
   validateBatchMigratorTraversalConfig(traversalConfig);
 
-  class CollectionBatchMigrator implements CollectionMigrator<T> {
+  class CollectionBatchMigrator implements Migrator<T> {
     private traverser = createTraverser(traversable, traversalConfig);
 
-    public setConfig(c: Partial<TraversalConfig>): CollectionMigrator<T> {
+    public setConfig(c: Partial<TraversalConfig>): Migrator<T> {
       validateBatchMigratorTraversalConfig(c);
       this.traverser.setConfig(c);
       return this;

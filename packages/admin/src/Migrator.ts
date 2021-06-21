@@ -16,13 +16,13 @@ export type SetOptions<M> = {
 
 export type SetDataGetter<T, M> = (snapshot: firestore.QueryDocumentSnapshot<T>) => SetData<T, M>;
 
-export interface CollectionMigrator<T = firestore.DocumentData> {
+export interface Migrator<T = firestore.DocumentData> {
   /**
    * Updates the specified keys of the traverser configuration.
    * @param config Partial traversal configuration.
    * @returns The migrator object itself.
    */
-  setConfig(config: Partial<TraversalConfig>): CollectionMigrator<T>;
+  setConfig(config: Partial<TraversalConfig>): Migrator<T>;
 
   /**
    * Sets all documents in this collection with the provided update data.

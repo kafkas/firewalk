@@ -96,7 +96,7 @@ Creates a batch migrator object that facilitates Firestore collection migrations
 #### Signature
 
 ```
-createBatchMigrator<T>(traversable: Traversable<T>, config?: TraversalConfig): CollectionMigrator<T>
+createBatchMigrator<T>(traversable: Traversable<T>, config?: TraversalConfig): Migrator<T>
 ```
 
 #### Arguments
@@ -106,7 +106,7 @@ createBatchMigrator<T>(traversable: Traversable<T>, config?: TraversalConfig): C
 
 #### Returns
 
-([CollectionMigrator](#CollectionMigrator<T>)) A batch migrator object.
+([Migrator](#Migrator<T>)) A batch migrator object.
 
 ### createTraverser
 
@@ -140,7 +140,7 @@ A plain object representing traversal configuration. The keys allowed are:
 - `sleepTimeBetweenBatches` (number): The amount of time (in ms) to "sleep" before moving on to the next batch. Defaults to 1000.
 - `maxDocCount` (number): The maximum number of documents that will be traversed. Defaults to `Infinity`.
 
-### CollectionMigrator
+### Migrator
 
 A migrator object responsible for efficiently traversing collection-like document groups (collections, queries, collection groups) and writing to the docs retrieved in each batch. Batch migrators rely on a traverser internally to traverse entire collection.
 

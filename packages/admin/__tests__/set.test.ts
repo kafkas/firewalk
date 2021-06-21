@@ -35,7 +35,7 @@ const usersCollection = firestore().collection(
   'users'
 ) as FirebaseFirestore.CollectionReference<UserDoc>;
 
-const migrator = new CollectionMigrator(usersCollection);
+const migrator = new Migrator(usersCollection);
 
 migrator.set(
   (snap) => {
