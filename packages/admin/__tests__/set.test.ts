@@ -11,12 +11,12 @@ const traverser = createTraverser(users, {
 
 const { batchCount, docCount } = await traverser.traverse(async (snapshots) => {
   const batchSize = snapshots.length;
-  const sendEmailToUsers = snapshots.map(async (snapshot) => {
+  const sendEmailToBatchUsers = snapshots.map(async (snapshot) => {
     const { email } = snapshot.data();
     await sendEmail(email, 'Hello!');
   });
 
-  await Promise.all(sendEmailToUsers);
+  await Promise.all(sendEmailToBatchUsers);
   console.log(`Sent email to ${batchSize} users in this batch.`);
 });
 
