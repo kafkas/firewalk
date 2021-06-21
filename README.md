@@ -101,12 +101,12 @@ createBatchMigrator<T>(traversable: Traversable<T>, config?: TraversalConfig): M
 
 #### Arguments
 
-1. traversable ([Traversable](#Traversable<T>)): A collection-like traversable object.
+1. traversable ([Traversable](#Traversable)): A collection-like traversable object.
 2. traversalConfig ([TraversalConfig](#TraversalConfig)): Optional. The traversal configuration with which the migrator is created.
 
 #### Returns
 
-([Migrator](#Migrator<T>)) A batch migrator object.
+([Migrator](#Migrator)) A batch migrator object.
 
 ### createTraverser
 
