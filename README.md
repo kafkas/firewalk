@@ -127,7 +127,7 @@ A collection-like traversable object. Can be one of [CollectionReference\<T\>](h
 
 A plain object representing traversal configuration. The keys allowed are:
 
-- `batchSize` (number): Defaults to 100. The number of documents that will be traversed in each batch.
+- `batchSize` (number): The number of documents that will be traversed in each batch. Defaults to 100.
 - `sleepBetweenBatches` (boolean): Whether to sleep between batches. Defaults to `true`.
 - `sleepTimeBetweenBatches` (number): The amount of time (in ms) to "sleep" before moving on to the next batch. Defaults to 1000.
 - `maxDocCount` (number): The maximum number of documents that will be traversed. Defaults to `Infinity`.
