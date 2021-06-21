@@ -127,6 +127,12 @@ createTraverser<T>(traversable: Traversable<T>, config?: TraversalConfig): Trave
 
 ([Traverser](#Traverser)) A traverser object.
 
+### Migrator
+
+A migrator object responsible for efficiently traversing collection-like document groups (collections, queries, collection groups) and writing to the docs retrieved in each batch. Batch migrators rely on a traverser internally to traverse the entire collection.
+
+#### TODO: Methods
+
 ### Traversable
 
 A collection-like traversable object. Can be one of [CollectionReference](https://googleapis.dev/nodejs/firestore/latest/CollectionReference.html), [CollectionGroup](https://googleapis.dev/nodejs/firestore/latest/CollectionGroup.html) and [Query](https://googleapis.dev/nodejs/firestore/latest/Query.html)
@@ -139,12 +145,6 @@ A plain object representing traversal configuration. The keys allowed are:
 - `sleepBetweenBatches` (boolean): Whether to sleep between batches. Defaults to `true`.
 - `sleepTimeBetweenBatches` (number): The amount of time (in ms) to "sleep" before moving on to the next batch. Defaults to 1000.
 - `maxDocCount` (number): The maximum number of documents that will be traversed. Defaults to `Infinity`.
-
-### Migrator
-
-A migrator object responsible for efficiently traversing collection-like document groups (collections, queries, collection groups) and writing to the docs retrieved in each batch. Batch migrators rely on a traverser internally to traverse entire collection.
-
-#### TODO: Methods
 
 ### Traverser
 
