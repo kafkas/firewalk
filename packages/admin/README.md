@@ -69,10 +69,10 @@ const { batchCount, docCount } = await traverser.traverse(async (snapshots) => {
 
   await sendEmailToEachUserInBatch();
 
-  console.log(`Successfully sent email to ${batchSize} users in this batch.`);
+  console.log(`Successfully emailed ${batchSize} users in this batch.`);
 });
 
-console.log(`Traversal done! We sent an email to ${docCount} users in ${batchCount} batches!`);
+console.log(`Traversal done! We emailed ${docCount} users in ${batchCount} batches!`);
 ```
 
 We are doing 3 things here:
