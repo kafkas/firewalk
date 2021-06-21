@@ -115,7 +115,7 @@ Creates a traverser object that facilitates Firestore collection traversals.
 #### Signature
 
 ```
-createTraverser<T>(traversable: Traversable<T>, config?: TraversalConfig): CollectionTraverser<T>
+createTraverser<T>(traversable: Traversable<T>, config?: TraversalConfig): Traverser<T>
 ```
 
 #### Arguments
@@ -125,7 +125,7 @@ createTraverser<T>(traversable: Traversable<T>, config?: TraversalConfig): Colle
 
 #### Returns
 
-([CollectionTraverser](#CollectionTraverser)) A traverser object.
+([Traverser](#Traverser)) A traverser object.
 
 ### Traversable
 
@@ -146,7 +146,7 @@ A migrator object responsible for efficiently traversing collection-like documen
 
 #### TODO: Methods
 
-### CollectionTraverser
+### Traverser
 
 A traverser object responsible for efficiently traversing collection-like document groups (collections, queries, collection groups).
 

@@ -1,5 +1,5 @@
 export { Migrator } from './Migrator';
-export { CollectionTraverser } from './CollectionTraverser';
+export { Traverser } from './Traverser';
 export { createBatchMigrator } from './createBatchMigrator';
 export { createTraverser } from './createTraverser';
 

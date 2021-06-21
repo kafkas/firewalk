@@ -1,5 +1,5 @@
 import type { firestore } from 'firebase-admin';
-import type { CollectionTraverser, BatchCallback } from './CollectionTraverser';
+import type { Traverser, BatchCallback } from './Traverser';
 import type { Traversable, TraversalConfig, TraverseEachConfig, TraversalResult } from './types';
 import { sleep, isPositiveInteger } from './_utils';
 
@@ -38,17 +38,17 @@ function validateTraversalConfig(c: Partial<TraversalConfig> = {}): void {
 export function createTraverser<T = firestore.DocumentData>(
   traversable: Traversable<T>,
   config: Partial<TraversalConfig> = {}
-): CollectionTraverser<T> {
+): Traverser<T> {
   validateTraversalConfig(config);
 
-  class DefaultCollectionTraverser implements CollectionTraverser<T> {
+  class DefaultTraverser implements Traverser<T> {
     private traversalConfig: TraversalConfig = { ...defaultTraversalConfig, ...config };
     private registeredCallbacks: {
       onBeforeBatchStart?: BatchCallback<T>;
       onAfterBatchComplete?: BatchCallback<T>;
     } = {};
 
-    public setConfig(c: Partial<TraversalConfig>): CollectionTraverser<T> {
+    public setConfig(c: Partial<TraversalConfig>): Traverser<T> {
       validateTraversalConfig(c);
       this.traversalConfig = { ...this.traversalConfig, ...c };
       return this;
@@ -132,5 +132,5 @@ export function createTraverser<T = firestore.DocumentData>(
     }
   }
 
-  return new DefaultCollectionTraverser();
+  return new DefaultTraverser();
 }
