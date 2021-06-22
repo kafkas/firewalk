@@ -1,6 +1,6 @@
 {
   "name": "@firecode/admin",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "A collection traversal library for Firestore",
   "keywords": [
     "Firecode",
