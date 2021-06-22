@@ -23,6 +23,13 @@ Firecode is an extremely light, well-typed, zero-dependency library that is usef
         <img src="https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg" /></a>
 </p>
 
+## Overview
+
+1. [Installation](#Installation)
+2. [Quick Start](<#Quick Start>)
+3. [API](#API)
+4. [License](#License)
+
 ## Installation
 
 Firecode is designed to work with the [Firebase Admin SDK](https://github.com/firebase/firebase-admin-node) so if you haven't already installed it, run
@@ -82,6 +89,10 @@ We are doing 3 things here:
 3. Invoke `.traverse()` with an async callback that is called for each batch of document snapshots
 
 This pretty much sums up the core functionality of this library! The `.traverse()` method returns a Promise that resolves when the entire traversal finishes, which can take a while if you have millions of docs. The Promise resolves with an object containing the traversal details e.g. the number of docs you touched.
+
+## [API](./docs/API.md)
+
+You can find the full API reference for `@firecode/admin` [here](./docs/API.md).
 
 ## License
 
