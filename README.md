@@ -26,7 +26,7 @@ Firecode is an extremely light, well-typed, zero-dependency library that is usef
 ## Overview
 
 1. [Installation](#Installation)
-2. [Quick Start](<#Quick Start>)
+2. [Quick Start](#Quick-Start)
 3. [API](#API)
 4. [License](#License)
 
