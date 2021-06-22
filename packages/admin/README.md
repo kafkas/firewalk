@@ -26,9 +26,10 @@ Firecode is an extremely light, well-typed, zero-dependency library that is usef
 ## Overview
 
 1. [Installation](#Installation)
-2. [Quick Start](<#Quick Start>)
-3. [API](#API)
-4. [License](#License)
+2. [Quick Start](#Quick-Start)
+3. [More Examples](#More-Examples)
+4. [API](#API)
+5. [License](#License)
 
 ## Installation
 
@@ -52,9 +53,9 @@ Suppose we want to send an email to all our users. We have a `users` collection 
 import { firestore } from 'firebase-admin';
 import { createTraverser } from '@firecode/admin';
 
-const users = firestore().collection('users');
+const usersCollection = firestore().collection('users');
 
-const traverser = createTraverser(users, {
+const traverser = createTraverser(usersCollection, {
   // We want each batch to have 500 docs. Obviously, the size of the very last batch may be less than 500
   batchSize: 500,
   // We want to wait before moving to the next batch
@@ -89,6 +90,64 @@ We are doing 3 things here:
 3. Invoke `.traverse()` with an async callback that is called for each batch of document snapshots
 
 This pretty much sums up the core functionality of this library! The `.traverse()` method returns a Promise that resolves when the entire traversal finishes, which can take a while if you have millions of docs. The Promise resolves with an object containing the traversal details e.g. the number of docs you touched.
+
+## More Examples
+
+### Add a new field
+
+```ts
+const projectsCollection = firestore().collection('projects');
+const migrator = createBatchMigrator(projectsCollection, { batchSize: 250 });
+
+const { migratedDocCount } = await migrator.update('isCompleted', false);
+console.log(`Successfully updated ${migratedDocCount} projects!`);
+```
+
+### Add a new field based on the previous fields
+
+```ts
+type UserDoc = {
+  firstName: string;
+  lastName: string;
+};
+
+const usersCollection = firestore().collection('users') as firestore.CollectionReference<UserDoc>;
+const migrator = createBatchMigrator(usersCollection, { batchSize: 250 });
+
+const { migratedDocCount } = await migrator.update((snap) => {
+  const { firstName, lastName } = snap.data();
+  return {
+    fullName: `${firstName} ${lastName}`,
+  };
+});
+console.log(`Successfully updated ${migratedDocCount} users!`);
+```
+
+### Rename an optional field
+
+```ts
+type UserPostDoc = {
+  text: string;
+  postedAt?: firestore.Timestamp;
+};
+
+const userPostsCollectionGroup = firestore().collectionGroup(
+  'posts'
+) as firestore.CollectionGroup<UserPostDoc>;
+const migrator = createBatchMigrator(userPostsCollectionGroup, { batchSize: 250 });
+
+const { migratedDocCount } = await migrator.update(
+  (snap) => {
+    const { postedAt } = snap.data();
+    return {
+      publishedAt: postedAt!, // Safe to assert
+      postedAt: firestore.FieldValue.delete(),
+    };
+  },
+  (snap) => snap.data().postedAt !== undefined // Ignore if it doesn't have a `postedAt` field
+);
+console.log(`Successfully updated ${migratedDocCount} users!`);
+```
 
 ## [API](./docs/API.md)
 

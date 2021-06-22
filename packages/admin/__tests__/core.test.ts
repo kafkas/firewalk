@@ -1,14 +1,11 @@
 import { firestore } from 'firebase-admin';
-import { createTraverser, createBatchMigrator } from '../src';
+import { createBatchMigrator } from '../src';
 
-const users = firestore().collection('users');
+const userPostsCollectionGroup = firestore().collection('projects');
+const migrator = createBatchMigrator(userPostsCollectionGroup, { batchSize: 250 });
 
-const traverser = createTraverser(users, {
-  batchSize: 500,
-  sleepTimeBetweenBatches: 1000,
-});
-
-const migrator = createBatchMigrator(users);
+const { migratedDocCount } = await migrator.update('isCompleted', false);
+console.log(`Successfully updated ${migratedDocCount} projects!`);
 
 (async () => {
   // S1
