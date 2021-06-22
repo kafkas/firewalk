@@ -18,18 +18,18 @@ export type SetDataGetter<T, M> = (snapshot: firestore.QueryDocumentSnapshot<T>)
 
 export interface Migrator<T = firestore.DocumentData> {
   /**
-   * Updates the specified keys of the traverser configuration.
+   * Updates the specified keys of the traversal configuration.
    * @param config Partial traversal configuration.
    * @returns The migrator object itself.
    */
   setConfig(config: Partial<TraversalConfig>): Migrator<T>;
 
   /**
-   * Sets all documents in this collection with the provided update data.
+   * Sets all documents in this collection with the provided data.
    * @param getData - A function that returns an object with which to set each document.
    * @param options - Optional. An object to configure the set behavior.
-   * @param predicate - Optional. A function that returns a boolean indicating whether to migrate the current document. Takes the `QueryDocumentSnapshot` corresponding to the document as its first argument. If this is not provided, all documents will be migrated.
-   * @returns The number of batches and documents migrated.
+   * @param predicate - Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
+   * @returns An object representing the details of the migration.
    */
   set<M extends boolean | undefined>(
     getData: SetDataGetter<T, M>,
@@ -38,11 +38,11 @@ export interface Migrator<T = firestore.DocumentData> {
   ): Promise<MigrationResult>;
 
   /**
-   * Sets all documents in this collection with the provided update data.
+   * Sets all documents in this collection with the provided data.
    * @param data - The data with which to set each document.
    * @param options - Optional. An object to configure the set behavior.
-   * @param predicate - Optional. A function that returns a boolean indicating whether to migrate the current document. Takes the `QueryDocumentSnapshot` corresponding to the document as its first argument. If this is not provided, all documents will be migrated.
-   * @returns The number of batches and documents migrated.
+   * @param predicate - Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
+   * @returns An object representing the details of the migration.
    */
   set<M extends boolean | undefined>(
     data: SetData<T, M>,
@@ -51,33 +51,27 @@ export interface Migrator<T = firestore.DocumentData> {
   ): Promise<MigrationResult>;
 
   /**
-   * Updates all documents in this collection with the provided update data.
-   * @param getUpdateData - A function that returns an object with which to update each document (i.e. the `updateData` object).
-   * @param predicate - Optional. A function that returns a boolean indicating whether to update the current document. Takes the `QueryDocumentSnapshot` corresponding to the document as its first argument. If this is not provided, all documents will be updated.
-   * @returns The number of batches and documents updated.
+   * Updates all documents in this collection with the provided data.
+   * @param getData - A function that returns the data with which to update each document.
+   * @param predicate - Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
+   * @returns An object representing the details of the migration.
    */
-  update(
-    getUpdateData: UpdateDataGetter<T>,
-    predicate?: MigrationPredicate<T>
-  ): Promise<MigrationResult>;
+  update(getData: UpdateDataGetter<T>, predicate?: MigrationPredicate<T>): Promise<MigrationResult>;
 
   /**
-   * Updates all documents in this collection with the provided update data.
-   * @param updateData - The data with which to update each document. Must be a non-empty object.
-   * @param predicate - Optional. A function that returns a boolean indicating whether to update the current document. Takes the `QueryDocumentSnapshot` corresponding to the document as its first argument. If this is not provided, all documents will be updated.
-   * @returns The number of batches and documents updated.
+   * Updates all documents in this collection with the provided data.
+   * @param data - The data with which to update each document. Must be a non-empty object.
+   * @param predicate - Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
+   * @returns An object representing the details of the migration.
    */
-  update(
-    updateData: firestore.UpdateData,
-    predicate?: MigrationPredicate<T>
-  ): Promise<MigrationResult>;
+  update(data: firestore.UpdateData, predicate?: MigrationPredicate<T>): Promise<MigrationResult>;
 
   /**
-   * Updates all documents in this collection with the provided update data.
+   * Updates all documents in this collection with the provided field-value pair.
    * @param field - The field to update in each document.
    * @param value - The value with which to update the specified field in each document. Must not be `undefined`.
-   * @param predicate - Optional. A function that returns a boolean indicating whether to update the current document. Takes the `QueryDocumentSnapshot` corresponding to the document as its first argument. If this is not provided, all documents will be updated.
-   * @returns The number of batches and documents updated.
+   * @param predicate - Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
+   * @returns An object representing the details of the migration.
    */
   update(
     field: string | firestore.FieldPath,

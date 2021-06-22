@@ -101,8 +101,8 @@ createBatchMigrator<T>(traversable: Traversable<T>, config?: TraversalConfig): M
 
 ##### Arguments
 
-1. traversable ([Traversable](#Traversable)): A collection-like traversable object.
-2. config ([TraversalConfig](#TraversalConfig)): Optional. The traversal configuration with which the migrator is created.
+1. `traversable` ([Traversable](#Traversable)): A collection-like traversable object.
+2. `config` ([TraversalConfig](#TraversalConfig)): Optional. The traversal configuration with which the migrator is created.
 
 ##### Returns
 
@@ -120,18 +120,104 @@ createTraverser<T>(traversable: Traversable<T>, config?: TraversalConfig): Trave
 
 ##### Arguments
 
-1. traversable ([Traversable](#Traversable)): A collection-like traversable object.
-2. config ([TraversalConfig](#TraversalConfig)): Optional. The traversal configuration with which the traverser is created.
+1. `traversable` ([Traversable](#Traversable)): A collection-like traversable object.
+2. `config` ([TraversalConfig](#TraversalConfig)): Optional. The traversal configuration with which the traverser is created.
 
 ##### Returns
 
 ([Traverser](#Traverser)) A traverser object.
 
+### MigrationResult
+
+A plain object representing the details of a migration. Contains the following keys:
+
+- `batchCount` (number): The number of batches that have been retrieved in this traversal.
+- `traversedDocCount` (number): The number of documents that have been retrieved in this traversal.
+- `migratedDocCount` (number): The number of documents that have been migrated.
+
 ### Migrator
 
 A migrator object responsible for efficiently traversing collection-like document groups (collections, queries, collection groups) and writing to the docs retrieved in each batch. Batch migrators rely on a traverser internally to traverse the entire collection.
 
-#### TODO: Methods
+#### .setConfig(config)
+
+Updates the specified keys of the traversal configuration.
+
+##### Arguments
+
+1. `config` (Partial\<[TraversalConfig](#TraversalConfig)\>): Partial traversal configuration.
+
+##### Returns
+
+([Migrator](#Migrator)) The migrator object itself.
+
+#### .set(getData, options, predicate)
+
+Sets all documents in this collection with the provided data.
+
+##### Arguments
+
+1. `getData` ((snapshot: QueryDocumentSnapshot) => object): A function that returns the data with which to set each document.
+2. `options` (object) Optional. An object to configure the set behavior.
+3. `predicate` ((snapshot: QueryDocumentSnapshot) => boolean): Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
+
+##### Returns
+
+([MigrationResult](#MigrationResult)) An object representing the details of the migration.
+
+#### .set(data, options, predicate)
+
+Sets all documents in this collection with the provided data.
+
+##### Arguments
+
+1. `data` (object): The data with which to set each document.
+2. `options` (object) Optional. An object to configure the set behavior.
+3. `predicate` ((snapshot: QueryDocumentSnapshot) => boolean): Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
+
+##### Returns
+
+([MigrationResult](#MigrationResult)) An object representing the details of the migration.
+
+#### .update(getData, predicate)
+
+Updates all documents in this collection with the provided data.
+
+##### Arguments
+
+1. `getData` ((snapshot: QueryDocumentSnapshot) => object): A function that returns the data with which to update each document.
+2. `predicate` ((snapshot: QueryDocumentSnapshot) => boolean): Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
+
+##### Returns
+
+([MigrationResult](#MigrationResult)) An object representing the details of the migration.
+
+#### .update(data, predicate)
+
+Updates all documents in this collection with the provided data.
+
+##### Arguments
+
+1. `data` (object): The data with which to update each document. Must be a non-empty object.
+2. `predicate` ((snapshot: QueryDocumentSnapshot) => boolean): Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
+
+##### Returns
+
+([MigrationResult](#MigrationResult)) An object representing the details of the migration.
+
+#### .update(field, value, predicate)
+
+Updates all documents in this collection with the provided field-value pair.
+
+##### Arguments
+
+1. `field` (string | firestore.FieldPath): The field to update in each document.
+2. `value` (any): The value with which to update the specified field in each document. Must not be `undefined`.
+3. `predicate` ((snapshot: QueryDocumentSnapshot) => boolean): Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
+
+##### Returns
+
+([MigrationResult](#MigrationResult)) An object representing the details of the migration.
 
 ### Traversable
 
