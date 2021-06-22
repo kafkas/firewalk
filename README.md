@@ -163,7 +163,7 @@ Sets all documents in this collection with the provided data.
 
 ##### Returns
 
-([MigrationResult](#MigrationResult)) An object representing the details of the migration.
+(Promise\<[MigrationResult](#MigrationResult)\>) A Promise resolving to an object representing the details of the migration.
 
 #### .set(data, options, predicate)
 
@@ -177,7 +177,7 @@ Sets all documents in this collection with the provided data.
 
 ##### Returns
 
-([MigrationResult](#MigrationResult)) An object representing the details of the migration.
+(Promise\<[MigrationResult](#MigrationResult)\>) A Promise resolving to an object representing the details of the migration.
 
 #### .update(getData, predicate)
 
@@ -190,7 +190,7 @@ Updates all documents in this collection with the provided data.
 
 ##### Returns
 
-([MigrationResult](#MigrationResult)) An object representing the details of the migration.
+(Promise\<[MigrationResult](#MigrationResult)\>) A Promise resolving to an object representing the details of the migration.
 
 #### .update(data, predicate)
 
@@ -203,7 +203,7 @@ Updates all documents in this collection with the provided data.
 
 ##### Returns
 
-([MigrationResult](#MigrationResult)) An object representing the details of the migration.
+(Promise\<[MigrationResult](#MigrationResult)\>) A Promise resolving to an object representing the details of the migration.
 
 #### .update(field, value, predicate)
 
@@ -217,7 +217,7 @@ Updates all documents in this collection with the provided field-value pair.
 
 ##### Returns
 
-([MigrationResult](#MigrationResult)) An object representing the details of the migration.
+(Promise\<[MigrationResult](#MigrationResult)\>) A Promise resolving to an object representing the details of the migration.
 
 ### Traversable
 
@@ -272,7 +272,7 @@ Traverses the entire collection in batches of the size specified in traversal co
 
 ##### Returns
 
-([TraversalResult](#TraversalResult)) An object representing the details of the traversal.
+(Promise\<[TraversalResult](#TraversalResult)\>) A Promise resolving to an object representing the details of the traversal.
 
 #### .traverseEach(callback, config)
 
@@ -285,7 +285,7 @@ Traverses the entire collection in batches of the size specified in traversal co
 
 ##### Returns
 
-([TraversalResult](#TraversalResult)) An object representing the details of the traversal.
+(Promise\<[TraversalResult](#TraversalResult)\>) A Promise resolving to an object representing the details of the traversal.
 
 ## License
 
