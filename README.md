@@ -93,18 +93,18 @@ Please note that although the Github docs for this project are work-in-progress,
 
 Creates a batch migrator object that facilitates Firestore collection migrations. Uses batch writes when writing to docs so the entire operation will fail if a single write isn't successful.
 
-#### Signature
+##### Signature
 
 ```
 createBatchMigrator<T>(traversable: Traversable<T>, config?: TraversalConfig): Migrator<T>
 ```
 
-#### Arguments
+##### Arguments
 
 1. traversable ([Traversable](#Traversable)): A collection-like traversable object.
-2. traversalConfig ([TraversalConfig](#TraversalConfig)): Optional. The traversal configuration with which the migrator is created.
+2. config ([TraversalConfig](#TraversalConfig)): Optional. The traversal configuration with which the migrator is created.
 
-#### Returns
+##### Returns
 
 ([Migrator](#Migrator)) A batch migrator object.
 
@@ -112,18 +112,18 @@ createBatchMigrator<T>(traversable: Traversable<T>, config?: TraversalConfig): M
 
 Creates a traverser object that facilitates Firestore collection traversals.
 
-#### Signature
+##### Signature
 
 ```
 createTraverser<T>(traversable: Traversable<T>, config?: TraversalConfig): Traverser<T>
 ```
 
-#### Arguments
+##### Arguments
 
 1. traversable ([Traversable](#Traversable)): A collection-like traversable object.
-2. traversalConfig ([TraversalConfig](#TraversalConfig)): Optional. The traversal configuration with which the traverser is created.
+2. config ([TraversalConfig](#TraversalConfig)): Optional. The traversal configuration with which the traverser is created.
 
-#### Returns
+##### Returns
 
 ([Traverser](#Traverser)) A traverser object.
 
