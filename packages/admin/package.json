@@ -8,9 +8,12 @@
     "firecode admin",
     "Firebase",
     "firebase",
+    "Firestore",
+    "firestore",
+    "Cloud Firestore",
+    "cloud firestore",
     "TypeScript",
-    "typescript",
-    "cloud firestore"
+    "typescript"
   ],
   "author": "Anar Kafkas <anarkafkas@gmail.com>",
   "homepage": "https://github.com/kafkas/firecode#readme",
