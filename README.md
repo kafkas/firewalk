@@ -103,7 +103,7 @@ const { migratedDocCount } = await migrator.update('isCompleted', false);
 console.log(`Successfully updated ${migratedDocCount} projects!`);
 ```
 
-### Add a new field based on the previous fields
+### Add a new field derived from the previous fields
 
 ```ts
 type UserDoc = {
