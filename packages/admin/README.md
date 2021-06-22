@@ -2,7 +2,7 @@
 
 Firecode is a Node.js library that lets you efficiently traverse Firestore collections.
 
-When you have millions of documents in a collection, you can't just get all of them at once as your machine's memory will explode. Firecode's configurable traverser objects let you do this in a simple, intuitive and memory-efficient way using batching.
+When you have millions of documents in a collection, you can't just get all of them at once as your program's memory will explode. Firecode's configurable traverser objects let you do this in a simple, intuitive and memory-efficient way using batching.
 
 Firecode is an extremely light, well-typed, zero-dependency library that is useful in a variety of scenarios. You can use it in database migration scripts (e.g. when you need to add a new field to all docs) or a scheduled Cloud Function that needs to check every doc in a collection periodically or a locally run script that retrieves some data from a collection.
 
