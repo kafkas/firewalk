@@ -1,10 +1,5 @@
 import type { firestore } from 'firebase-admin';
-import type { TraverseEachConfig, TraversalResult, TraversalConfig } from './types';
-
-export type BatchCallback<T = firestore.DocumentData> = (
-  batchSnapshots: firestore.QueryDocumentSnapshot<T>[],
-  batchIndex: number
-) => void;
+import type { TraverseEachConfig, TraversalResult, TraversalConfig, BatchCallback } from './types';
 
 export interface Traverser<T = firestore.DocumentData> {
   /**

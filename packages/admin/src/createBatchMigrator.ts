@@ -7,7 +7,7 @@ import type {
   SetOptions,
   SetDataGetter,
 } from './Migrator';
-import type { Traversable, TraversalConfig, MigrationResult } from './types';
+import type { Traversable, TraversalConfig, MigrationResult, BatchCallback } from './types';
 import { createTraverser } from './createTraverser';
 import { isPositiveInteger } from './_utils';
 
@@ -44,6 +44,14 @@ export function createBatchMigrator<T = firestore.DocumentData>(
       validateBatchMigratorTraversalConfig(c);
       this.traverser.setConfig(c);
       return this;
+    }
+
+    public onBeforeBatchStart(callback: BatchCallback<T>): void {
+      this.traverser.onBeforeBatchStart(callback);
+    }
+
+    public onAfterBatchComplete(callback: BatchCallback<T>): void {
+      this.traverser.onAfterBatchComplete(callback);
     }
 
     public async set<M extends boolean | undefined>(

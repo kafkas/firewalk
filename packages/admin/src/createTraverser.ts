@@ -1,6 +1,12 @@
 import type { firestore } from 'firebase-admin';
-import type { Traverser, BatchCallback } from './Traverser';
-import type { Traversable, TraversalConfig, TraverseEachConfig, TraversalResult } from './types';
+import type { Traverser } from './Traverser';
+import type {
+  Traversable,
+  TraversalConfig,
+  TraverseEachConfig,
+  TraversalResult,
+  BatchCallback,
+} from './types';
 import { sleep, isPositiveInteger } from './_utils';
 
 const defaultTraversalConfig: TraversalConfig = {
