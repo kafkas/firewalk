@@ -27,24 +27,24 @@ export interface Traverser<T = firestore.DocumentData> {
   onAfterBatchComplete(callback: BatchCallback<T>): void;
 
   /**
-   * Traverses the entire collection in batches of size `TraversalConfig.batchSize`. Invokes the
-   * specified callback sequentially for each document snapshot in each batch.
-   * @param callback The callback to invoke for each document snapshot.
+   * Traverses the entire collection in batches of the size specified in traversal config. Invokes the specified
+   * callback for each batch of document snapshots.
+   * @param callback An asynchronous callback function to invoke for each batch of document snapshots.
+   * @returns An object containing the number of batches and documents retrieved.
+   */
+  traverse(
+    callback: (batchSnapshots: firestore.QueryDocumentSnapshot<T>[]) => Promise<void>
+  ): Promise<TraversalResult>;
+
+  /**
+   * Traverses the entire collection in batches of the size specified in traversal config. Invokes the specified
+   * callback sequentially for each document snapshot in each batch.
+   * @param callback An asynchronous callback function to invoke for each document snapshot in each batch.
    * @param config The sequential traversal configuration.
    * @returns An object containing the number of batches and documents retrieved.
    */
   traverseEach(
     callback: (snapshot: firestore.QueryDocumentSnapshot<T>) => Promise<void>,
     config?: Partial<TraverseEachConfig>
-  ): Promise<TraversalResult>;
-
-  /**
-   * Traverses the entire collection in batches of size `TraversalConfig.batchSize`. Invokes the
-   * specified callback for each batch of document snapshots.
-   * @param callback The callback to invoke for each batch of document snapshots.
-   * @returns An object containing the number of batches and documents retrieved.
-   */
-  traverse(
-    callback: (batchSnapshots: firestore.QueryDocumentSnapshot<T>[]) => Promise<void>
   ): Promise<TraversalResult>;
 }

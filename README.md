@@ -239,11 +239,53 @@ A plain object representing the details of a traversal. Contains the following k
 - `batchCount` (number): The number of batches that have been retrieved in this traversal.
 - `docCount` (number): The number of documents that have been retrieved in this traversal.
 
+### TraverseEachConfig
+
+A plain object representing sequential traversal configuration. The keys allowed are:
+
+- `sleepBetweenDocs` (boolean): Whether to sleep before moving to the next doc. Defaults to `false`.
+- `sleepTimeBetweenDocs` (number): The amount of time (in ms) to "sleep" before moving to the next doc. Defaults to 500.
+
 ### Traverser
 
 A traverser object responsible for efficiently traversing collection-like document groups (collections, queries, collection groups).
 
-#### TODO: Methods
+#### .setConfig(config)
+
+Updates the specified keys of the traversal configuration.
+
+##### Arguments
+
+1. `config` (Partial\<[TraversalConfig](#TraversalConfig)\>): Partial traversal configuration.
+
+##### Returns
+
+([Traverser](#Traverser)) The traverser object itself.
+
+#### .traverse(callback)
+
+Traverses the entire collection in batches of the size specified in traversal config. Invokes the specified callback for each batch of document snapshots.
+
+##### Arguments
+
+1. `callback` ((batchSnapshots: QueryDocumentSnapshot[]) => Promise\<void\>): An asynchronous callback function to invoke for each batch of document snapshots.
+
+##### Returns
+
+([TraversalResult](#TraversalResult)) An object representing the details of the traversal.
+
+#### .traverseEach(callback, config)
+
+Traverses the entire collection in batches of the size specified in traversal config. Invokes the specified callback sequentially for each document snapshot in each batch.
+
+##### Arguments
+
+1. `callback` ((snapshot: QueryDocumentSnapshot) => Promise\<void\>): An asynchronous callback function to invoke for each document snapshot in each batch.
+2. `config` ([TraverseEachConfig](#TraverseEachConfig)): Optional. The sequential traversal configuration.
+
+##### Returns
+
+([TraversalResult](#TraversalResult)) An object representing the details of the traversal.
 
 ## License
 
