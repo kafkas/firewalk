@@ -36,7 +36,9 @@ function validateTraversalConfig(c: Partial<TraversalConfig> = {}): void {
 
   assertPositiveIntegerInConfig(batchSize, 'batchSize');
   assertPositiveIntegerInConfig(sleepTimeBetweenBatches, 'sleepTimeBetweenBatches');
-  assertPositiveIntegerInConfig(maxDocCount, 'maxDocCount');
+  if (maxDocCount !== Infinity) {
+    assertPositiveIntegerInConfig(maxDocCount, 'maxDocCount');
+  }
 }
 
 /**
