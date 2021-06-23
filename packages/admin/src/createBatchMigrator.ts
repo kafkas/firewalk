@@ -27,9 +27,8 @@ function validateBatchMigratorTraversalConfig(c: Partial<TraversalConfig> = {}):
 }
 
 /**
- * Creates a migrator object that facilitates Firestore collection migrations. Uses batch writes when writing
- * to documents so the entire operation will fail if a single write isn't successful. Uses a traverser object
- * internally to traverse the entire collection.
+ * Creates a batch migrator object that facilitates Firestore collection migrations. This migrator uses batch
+ * writes when writing to docs so the entire operation will fail if a single write isn't successful.
  */
 export function createBatchMigrator<T = firestore.DocumentData>(
   traversable: Traversable<T>,

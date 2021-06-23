@@ -6,7 +6,7 @@ Please note that although the Github docs for this project are work-in-progress,
 
 ## createBatchMigrator
 
-Creates a batch migrator object that facilitates Firestore collection migrations. Uses batch writes when writing to docs so the entire operation will fail if a single write isn't successful.
+Creates a batch migrator object that facilitates Firestore collection migrations. This migrator uses batch writes when writing to docs so the entire operation will fail if a single write isn't successful.
 
 #### Signature
 
@@ -25,12 +25,31 @@ createBatchMigrator<T>(traversable: Traversable<T>, config?: TraversalConfig): M
 
 ## createTraverser
 
-Creates a traverser object that facilitates Firestore collection traversals.
+Creates a traverser object that facilitates Firestore collection traversals. When traversing the collection, this traverser invokes a specified async callback for each batch of document snapshots and waits for the callback Promise to resolve before moving to the next batch.
 
 #### Signature
 
 ```
 createTraverser<T>(traversable: Traversable<T>, config?: TraversalConfig): Traverser<T>
+```
+
+#### Arguments
+
+1. `traversable` ([Traversable](#Traversable)): A collection-like traversable object.
+2. `config` ([TraversalConfig](#TraversalConfig)): Optional. The traversal configuration with which the traverser is created.
+
+#### Returns
+
+([Traverser](#Traverser)) A traverser object.
+
+## createFastTraverser (coming in the next release)
+
+Creates a fast traverser object that facilitates Firestore collection traversals. When traversing the collection, this traverser invokes a specified async callback for each batch of document snapshots and immediately moves to the next batch. It does not wait for the callback Promise to resolve before moving to the next batch so there is no guarantee that any given batch will finish processing before a later batch. This traverser uses more memory but is significantly faster than the default traverser.
+
+#### Signature
+
+```
+createFastTraverser<T>(traversable: Traversable<T>, config?: TraversalConfig): FastTraverser<T>
 ```
 
 #### Arguments

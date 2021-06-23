@@ -149,17 +149,19 @@ console.log(`Successfully updated ${migratedDocCount} users!`);
 
 You can find the full API reference for `@firecode/admin` [here](./packages/admin/docs/API.md). Here are the core functions that this library provides.
 
-### .createBatchMigrator()
+### [createBatchMigrator](./packages/admin/docs/API.md#createBatchMigrator)
 
-Creates a batch migrator object that facilitates Firestore collection migrations. Uses batch writes when writing to docs so the entire operation will fail if a single write isn't successful.
+Creates a batch migrator object that facilitates Firestore collection migrations. This migrator uses batch writes when writing to docs so the entire operation will fail if a single write isn't successful.
 
-### .createTraverser()
+### [createTraverser](./packages/admin/docs/API.md#createTraverser)
 
-Creates a traverser object that facilitates Firestore collection traversals. Invokes a specified async callback for each batch of document snapshots. Waits for the callback Promise to resolve before moving to the next batch.
+Creates a traverser object that facilitates Firestore collection traversals. When traversing the collection, this traverser invokes a specified async callback for each batch of document snapshots and waits for the callback Promise to resolve before moving to the next batch.
 
-### .createFastTraverser() (coming in the next release)
+### [createFastTraverser](./packages/admin/docs/API.md#createFastTraverser) (coming in the next release)
 
-Creates a fast traverser object that facilitates Firestore collection traversals. Invokes a specified async callback for each batch of document snapshots and immediately moves to the next batch. Does not wait for the callback Promise to resolve before moving to the next batch so there is no guarantee that any given batch will finish processing before a later batch. This traverser uses more memory but is significantly faster than the default traverser.
+Creates a fast traverser object that facilitates Firestore collection traversals. When traversing the collection, this traverser invokes a specified async callback for each batch of document snapshots and immediately moves to the next batch. It does not wait for the callback Promise to resolve before moving to the next batch so there is no guarantee that any given batch will finish processing before a later batch. This traverser uses more memory but is significantly faster than the default traverser.
+
+<!-- TODO: Add space complexity -->
 
 ## Upgrading
 
