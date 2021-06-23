@@ -48,37 +48,24 @@ npm install @firecode/admin
 
 ## Quick Start
 
-Suppose we want to send an email to all our users. We have a `users` collection that needs to be traversed. The following piece of code uses a Firecode traverser to do this simply and efficiently.
+Suppose we have a `users` collection and we want to send an email to each user. This is how easy it is to do that efficiently with a Firecode traverser:
 
 ```ts
 import { firestore } from 'firebase-admin';
 import { createTraverser } from '@firecode/admin';
 
 const usersCollection = firestore().collection('users');
+const traverser = createTraverser(usersCollection);
 
-const traverser = createTraverser(usersCollection, {
-  // We want each batch to have 500 docs. Obviously, the size of the very last batch may be less than 500
-  batchSize: 500,
-  // We want to wait before moving to the next batch
-  sleepBetweenBatches: true,
-  // We'll wait 500ms before moving to the next batch
-  sleepTimeBetweenBatches: 500,
-});
-
-const { batchCount, docCount } = await traverser.traverse(async (snapshots) => {
-  const batchSize = snapshots.length;
-
-  const sendEmailToEachUserInBatch = () =>
-    Promise.all(
-      snapshots.map(async (snapshot) => {
-        const { email, firstName } = snapshot.data();
-        await sendEmail({ to: email, content: `Hello ${firstName}!` });
-      })
-    );
-
-  await sendEmailToEachUserInBatch();
-
-  console.log(`Successfully emailed ${batchSize} users in this batch.`);
+const { batchCount, docCount } = await traverser.traverse(async (batchDocs, batchIndex) => {
+  const batchSize = batchDocs.length;
+  await Promise.all(
+    batchDocs.map(async (snapshot) => {
+      const { email, firstName } = snapshot.data();
+      await sendEmail({ to: email, content: `Hello ${firstName}!` });
+    })
+  );
+  console.log(`Batch ${batchIndex} done! We emailed ${batchSize} users in this batch.`);
 });
 
 console.log(`Traversal done! We emailed ${docCount} users in ${batchCount} batches!`);
@@ -87,7 +74,7 @@ console.log(`Traversal done! We emailed ${docCount} users in ${batchCount} batch
 We are doing 3 things here:
 
 1. Create a reference to the `users` collection
-2. Pass that reference to the `createTraverser()` function and create the traverser with our desired configuration
+2. Pass that reference to the `createTraverser()` function
 3. Invoke `.traverse()` with an async callback that is called for each batch of document snapshots
 
 This pretty much sums up the core functionality of this library! The `.traverse()` method returns a Promise that resolves when the entire traversal finishes, which can take a while if you have millions of docs. The Promise resolves with an object containing the traversal details e.g. the number of docs you touched.
@@ -113,7 +100,15 @@ type UserDoc = {
 };
 
 const usersCollection = firestore().collection('users') as firestore.CollectionReference<UserDoc>;
-const migrator = createBatchMigrator(usersCollection, { batchSize: 250 });
+
+const migrator = createBatchMigrator(usersCollection, {
+  // We want each batch to have 500 docs. The size of the very last batch may be less than 500
+  batchSize: 500,
+  // We want to wait before moving to the next batch
+  sleepBetweenBatches: true,
+  // We want to wait 500ms before moving to the next batch
+  sleepTimeBetweenBatches: 500,
+});
 
 const { migratedDocCount } = await migrator.update((snap) => {
   const { firstName, lastName } = snap.data();
