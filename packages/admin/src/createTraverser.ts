@@ -55,10 +55,9 @@ export function createTraverser<T = firestore.DocumentData>(
       onAfterBatchComplete?: BatchCallback<T>;
     } = {};
 
-    public setConfig(c: Partial<TraversalConfig>): Traverser<T> {
+    public withConfig(c: Partial<TraversalConfig>): Traverser<T> {
       validateTraversalConfig(c);
-      this.traversalConfig = { ...this.traversalConfig, ...c };
-      return this;
+      return createTraverser(traversable, { ...this.traversalConfig, ...c });
     }
 
     public onBeforeBatchStart(callback: BatchCallback<T>): void {

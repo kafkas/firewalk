@@ -20,9 +20,9 @@ export interface Migrator<T = firestore.DocumentData> {
   /**
    * Updates the specified keys of the traversal configuration.
    * @param config Partial traversal configuration.
-   * @returns The migrator object itself.
+   * @returns A new migrator object.
    */
-  setConfig(config: Partial<TraversalConfig>): Migrator<T>;
+  withConfig(config: Partial<TraversalConfig>): Migrator<T>;
 
   /**
    * Registers a callback function that fires right before the current batch starts processing.

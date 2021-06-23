@@ -40,10 +40,10 @@ export function createBatchMigrator<T = firestore.DocumentData>(
   class CollectionBatchMigrator implements Migrator<T> {
     private traverser = createTraverser(traversable, traversalConfig);
 
-    public setConfig(c: Partial<TraversalConfig>): Migrator<T> {
+    public withConfig(c: Partial<TraversalConfig>): Migrator<T> {
       validateBatchMigratorTraversalConfig(c);
-      this.traverser.setConfig(c);
-      return this;
+      this.traverser.withConfig(c);
+      return createBatchMigrator(traversable, { ...traversalConfig, ...c });
     }
 
     public onBeforeBatchStart(callback: BatchCallback<T>): void {

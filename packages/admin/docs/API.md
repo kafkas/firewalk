@@ -54,7 +54,7 @@ A plain object representing the details of a migration. Contains the following k
 
 A migrator object responsible for efficiently traversing collection-like document groups (collections, queries, collection groups) and writing to the docs retrieved in each batch. Batch migrators rely on a traverser internally to traverse the entire collection.
 
-### .setConfig(config)
+### .withConfig(config)
 
 Updates the specified keys of the traversal configuration.
 
@@ -64,7 +64,7 @@ Updates the specified keys of the traversal configuration.
 
 #### Returns
 
-([Migrator](#Migrator)) The migrator object itself.
+([Migrator](#Migrator)) A new migrator object.
 
 ### .set(getData, options, predicate)
 
@@ -165,7 +165,7 @@ A plain object representing sequential traversal configuration. The keys allowed
 
 A traverser object responsible for efficiently traversing collection-like document groups (collections, queries, collection groups).
 
-### .setConfig(config)
+### .withConfig(config)
 
 Updates the specified keys of the traversal configuration.
 
@@ -175,7 +175,7 @@ Updates the specified keys of the traversal configuration.
 
 #### Returns
 
-([Traverser](#Traverser)) The traverser object itself.
+([Traverser](#Traverser)) A new traverser object.
 
 ### .traverse(callback)
 
