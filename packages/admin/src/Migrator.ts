@@ -26,13 +26,13 @@ export interface Migrator<T = firestore.DocumentData> {
 
   /**
    * Registers a callback function that fires right before the current batch starts processing.
-   * @param callback A synchronous callback that takes batch doc snapshots and the 1-based batch index as its arguments.
+   * @param callback A synchronous callback that takes batch doc snapshots and the 0-based batch index as its arguments.
    */
   onBeforeBatchStart(callback: BatchCallback<T>): void;
 
   /**
    * Registers a callback function that fires after the current batch is processed.
-   * @param callback A synchronous callback that takes batch doc snapshots and the 1-based batch index as its arguments.
+   * @param callback A synchronous callback that takes batch doc snapshots and the 0-based batch index as its arguments.
    */
   onAfterBatchComplete(callback: BatchCallback<T>): void;
 

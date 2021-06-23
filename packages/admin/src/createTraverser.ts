@@ -99,7 +99,7 @@ export function createTraverser<T = firestore.DocumentData>(
         maxDocCount,
       } = this.traversalConfig;
 
-      let batchCount = 0;
+      let batchIndex = 0;
       let docCount = 0;
       let query = traversable.limit(Math.min(batchSize, maxDocCount));
 
@@ -111,10 +111,8 @@ export function createTraverser<T = firestore.DocumentData>(
           break;
         }
 
-        const batchIndex = batchCount + 1;
         const lastDocInBatch = batchDocSnapshots[batchDocCount - 1];
 
-        batchCount++;
         docCount += batchDocCount;
 
         this.registeredCallbacks.onBeforeBatchStart?.(batchDocSnapshots, batchIndex);
@@ -128,13 +126,14 @@ export function createTraverser<T = firestore.DocumentData>(
         }
 
         query = query.startAfter(lastDocInBatch).limit(Math.min(batchSize, maxDocCount - docCount));
+        batchIndex++;
 
         if (sleepBetweenBatches) {
           await sleep(sleepTimeBetweenBatches);
         }
       }
 
-      return { batchCount, docCount };
+      return { batchCount: batchIndex, docCount };
     }
   }
 
