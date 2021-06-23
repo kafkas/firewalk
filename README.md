@@ -29,7 +29,8 @@ Firecode is an extremely light, well-typed, zero-dependency library that is usef
 2. [Quick Start](#Quick-Start)
 3. [More Examples](#More-Examples)
 4. [API](#API)
-5. [License](#License)
+5. [Upgrading/Changelog](#Upgrading/Changelog)
+6. [License](#License)
 
 ## Installation
 
@@ -152,6 +153,10 @@ console.log(`Successfully updated ${migratedDocCount} users!`);
 ## [API](./packages/admin/docs/API.md)
 
 You can find the full API reference for `@firecode/admin` [here](./packages/admin/docs/API.md).
+
+## Upgrading/Changelog
+
+This project is still very new and we have a lot to work on. We will be moving fast and until we release v1, there may be breaking changes between minor versions (e.g. when upgrading from 0.4 to 0.5). However, all breaking changes will be documented and you can always visit our [Releases](https://github.com/kafkas/firecode/releases) page to view the important changes between versions.
 
 ## License
 
