@@ -147,7 +147,19 @@ console.log(`Successfully updated ${migratedDocCount} users!`);
 
 ## [API](./docs/API.md)
 
-You can find the full API reference for `@firecode/admin` [here](./docs/API.md).
+You can find the full API reference for `@firecode/admin` [here](./docs/API.md). Here are the core functions that this library provides.
+
+### .createBatchMigrator()
+
+Creates a batch migrator object that facilitates Firestore collection migrations. Uses batch writes when writing to docs so the entire operation will fail if a single write isn't successful.
+
+### .createTraverser()
+
+Creates a traverser object that facilitates Firestore collection traversals. Executes a specified async callback for each batch of document snapshots. Waits for the callback to resolve before moving to the next batch.
+
+### .createFastTraverser() (coming in the next release)
+
+Creates a fast traverser object that facilitates Firestore collection traversals. Executes a specified async callback for each batch of document snapshots and immediately moves to the next batch. Does not wait for the callback to resolve before moving to the next batch so there is no guarantee that any given batch will finish processing before a later batch. This traverser uses more memory but is significantly faster than the default traverser.
 
 ## Upgrading
 

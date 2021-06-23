@@ -29,7 +29,7 @@ export interface Traverser<T = firestore.DocumentData> {
 
   /**
    * Traverses the entire collection in batches of the size specified in traversal config. Invokes the specified
-   * callback for each batch of document snapshots.
+   * async callback for each batch of document snapshots. Waits for the callback Promise to resolve before moving to the next batch.
    * @param callback An asynchronous callback function to invoke for each batch of document snapshots.
    * @returns A Promise resolving to an object representing the details of the traversal.
    */
