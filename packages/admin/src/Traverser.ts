@@ -1,5 +1,11 @@
 import type { firestore } from 'firebase-admin';
-import type { TraverseEachConfig, TraversalResult, TraversalConfig, BatchCallback } from './types';
+import type {
+  TraverseEachConfig,
+  TraversalResult,
+  TraversalConfig,
+  BatchCallback,
+  BatchCallbackAsync,
+} from './types';
 
 export interface Traverser<T = firestore.DocumentData> {
   /**
@@ -27,9 +33,7 @@ export interface Traverser<T = firestore.DocumentData> {
    * @param callback An asynchronous callback function to invoke for each batch of document snapshots.
    * @returns A Promise resolving to an object representing the details of the traversal.
    */
-  traverse(
-    callback: (batchSnapshots: firestore.QueryDocumentSnapshot<T>[]) => Promise<void>
-  ): Promise<TraversalResult>;
+  traverse(callback: BatchCallbackAsync<T>): Promise<TraversalResult>;
 
   /**
    * Traverses the entire collection in batches of the size specified in traversal config. Invokes the specified

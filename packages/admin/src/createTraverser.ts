@@ -6,6 +6,7 @@ import type {
   TraverseEachConfig,
   TraversalResult,
   BatchCallback,
+  BatchCallbackAsync,
 } from './types';
 import { sleep, isPositiveInteger } from './_utils';
 
@@ -89,9 +90,7 @@ export function createTraverser<T = firestore.DocumentData>(
       return { batchCount, docCount };
     }
 
-    public async traverse(
-      callback: (batchSnapshots: firestore.QueryDocumentSnapshot<T>[]) => Promise<void>
-    ): Promise<TraversalResult> {
+    public async traverse(callback: BatchCallbackAsync<T>): Promise<TraversalResult> {
       const {
         batchSize,
         sleepBetweenBatches,
@@ -117,7 +116,7 @@ export function createTraverser<T = firestore.DocumentData>(
 
         this.registeredCallbacks.onBeforeBatchStart?.(batchDocSnapshots, batchIndex);
 
-        await callback(batchDocSnapshots);
+        await callback(batchDocSnapshots, batchIndex);
 
         this.registeredCallbacks.onAfterBatchComplete?.(batchDocSnapshots, batchIndex);
 
