@@ -13,17 +13,17 @@ export type Traversable<T = firestore.DocumentData> =
  */
 export interface BaseTraversalConfig {
   /**
-   * The number of documents that will be traversed in each batch. Defaults to 100.
+   * The number of documents that will be traversed in each batch. Defaults to 250.
    */
   batchSize: number;
 
   /**
-   * Whether to sleep between batches. Defaults to `true`.
+   * Whether to sleep between batches. Defaults to `false`.
    */
   sleepBetweenBatches: boolean;
 
   /**
-   * The amount of time (in ms) to "sleep" before moving on to the next batch. Defaults to 1000.
+   * The amount of time (in ms) to "sleep" before moving on to the next batch. Defaults to 500.
    */
   sleepTimeBetweenBatches: number;
 
