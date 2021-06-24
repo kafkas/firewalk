@@ -4,7 +4,6 @@ import type {
   TraverseEachConfig,
   TraversalResult,
   BaseTraversalConfig,
-  BatchCallback,
   BatchCallbackAsync,
 } from './types';
 
@@ -18,18 +17,6 @@ export interface Traverser<D = firestore.DocumentData> {
    * @returns The newly created traverser.
    */
   withConfig(config: Partial<BaseTraversalConfig>): Traverser<D>;
-
-  /**
-   * Registers a callback function that fires right before the current batch starts processing.
-   * @param callback A synchronous callback that takes batch doc snapshots and the 0-based batch index as its arguments.
-   */
-  onBeforeBatchStart(callback: BatchCallback<D>): void;
-
-  /**
-   * Registers a callback function that fires after the current batch is processed.
-   * @param callback A synchronous callback that takes batch doc snapshots and the 0-based batch index as its arguments.
-   */
-  onAfterBatchComplete(callback: BatchCallback<D>): void;
 
   /**
    * Traverses the entire collection in batches of the size specified in traversal config. Invokes the specified

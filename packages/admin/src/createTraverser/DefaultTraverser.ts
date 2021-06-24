@@ -49,11 +49,7 @@ export class DefaultTraverser<D = firestore.DocumentData>
 
       docCount += batchDocCount;
 
-      this.registeredCallbacks.onBeforeBatchStart?.(batchDocSnapshots, batchIndex);
-
       await callback(batchDocSnapshots, batchIndex);
-
-      this.registeredCallbacks.onAfterBatchComplete?.(batchDocSnapshots, batchIndex);
 
       if (docCount === maxDocCount) {
         break;

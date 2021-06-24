@@ -3,7 +3,6 @@ import type {
   BaseTraversalConfig,
   TraverseEachConfig,
   TraversalResult,
-  BatchCallback,
   BatchCallbackAsync,
 } from '../types';
 import { sleep, isPositiveInteger } from '../utils';
@@ -45,23 +44,10 @@ export abstract class BaseTraverser<C extends BaseTraversalConfig, D = firestore
   }
 
   protected readonly traversalConfig: C;
-  protected readonly registeredCallbacks: {
-    onBeforeBatchStart?: BatchCallback<D>;
-    onAfterBatchComplete?: BatchCallback<D>;
-  };
 
   protected constructor(c: C) {
     validateTraversalConfig(c);
     this.traversalConfig = c;
-    this.registeredCallbacks = {};
-  }
-
-  public onBeforeBatchStart(callback: BatchCallback<D>): void {
-    this.registeredCallbacks.onBeforeBatchStart = callback;
-  }
-
-  public onAfterBatchComplete(callback: BatchCallback<D>): void {
-    this.registeredCallbacks.onAfterBatchComplete = callback;
   }
 
   public async traverseEach(

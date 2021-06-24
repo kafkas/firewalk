@@ -82,9 +82,8 @@ export class ObservableQueueBasedFastTraverser<D = firestore.DocumentData>
       queueState.hasNewItems = false;
 
       await Promise.all(
-        dequeuedItems.map(async ({ promise, batchDocs, batchIndex }) => {
+        dequeuedItems.map(async ({ promise }) => {
           await promise;
-          this.registeredCallbacks.onAfterBatchComplete?.(batchDocs, batchIndex);
         })
       );
     };
@@ -101,7 +100,6 @@ export class ObservableQueueBasedFastTraverser<D = firestore.DocumentData>
 
       docCount += batchDocCount;
 
-      this.registeredCallbacks.onBeforeBatchStart?.(batchDocSnapshots, curBatchIndex);
       callbackPromiseQueue.enqueue({
         batchDocs: batchDocSnapshots,
         batchIndex: curBatchIndex,
