@@ -1,45 +1,15 @@
 import type { firestore } from 'firebase-admin';
+import { BaseTraverser } from './BaseTraverser';
 import type { Traverser } from './Traverser';
 import type {
   Traversable,
-  TraversalConfig,
-  TraverseEachConfig,
+  BaseTraversalConfig,
   TraversalResult,
-  BatchCallback,
   BatchCallbackAsync,
 } from './types';
-import { sleep, isPositiveInteger } from './_utils';
+import { sleep } from './_utils';
 
-const defaultTraversalConfig: TraversalConfig = {
-  batchSize: 100,
-  sleepBetweenBatches: true,
-  sleepTimeBetweenBatches: 1_000,
-  maxDocCount: Infinity,
-};
-
-const defaultTraverseEachConfig: TraverseEachConfig = {
-  sleepBetweenDocs: false,
-  sleepTimeBetweenDocs: 500,
-};
-
-function assertPositiveIntegerInConfig(
-  num: number | undefined,
-  field: keyof TraversalConfig
-): asserts num {
-  if (typeof num === 'number' && !isPositiveInteger(num)) {
-    throw new Error(`The '${field}' field in traversal config must be a positive integer.`);
-  }
-}
-
-function validateTraversalConfig(c: Partial<TraversalConfig> = {}): void {
-  const { batchSize, sleepTimeBetweenBatches, maxDocCount } = c;
-
-  assertPositiveIntegerInConfig(batchSize, 'batchSize');
-  assertPositiveIntegerInConfig(sleepTimeBetweenBatches, 'sleepTimeBetweenBatches');
-  if (maxDocCount !== Infinity) {
-    assertPositiveIntegerInConfig(maxDocCount, 'maxDocCount');
-  }
-}
+export type DefaultTraversalConfig = BaseTraversalConfig;
 
 /**
  * Creates a traverser object that facilitates Firestore collection traversals. When traversing the collection,
@@ -48,49 +18,18 @@ function validateTraversalConfig(c: Partial<TraversalConfig> = {}): void {
  */
 export function createTraverser<T = firestore.DocumentData>(
   traversable: Traversable<T>,
-  config: Partial<TraversalConfig> = {}
+  config: Partial<DefaultTraversalConfig> = {}
 ): Traverser<T> {
-  validateTraversalConfig(config);
+  class DefaultTraverser extends BaseTraverser<T> implements Traverser<T> {
+    public readonly traversable: Traversable<T>;
 
-  class DefaultTraverser implements Traverser<T> {
-    private traversalConfig: TraversalConfig = { ...defaultTraversalConfig, ...config };
-    private registeredCallbacks: {
-      onBeforeBatchStart?: BatchCallback<T>;
-      onAfterBatchComplete?: BatchCallback<T>;
-    } = {};
-
-    public withConfig(c: Partial<TraversalConfig>): Traverser<T> {
-      validateTraversalConfig(c);
-      return createTraverser(traversable, { ...this.traversalConfig, ...c });
+    public constructor(t: Traversable<T>) {
+      super(config);
+      this.traversable = t;
     }
 
-    public onBeforeBatchStart(callback: BatchCallback<T>): void {
-      this.registeredCallbacks.onBeforeBatchStart = callback;
-    }
-
-    public onAfterBatchComplete(callback: BatchCallback<T>): void {
-      this.registeredCallbacks.onAfterBatchComplete = callback;
-    }
-
-    public async traverseEach(
-      callback: (snapshot: firestore.QueryDocumentSnapshot<T>) => Promise<void>,
-      c: Partial<TraverseEachConfig> = {}
-    ): Promise<TraversalResult> {
-      const { sleepBetweenDocs, sleepTimeBetweenDocs } = {
-        ...defaultTraverseEachConfig,
-        ...c,
-      };
-
-      const { batchCount, docCount } = await this.traverse(async (docSnapshots) => {
-        for (let i = 0; i < docSnapshots.length; i++) {
-          await callback(docSnapshots[i]);
-          if (sleepBetweenDocs) {
-            await sleep(sleepTimeBetweenDocs);
-          }
-        }
-      });
-
-      return { batchCount, docCount };
+    public withConfig(c: Partial<DefaultTraversalConfig>): Traverser<T> {
+      return createTraverser(this.traversable, { ...this.traversalConfig, ...c });
     }
 
     public async traverse(callback: BatchCallbackAsync<T>): Promise<TraversalResult> {
@@ -103,7 +42,7 @@ export function createTraverser<T = firestore.DocumentData>(
 
       let batchIndex = 0;
       let docCount = 0;
-      let query = traversable.limit(Math.min(batchSize, maxDocCount));
+      let query = this.traversable.limit(Math.min(batchSize, maxDocCount));
 
       while (true) {
         const { docs: batchDocSnapshots } = await query.get();
@@ -139,5 +78,5 @@ export function createTraverser<T = firestore.DocumentData>(
     }
   }
 
-  return new DefaultTraverser();
+  return new DefaultTraverser(traversable);
 }

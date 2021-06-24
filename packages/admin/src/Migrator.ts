@@ -1,5 +1,6 @@
 import type { firestore } from 'firebase-admin';
-import type { TraversalConfig, MigrationResult, BatchCallback } from './types';
+import type { Traverser } from './Traverser';
+import type { MigrationResult } from './types';
 
 export type MigrationPredicate<T> = (snapshot: firestore.QueryDocumentSnapshot<T>) => boolean;
 
@@ -17,24 +18,7 @@ export type SetOptions<M> = {
 export type SetDataGetter<T, M> = (snapshot: firestore.QueryDocumentSnapshot<T>) => SetData<T, M>;
 
 export interface Migrator<T = firestore.DocumentData> {
-  /**
-   * Updates the specified keys of the traversal configuration.
-   * @param config Partial traversal configuration.
-   * @returns A new migrator object.
-   */
-  withConfig(config: Partial<TraversalConfig>): Migrator<T>;
-
-  /**
-   * Registers a callback function that fires right before the current batch starts processing.
-   * @param callback A synchronous callback that takes batch doc snapshots and the 0-based batch index as its arguments.
-   */
-  onBeforeBatchStart(callback: BatchCallback<T>): void;
-
-  /**
-   * Registers a callback function that fires after the current batch is processed.
-   * @param callback A synchronous callback that takes batch doc snapshots and the 0-based batch index as its arguments.
-   */
-  onAfterBatchComplete(callback: BatchCallback<T>): void;
+  readonly traverser: Traverser<T>;
 
   /**
    * Sets all documents in this collection with the provided data.

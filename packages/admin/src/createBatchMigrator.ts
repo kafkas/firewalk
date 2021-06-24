@@ -1,4 +1,5 @@
 import type { firestore } from 'firebase-admin';
+import type { Traverser } from './Traverser';
 import type {
   Migrator,
   MigrationPredicate,
@@ -7,13 +8,13 @@ import type {
   SetOptions,
   SetDataGetter,
 } from './Migrator';
-import type { Traversable, TraversalConfig, MigrationResult, BatchCallback } from './types';
+import type { Traversable, BaseTraversalConfig, MigrationResult, BatchCallback } from './types';
 import { createTraverser } from './createTraverser';
-import { isPositiveInteger } from './_utils';
+import { isPositiveInteger, isTraverser } from './_utils';
 
 const MAX_BATCH_WRITE_DOC_COUNT = 500;
 
-function validateBatchMigratorTraversalConfig(c: Partial<TraversalConfig> = {}): void {
+function validateBatchMigratorTraversalConfig(c: Partial<BaseTraversalConfig> = {}): void {
   const { batchSize } = c;
 
   if (
@@ -26,24 +27,29 @@ function validateBatchMigratorTraversalConfig(c: Partial<TraversalConfig> = {}):
   }
 }
 
+export function createBatchMigrator<T = firestore.DocumentData>(
+  traverser: Traverser<T>
+): Migrator<T>;
+
+export function createBatchMigrator<T = firestore.DocumentData>(
+  traversable: Traversable<T>,
+  traversalConfig?: Partial<BaseTraversalConfig>
+): Migrator<T>;
+
 /**
  * Creates a batch migrator object that facilitates Firestore collection migrations. This migrator uses batch
  * writes when writing to docs so the entire operation will fail if a single write isn't successful.
  */
 export function createBatchMigrator<T = firestore.DocumentData>(
-  traversable: Traversable<T>,
-  traversalConfig?: Partial<TraversalConfig>
+  traversableOrTraverser: Traverser<T> | Traversable<T>,
+  traversalConfig?: Partial<BaseTraversalConfig>
 ): Migrator<T> {
   validateBatchMigratorTraversalConfig(traversalConfig);
 
-  class CollectionBatchMigrator implements Migrator<T> {
-    private traverser = createTraverser(traversable, traversalConfig);
-
-    public withConfig(c: Partial<TraversalConfig>): Migrator<T> {
-      validateBatchMigratorTraversalConfig(c);
-      this.traverser.withConfig(c);
-      return createBatchMigrator(traversable, { ...traversalConfig, ...c });
-    }
+  class BatchMigrator implements Migrator<T> {
+    public readonly traverser = isTraverser(traversableOrTraverser)
+      ? traversableOrTraverser
+      : createTraverser(traversableOrTraverser, traversalConfig);
 
     public onBeforeBatchStart(callback: BatchCallback<T>): void {
       this.traverser.onBeforeBatchStart(callback);
@@ -62,7 +68,7 @@ export function createBatchMigrator<T = firestore.DocumentData>(
 
       const { batchCount, docCount: traversedDocCount } = await this.traverser.traverse(
         async (snapshots) => {
-          const writeBatch = traversable.firestore.batch();
+          const writeBatch = this.traverser.traversable.firestore.batch();
           let migratableDocCount = 0;
 
           snapshots.forEach((snapshot) => {
@@ -103,7 +109,7 @@ export function createBatchMigrator<T = firestore.DocumentData>(
 
       const { batchCount, docCount: traversedDocCount } = await this.traverser.traverse(
         async (snapshots) => {
-          const writeBatch = traversable.firestore.batch();
+          const writeBatch = this.traverser.traversable.firestore.batch();
           let migratableDocCount = 0;
 
           snapshots.forEach((snapshot) => {
@@ -147,5 +153,5 @@ export function createBatchMigrator<T = firestore.DocumentData>(
     }
   }
 
-  return new CollectionBatchMigrator();
+  return new BatchMigrator();
 }

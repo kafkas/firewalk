@@ -1,19 +1,22 @@
 import type { firestore } from 'firebase-admin';
 import type {
+  Traversable,
   TraverseEachConfig,
   TraversalResult,
-  TraversalConfig,
+  BaseTraversalConfig,
   BatchCallback,
   BatchCallbackAsync,
 } from './types';
 
 export interface Traverser<T = firestore.DocumentData> {
+  readonly traversable: Traversable<T>; // TODO: Probably needs to be generic
+
   /**
    * Updates the specified keys of the traverser configuration.
    * @param config Partial traversal configuration.
    * @returns A new traverser object.
    */
-  withConfig(config: Partial<TraversalConfig>): Traverser<T>;
+  withConfig(config: Partial<BaseTraversalConfig>): Traverser<T>;
 
   /**
    * Registers a callback function that fires right before the current batch starts processing.

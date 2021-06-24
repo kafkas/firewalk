@@ -11,7 +11,7 @@ export type Traversable<T = firestore.DocumentData> =
 /**
  * The configuration with which a traverser is created.
  */
-export interface TraversalConfig {
+export interface BaseTraversalConfig {
   /**
    * The number of documents that will be traversed in each batch. Defaults to 100.
    */

@@ -1,44 +1,30 @@
 import type { firestore } from 'firebase-admin';
+import { BaseTraverser } from './BaseTraverser';
 import type { Traverser } from './Traverser';
 import type {
   Traversable,
-  TraversalConfig,
-  TraverseEachConfig,
+  BaseTraversalConfig,
   TraversalResult,
-  BatchCallback,
   BatchCallbackAsync,
 } from './types';
 import { isPositiveInteger } from './_utils';
 
-const defaultTraversalConfig: TraversalConfig = {
-  batchSize: 100,
-  sleepBetweenBatches: true,
-  sleepTimeBetweenBatches: 1_000,
-  maxDocCount: Infinity,
-};
-
-const defaultTraverseEachConfig: TraverseEachConfig = {
-  sleepBetweenDocs: false,
-  sleepTimeBetweenDocs: 500,
-};
+interface FastTraversalConfig extends BaseTraversalConfig {
+  maxInMemoryBatchCount: number;
+}
 
 function assertPositiveIntegerInConfig(
   num: number | undefined,
-  field: keyof TraversalConfig
+  field: keyof FastTraversalConfig
 ): asserts num {
   if (typeof num === 'number' && !isPositiveInteger(num)) {
     throw new Error(`The '${field}' field in traversal config must be a positive integer.`);
   }
 }
 
-function validateTraversalConfig(c: Partial<TraversalConfig> = {}): void {
-  const { batchSize, sleepTimeBetweenBatches, maxDocCount } = c;
-
-  assertPositiveIntegerInConfig(batchSize, 'batchSize');
-  assertPositiveIntegerInConfig(sleepTimeBetweenBatches, 'sleepTimeBetweenBatches');
-  if (maxDocCount !== Infinity) {
-    assertPositiveIntegerInConfig(maxDocCount, 'maxDocCount');
-  }
+function validateFastTraversalConfig(c: Partial<FastTraversalConfig> = {}): void {
+  const { maxInMemoryBatchCount } = c;
+  assertPositiveIntegerInConfig(maxInMemoryBatchCount, 'maxInMemoryBatchCount');
 }
 
 /**
@@ -50,36 +36,20 @@ function validateTraversalConfig(c: Partial<TraversalConfig> = {}): void {
  */
 export function createFastTraverser<T = firestore.DocumentData>(
   traversable: Traversable<T>,
-  config: Partial<TraversalConfig> = {}
+  config: Partial<FastTraversalConfig> = {}
 ): Traverser<T> {
-  validateTraversalConfig(config);
+  validateFastTraversalConfig(config);
 
-  class FastTraverser implements Traverser<T> {
-    private traversalConfig: TraversalConfig = { ...defaultTraversalConfig, ...config };
-    private registeredCallbacks: {
-      onBeforeBatchStart?: BatchCallback<T>;
-      onAfterBatchComplete?: BatchCallback<T>;
-    } = {};
+  class FastTraverser extends BaseTraverser<T> implements Traverser<T> {
+    public readonly traversable: Traversable<T>;
 
-    public withConfig(c: Partial<TraversalConfig>): Traverser<T> {
-      validateTraversalConfig(c);
-      return createFastTraverser(traversable, { ...this.traversalConfig, ...c });
+    public constructor(t: Traversable<T>) {
+      super(config);
+      this.traversable = t;
     }
 
-    public onBeforeBatchStart(callback: BatchCallback<T>): void {
-      this.registeredCallbacks.onBeforeBatchStart = callback;
-    }
-
-    public onAfterBatchComplete(callback: BatchCallback<T>): void {
-      this.registeredCallbacks.onAfterBatchComplete = callback;
-    }
-
-    // TODO: Implement
-    public async traverseEach(
-      callback: (snapshot: firestore.QueryDocumentSnapshot<T>) => Promise<void>,
-      c: Partial<TraverseEachConfig> = {}
-    ): Promise<TraversalResult> {
-      return { batchCount: 0, docCount: 0 };
+    public withConfig(c: Partial<FastTraversalConfig>): Traverser<T> {
+      return createFastTraverser(this.traversable, { ...this.traversalConfig, ...c });
     }
 
     // TODO: Implement
@@ -88,5 +58,5 @@ export function createFastTraverser<T = firestore.DocumentData>(
     }
   }
 
-  return new FastTraverser();
+  return new FastTraverser(traversable);
 }
