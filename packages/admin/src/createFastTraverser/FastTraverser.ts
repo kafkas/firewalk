@@ -7,7 +7,7 @@ import type {
   TraversalResult,
   BatchCallbackAsync,
 } from '../types';
-import { SLLQueue, sleep } from '../utils';
+import { sleep, ObservableQueue } from '../utils';
 import { validateConfig } from './validateConfig';
 
 const defaultTraversalConfig: FastTraversalConfig = {
@@ -49,29 +49,24 @@ export class FastTraverser<T = firestore.DocumentData>
       promise: Promise<void>;
     };
 
-    const callbackPromiseQueue = new SLLQueue<QueueItem>();
-
-    const attachObserverTo = <T>(func: (item: T) => void, callback: () => Promise<void>): void => {
-      // TODO: Implement
-    };
-
+    const callbackPromiseQueue = new ObservableQueue<QueueItem>();
     const queueState = {
       isProcessing: false,
       hasNewItems: false,
     };
 
-    attachObserverTo(callbackPromiseQueue.enqueue, async () => {
-      queueState.hasNewItems = true;
-
-      if (queueState.isProcessing) {
-        return;
-      }
-
-      while (queueState.hasNewItems) {
-        queueState.isProcessing = true;
-        await processQueue();
-        queueState.isProcessing = false;
-      }
+    const unregisterEnqueueObserver = callbackPromiseQueue.registerEnqueueObserver({
+      receiveUpdate: async () => {
+        queueState.hasNewItems = true;
+        if (queueState.isProcessing) {
+          return;
+        }
+        while (queueState.hasNewItems) {
+          queueState.isProcessing = true;
+          await processQueue();
+          queueState.isProcessing = false;
+        }
+      },
     });
 
     const processQueue = async (): Promise<void> => {
@@ -116,12 +111,14 @@ export class FastTraverser<T = firestore.DocumentData>
 
       while (callbackPromiseQueue.size > maxInMemoryBatchCount) {
         // The queue is getting too large. Wait until its emptied a little.
-        const promise = new Promise<void>((res) => {
-          attachObserverTo(callbackPromiseQueue.dequeue, async () => {
-            res();
+        let unregisterDequeueObserver = (): void => {};
+        const dequeuePromise = new Promise<void>((res) => {
+          unregisterDequeueObserver = callbackPromiseQueue.registerDequeueObserver({
+            receiveUpdate: () => res(),
           });
         });
-        await promise;
+        await dequeuePromise;
+        unregisterDequeueObserver();
       }
 
       if (sleepBetweenBatches) {
@@ -131,6 +128,8 @@ export class FastTraverser<T = firestore.DocumentData>
       query = query.startAfter(lastDocInBatch).limit(Math.min(batchSize, maxDocCount - docCount));
       curBatchIndex++;
     }
+
+    unregisterEnqueueObserver();
 
     // There may still be some Promises left in the queue but there won't be any new items coming in.
     // Wait for the existing ones to resolve and exit.
