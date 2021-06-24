@@ -10,7 +10,7 @@ import type {
 } from '../Migrator';
 import type { Traversable, BaseTraversalConfig, MigrationResult } from '../types';
 import { createTraverser } from '../createTraverser';
-import { isTraverser } from '../_utils';
+import { isTraverser } from '../utils';
 import { validateConfig } from './validateConfig';
 
 export class BatchMigrator<T = firestore.DocumentData> implements Migrator<T> {

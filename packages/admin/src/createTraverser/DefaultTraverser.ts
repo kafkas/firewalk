@@ -7,7 +7,7 @@ import type {
   TraversalResult,
   BatchCallbackAsync,
 } from '../types';
-import { sleep } from '../_utils';
+import { sleep } from '../utils';
 
 export class DefaultTraverser<T = firestore.DocumentData>
   extends BaseTraverser<T>

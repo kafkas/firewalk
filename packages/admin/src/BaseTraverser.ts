@@ -6,7 +6,7 @@ import type {
   BatchCallback,
   BatchCallbackAsync,
 } from './types';
-import { sleep, isPositiveInteger } from './_utils';
+import { sleep, isPositiveInteger } from './utils';
 
 const defaultTraversalConfig: BaseTraversalConfig = {
   batchSize: 250,

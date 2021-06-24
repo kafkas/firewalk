@@ -1,5 +1,5 @@
 import type { BaseTraversalConfig } from '../types';
-import { isPositiveInteger } from '../_utils';
+import { isPositiveInteger } from '../utils';
 
 const MAX_BATCH_WRITE_DOC_COUNT = 500;
 

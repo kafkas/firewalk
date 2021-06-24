@@ -1,5 +1,5 @@
 import type { FastTraversalConfig } from '../types';
-import { isPositiveInteger } from '../_utils';
+import { isPositiveInteger } from '../utils';
 
 function assertPositiveIntegerInConfig(
   num: number | undefined,
