@@ -9,16 +9,20 @@ import type {
 } from '../types';
 import { validateConfig } from './validateConfig';
 
+const defaultTraversalConfig: FastTraversalConfig = {
+  ...BaseTraverser.getDefaultConfig(),
+  maxInMemoryBatchCount: 10,
+};
+
 export class FastTraverser<T = firestore.DocumentData>
-  extends BaseTraverser<T>
+  extends BaseTraverser<FastTraversalConfig, T>
   implements Traverser<T> {
   public constructor(
     public readonly traversable: Traversable<T>,
     config?: Partial<FastTraversalConfig>
   ) {
-    super(config);
+    super({ ...defaultTraversalConfig, ...config });
     validateConfig(config);
-    // TODO: Make sure we assign default values to config values that are not in base traverser config
   }
 
   public withConfig(c: Partial<FastTraversalConfig>): Traverser<T> {

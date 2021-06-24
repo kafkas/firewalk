@@ -39,16 +39,20 @@ function validateTraversalConfig(c: Partial<BaseTraversalConfig> = {}): void {
   }
 }
 
-export abstract class BaseTraverser<T = firestore.DocumentData> {
-  protected traversalConfig: BaseTraversalConfig;
-  protected registeredCallbacks: {
+export abstract class BaseTraverser<C extends BaseTraversalConfig, T = firestore.DocumentData> {
+  public static getDefaultConfig(): BaseTraversalConfig {
+    return { ...defaultTraversalConfig };
+  }
+
+  protected readonly traversalConfig: C;
+  protected readonly registeredCallbacks: {
     onBeforeBatchStart?: BatchCallback<T>;
     onAfterBatchComplete?: BatchCallback<T>;
   };
 
-  protected constructor(c?: Partial<BaseTraversalConfig>) {
+  protected constructor(c: C) {
     validateTraversalConfig(c);
-    this.traversalConfig = { ...defaultTraversalConfig, ...c };
+    this.traversalConfig = c;
     this.registeredCallbacks = {};
   }
 

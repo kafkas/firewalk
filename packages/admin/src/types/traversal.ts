@@ -33,7 +33,13 @@ export interface BaseTraversalConfig {
   maxDocCount: number;
 }
 
+/**
+ * The configuration with which a fast traverser is created.
+ */
 export interface FastTraversalConfig extends BaseTraversalConfig {
+  /**
+   * The maximum number of batches to hold in memory. Defaults to 10.
+   */
   maxInMemoryBatchCount: number;
 }
 
