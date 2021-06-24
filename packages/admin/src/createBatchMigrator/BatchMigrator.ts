@@ -13,11 +13,12 @@ import { createTraverser } from '../createTraverser';
 import { isTraverser } from '../utils';
 import { validateConfig } from './validateConfig';
 
-export class BatchMigrator<D = firestore.DocumentData> implements Migrator<D> {
-  public readonly traverser: Traverser<D>;
+export class BatchMigrator<T extends Traversable<D>, D = firestore.DocumentData>
+  implements Migrator<T, D> {
+  public readonly traverser: Traverser<T, D>;
 
   public constructor(
-    traversableOrTraverser: Traverser<D> | Traversable<D>,
+    traversableOrTraverser: Traverser<T, D> | T,
     traversalConfig?: Partial<BaseTraversalConfig>
   ) {
     validateConfig(traversalConfig);

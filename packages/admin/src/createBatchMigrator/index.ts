@@ -11,9 +11,9 @@ import { BatchMigrator } from './BatchMigrator';
  * This migrator uses batch writes when writing to docs so the entire operation will fail if a single write isn't successful.
  * @param traverser The traverser object that this migrator will use when traversing the collection and writing to documents.
  */
-export function createBatchMigrator<D = firestore.DocumentData>(
-  traverser: Traverser<D>
-): Migrator<D>;
+export function createBatchMigrator<T extends Traversable<D>, D = firestore.DocumentData>(
+  traverser: Traverser<T, D>
+): Migrator<T, D>;
 
 /**
  * Creates a migrator that facilitates database migrations. The migrator creates a default (slow) traverser that
@@ -23,14 +23,14 @@ export function createBatchMigrator<D = firestore.DocumentData>(
  * @param traversable A collection-like traversable group of documents to migrate.
  * @param traversalConfig Optional. The traversal configuration with which the default traverser will be created.
  */
-export function createBatchMigrator<D = firestore.DocumentData>(
-  traversable: Traversable<D>,
+export function createBatchMigrator<T extends Traversable<D>, D = firestore.DocumentData>(
+  traversable: T,
   traversalConfig?: Partial<BaseTraversalConfig>
-): Migrator<D>;
+): Migrator<T, D>;
 
-export function createBatchMigrator<D = firestore.DocumentData>(
-  traversableOrTraverser: Traverser<D> | Traversable<D>,
+export function createBatchMigrator<T extends Traversable<D>, D = firestore.DocumentData>(
+  traversableOrTraverser: Traverser<T, D> | T,
   traversalConfig?: Partial<BaseTraversalConfig>
-): Migrator<D> {
+): Migrator<T, D> {
   return new BatchMigrator(traversableOrTraverser, traversalConfig);
 }

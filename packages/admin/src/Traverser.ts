@@ -7,8 +7,8 @@ import type {
   BatchCallbackAsync,
 } from './types';
 
-export interface Traverser<D = firestore.DocumentData> {
-  readonly traversable: Traversable<D>; // TODO: Probably needs to be generic
+export interface Traverser<T extends Traversable<D>, D = firestore.DocumentData> {
+  readonly traversable: T;
 
   /**
    * Applies the specified traversal config values. Creates and returns a new traverser rather than
@@ -16,7 +16,7 @@ export interface Traverser<D = firestore.DocumentData> {
    * @param config Partial traversal configuration.
    * @returns The newly created traverser.
    */
-  withConfig(config: Partial<BaseTraversalConfig>): Traverser<D>;
+  withConfig(config: Partial<BaseTraversalConfig>): Traverser<T, D>;
 
   /**
    * Traverses the entire collection in batches of the size specified in traversal config. Invokes the specified

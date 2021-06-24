@@ -15,18 +15,15 @@ const defaultTraversalConfig: FastTraversalConfig = {
   maxInMemoryBatchCount: 10,
 };
 
-export class ObservableQueueBasedFastTraverser<D = firestore.DocumentData>
+export class ObservableQueueBasedFastTraverser<T extends Traversable<D>, D = firestore.DocumentData>
   extends BaseTraverser<FastTraversalConfig, D>
-  implements FastTraverser<D> {
-  public constructor(
-    public readonly traversable: Traversable<D>,
-    config?: Partial<FastTraversalConfig>
-  ) {
+  implements FastTraverser<T, D> {
+  public constructor(public readonly traversable: T, config?: Partial<FastTraversalConfig>) {
     super({ ...defaultTraversalConfig, ...config });
     validateConfig(config);
   }
 
-  public withConfig(c: Partial<FastTraversalConfig>): FastTraverser<D> {
+  public withConfig(c: Partial<FastTraversalConfig>): FastTraverser<T, D> {
     return new ObservableQueueBasedFastTraverser(this.traversable, {
       ...this.traversalConfig,
       ...c,

@@ -11,17 +11,14 @@ import { sleep } from '../utils';
 
 const defaultTraversalConfig: BaseTraversalConfig = BaseTraverser.getDefaultConfig();
 
-export class DefaultTraverser<D = firestore.DocumentData>
+export class DefaultTraverser<T extends Traversable<D>, D = firestore.DocumentData>
   extends BaseTraverser<BaseTraversalConfig, D>
-  implements Traverser<D> {
-  public constructor(
-    public readonly traversable: Traversable<D>,
-    config?: Partial<BaseTraversalConfig>
-  ) {
+  implements Traverser<T, D> {
+  public constructor(public readonly traversable: T, config?: Partial<BaseTraversalConfig>) {
     super({ ...defaultTraversalConfig, ...config });
   }
 
-  public withConfig(c: Partial<BaseTraversalConfig>): Traverser<D> {
+  public withConfig(c: Partial<BaseTraversalConfig>): Traverser<T, D> {
     return new DefaultTraverser(this.traversable, { ...this.traversalConfig, ...c });
   }
 
