@@ -33,6 +33,10 @@ export interface BaseTraversalConfig {
   maxDocCount: number;
 }
 
+export interface FastTraversalConfig extends BaseTraversalConfig {
+  maxInMemoryBatchCount: number;
+}
+
 /**
  * The configuration that a given traverser uses in sequential traversals.
  */
