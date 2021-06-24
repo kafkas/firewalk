@@ -36,7 +36,7 @@ export class ObservableQueue<E> extends SLLQueue<E> {
 
   public dequeue(): E {
     const item = super.dequeue();
-    this.enqueueObservers.forEach((observer) => {
+    this.dequeueObservers.forEach((observer) => {
       observer.receiveUpdate(item);
     });
     return item;
