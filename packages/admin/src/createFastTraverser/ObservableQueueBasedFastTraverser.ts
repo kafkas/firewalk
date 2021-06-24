@@ -46,13 +46,7 @@ export class ObservableQueueBasedFastTraverser<D = firestore.DocumentData>
     let docCount = 0;
     let query = this.traversable.limit(Math.min(batchSize, maxDocCount));
 
-    type QueueItem = {
-      batchDocs: firestore.QueryDocumentSnapshot<D>[];
-      batchIndex: number;
-      promise: Promise<void>;
-    };
-
-    const callbackPromiseQueue = new ObservableQueue<QueueItem>();
+    const callbackPromiseQueue = new ObservableQueue<Promise<void>>();
     const queueState = {
       isProcessing: false,
       hasNewItems: false,
@@ -74,18 +68,14 @@ export class ObservableQueueBasedFastTraverser<D = firestore.DocumentData>
 
     const processQueue = async (): Promise<void> => {
       // Clear resolved promises
-      const dequeuedItems: QueueItem[] = [];
+      const dequeuedPromises: Promise<void>[] = [];
 
       while (!callbackPromiseQueue.isEmpty()) {
-        dequeuedItems.push(callbackPromiseQueue.dequeue());
+        dequeuedPromises.push(callbackPromiseQueue.dequeue());
       }
       queueState.hasNewItems = false;
 
-      await Promise.all(
-        dequeuedItems.map(async ({ promise }) => {
-          await promise;
-        })
-      );
+      await Promise.all(dequeuedPromises);
     };
 
     while (true) {
@@ -100,11 +90,7 @@ export class ObservableQueueBasedFastTraverser<D = firestore.DocumentData>
 
       docCount += batchDocCount;
 
-      callbackPromiseQueue.enqueue({
-        batchDocs: batchDocSnapshots,
-        batchIndex: curBatchIndex,
-        promise: callback(batchDocSnapshots, curBatchIndex),
-      });
+      callbackPromiseQueue.enqueue(callback(batchDocSnapshots, curBatchIndex));
 
       if (docCount === maxDocCount) {
         break;
