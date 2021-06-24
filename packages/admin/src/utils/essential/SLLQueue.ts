@@ -22,6 +22,17 @@ export class SLLQueue<E> {
     return this.size === 0;
   }
 
+  public extractToArray(): E[] {
+    const len = this.size;
+    const items = new Array<E>(len);
+
+    for (let i = 0; i < len; i++) {
+      items[i] = this.dequeue();
+    }
+
+    return items;
+  }
+
   /**
    * Pushes an item to the queue.
    */
