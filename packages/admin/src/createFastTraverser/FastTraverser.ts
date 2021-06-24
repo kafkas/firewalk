@@ -51,6 +51,29 @@ export class FastTraverser<T = firestore.DocumentData>
 
     const callbackPromiseQueue = new SLLQueue<QueueItem>();
 
+    const attachObserverTo = <T>(func: (item: T) => void, callback: () => Promise<void>): void => {
+      // TODO: Implement
+    };
+
+    const queueState = {
+      isProcessing: false,
+      hasNewItems: false,
+    };
+
+    attachObserverTo(callbackPromiseQueue.enqueue, async () => {
+      queueState.hasNewItems = true;
+
+      if (queueState.isProcessing) {
+        return;
+      }
+
+      while (queueState.hasNewItems) {
+        queueState.isProcessing = true;
+        await processQueue();
+        queueState.isProcessing = false;
+      }
+    });
+
     const processQueue = async (): Promise<void> => {
       // Clear resolved promises
       const dequeuedItems: QueueItem[] = [];
@@ -58,6 +81,7 @@ export class FastTraverser<T = firestore.DocumentData>
       while (!callbackPromiseQueue.isEmpty()) {
         dequeuedItems.push(callbackPromiseQueue.dequeue());
       }
+      queueState.hasNewItems = false;
 
       await Promise.all(
         dequeuedItems.map(async ({ promise, batchDocs, batchIndex }) => {
@@ -66,20 +90,6 @@ export class FastTraverser<T = firestore.DocumentData>
         })
       );
     };
-
-    const attachObserverTo = <T>(func: (item: T) => void, callback: () => Promise<void>): void => {
-      // TODO: Implement
-    };
-
-    let isProcessingQueue = false;
-    attachObserverTo(callbackPromiseQueue.enqueue, async () => {
-      if (isProcessingQueue) {
-        return;
-      }
-      isProcessingQueue = true;
-      await processQueue();
-      isProcessingQueue = false;
-    });
 
     while (true) {
       const { docs: batchDocSnapshots } = await query.get();
@@ -106,11 +116,12 @@ export class FastTraverser<T = firestore.DocumentData>
 
       while (callbackPromiseQueue.size > maxInMemoryBatchCount) {
         // The queue is getting too large. Wait until its emptied a little.
-        // TODO: This needs to be done differently. Likely with some kind of an observable.
-        attachObserverTo(callbackPromiseQueue.dequeue, async () => {
-          //
+        const promise = new Promise<void>((res) => {
+          attachObserverTo(callbackPromiseQueue.dequeue, async () => {
+            res();
+          });
         });
-        await sleep(500);
+        await promise;
       }
 
       if (sleepBetweenBatches) {
