@@ -9,9 +9,9 @@ import type {
 import { sleep, isPositiveInteger } from './_utils';
 
 const defaultTraversalConfig: BaseTraversalConfig = {
-  batchSize: 100,
-  sleepBetweenBatches: true,
-  sleepTimeBetweenBatches: 1_000,
+  batchSize: 250,
+  sleepBetweenBatches: false,
+  sleepTimeBetweenBatches: 500,
   maxDocCount: Infinity,
 };
 
