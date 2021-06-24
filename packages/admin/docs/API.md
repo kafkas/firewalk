@@ -186,7 +186,7 @@ A traverser object responsible for efficiently traversing collection-like docume
 
 ### .withConfig(config)
 
-Updates the specified keys of the traversal configuration.
+Applies the specified traversal config values. Creates and returns a new traverser rather than modify the existing instance.
 
 #### Arguments
 
@@ -194,7 +194,7 @@ Updates the specified keys of the traversal configuration.
 
 #### Returns
 
-([Traverser](#Traverser)) A new traverser object.
+([Traverser](#Traverser)) The newly created traverser.
 
 ### .traverse(callback)
 

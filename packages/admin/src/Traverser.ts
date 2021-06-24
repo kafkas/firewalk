@@ -12,9 +12,10 @@ export interface Traverser<T = firestore.DocumentData> {
   readonly traversable: Traversable<T>; // TODO: Probably needs to be generic
 
   /**
-   * Updates the specified keys of the traverser configuration.
+   * Applies the specified traversal config values. Creates and returns a new traverser rather than
+   * modify the existing instance.
    * @param config Partial traversal configuration.
-   * @returns A new traverser object.
+   * @returns The newly created traverser.
    */
   withConfig(config: Partial<BaseTraversalConfig>): Traverser<T>;
 
