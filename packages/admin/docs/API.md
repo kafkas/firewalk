@@ -1,17 +1,33 @@
 # API Reference
 
+When using Firecode, there are 2 kinds of objects that you need to be familiar with: traverser and migrator. A **traverser** is an object that walks you through a collection of documents (or more generally a [Traversable](#Traversable)). A **migrator** is a convenience object that lets you easily write to documents within a given traversable. It uses a traverser to do that.
+
 To create traversers and migrators, you will be using factory functions provided by this library. We also provide you with the TypeScript types for the important objects that you will be interacting with. The generic parameter `D` that we use throughout the docs refers to the shape of the documents in the traversable and defaults to [FirebaseFirestore.DocumentData](https://github.com/googleapis/nodejs-firestore/blob/28d645bd3e368abde592bfa2611de3378ca175a6/types/firestore.d.ts#L28).
 
 Please note that although the Github docs for this project are work-in-progress, the JSDocs and TypeScript types are solid and I'm sure you'll find them useful!
 
 ## createBatchMigrator
 
-Creates a batch migrator object that facilitates Firestore collection migrations. This migrator uses batch writes when writing to docs so the entire operation will fail if a single write isn't successful.
+Creates a migrator that facilitates database migrations. You can either pass your own traverser to the migrator or let it create a default traverser with your desired traversal config. This migrator uses batch writes when writing to docs so the entire operation will fail if a single write isn't successful.
 
-#### Signature
+#### Signature 1
 
 ```
-createBatchMigrator<D>(traversable: Traversable<D>, config?: TraversalConfig): Migrator<D>
+createBatchMigrator<T, D>(traverser: Traverser<T, D>): Migrator<D>
+```
+
+#### Arguments
+
+1. `traverser` ([Traverser](#Traverser)): The traverser object that the migrator will use to traverse the collection.
+
+#### Returns
+
+([Migrator](#Migrator)) A batch migrator object.
+
+#### Signature 2
+
+```
+createBatchMigrator<T, D>(traversable: Traversable<D>, config?: TraversalConfig): Migrator<D>
 ```
 
 #### Arguments
@@ -30,7 +46,7 @@ Creates a traverser object that facilitates Firestore collection traversals. Whe
 #### Signature
 
 ```
-createTraverser<D>(traversable: Traversable<D>, config?: TraversalConfig): Traverser<D>
+createTraverser<T, D>(traversable: Traversable<D>, config?: TraversalConfig): Traverser<D>
 ```
 
 #### Arguments
@@ -155,7 +171,7 @@ Updates all documents in this collection with the provided field-value pair.
 
 ## Traversable
 
-A collection-like traversable object. Can be one of [CollectionReference](https://googleapis.dev/nodejs/firestore/latest/CollectionReference.html), [CollectionGroup](https://googleapis.dev/nodejs/firestore/latest/CollectionGroup.html) and [Query](https://googleapis.dev/nodejs/firestore/latest/Query.html).
+A collection-like group of documents. Can be one of [CollectionReference](https://googleapis.dev/nodejs/firestore/latest/CollectionReference.html), [CollectionGroup](https://googleapis.dev/nodejs/firestore/latest/CollectionGroup.html) and [Query](https://googleapis.dev/nodejs/firestore/latest/Query.html).
 
 ## TraversalConfig
 

@@ -84,11 +84,10 @@ This pretty much sums up the core functionality of this library! The `.traverse(
 ### Add a new field
 
 ```ts
-const projectsCollection = firestore().collection('projects');
-const migrator = createBatchMigrator(projectsCollection, { batchSize: 250 });
-
+const projectsColRef = firestore().collection('projects');
+const migrator = createBatchMigrator(projectsColRef);
 const { migratedDocCount } = await migrator.update('isCompleted', false);
-console.log(`Successfully updated ${migratedDocCount} projects!`);
+console.log(`Updated ${migratedDocCount} projects!`);
 ```
 
 ### Add a new field derived from the previous fields
@@ -98,10 +97,22 @@ type UserDoc = {
   firstName: string;
   lastName: string;
 };
+const usersColRef = firestore().collection('users') as firestore.CollectionReference<UserDoc>;
+const migrator = createBatchMigrator(usersColRef);
+const { migratedDocCount } = await migrator.update((snap) => {
+  const { firstName, lastName } = snap.data();
+  return {
+    fullName: `${firstName} ${lastName}`,
+  };
+});
+console.log(`Updated ${migratedDocCount} users!`);
+```
 
-const usersCollection = firestore().collection('users') as firestore.CollectionReference<UserDoc>;
+### Change traversal config
 
-const migrator = createBatchMigrator(usersCollection, {
+```ts
+const walletsWithNegativeBalance = firestore().collection('wallets').where('money', '<', 0);
+const migrator = createBatchMigrator(walletsWithNegativeBalance, {
   // We want each batch to have 500 docs. The size of the very last batch may be less than 500
   batchSize: 500,
   // We want to wait before moving to the next batch
@@ -109,29 +120,20 @@ const migrator = createBatchMigrator(usersCollection, {
   // We want to wait 500ms before moving to the next batch
   sleepTimeBetweenBatches: 500,
 });
-
-const { migratedDocCount } = await migrator.update((snap) => {
-  const { firstName, lastName } = snap.data();
-  return {
-    fullName: `${firstName} ${lastName}`,
-  };
-});
-console.log(`Successfully updated ${migratedDocCount} users!`);
+// Wipe out their debts!
+const { migratedDocCount } = await migrator.set({ money: 0 });
+console.log(`Updated ${migratedDocCount} wallets!`);
 ```
 
 ### Rename an optional field
 
 ```ts
-type UserPostDoc = {
+type PostDoc = {
   text: string;
   postedAt?: firestore.Timestamp;
 };
-
-const userPostsCollectionGroup = firestore().collectionGroup(
-  'posts'
-) as firestore.CollectionGroup<UserPostDoc>;
-const migrator = createBatchMigrator(userPostsCollectionGroup, { batchSize: 250 });
-
+const postsColGroup = firestore().collectionGroup('posts') as firestore.CollectionGroup<PostDoc>;
+const migrator = createBatchMigrator(postsColGroup);
 const { migratedDocCount } = await migrator.update(
   (snap) => {
     const { postedAt } = snap.data();
@@ -142,16 +144,18 @@ const { migratedDocCount } = await migrator.update(
   },
   (snap) => snap.data().postedAt !== undefined // Ignore if it doesn't have a `postedAt` field
 );
-console.log(`Successfully updated ${migratedDocCount} users!`);
+console.log(`Updated ${migratedDocCount} posts!`);
 ```
 
 ## [API](./docs/API.md)
+
+When using Firecode, there are 2 kinds of objects that you need to be familiar with: traverser and migrator. A **traverser** is an object that walks you through a collection of documents (or more generally a [Traversable](./docs/API.md#Traversable)). A **migrator** is a convenience object that lets you easily write to documents within a given traversable. It uses a traverser to do that.
 
 You can find the full API reference for `@firecode/admin` [here](./docs/API.md). Here are the core functions that this library provides.
 
 ### [createBatchMigrator](./docs/API.md#createBatchMigrator)
 
-Creates a batch migrator object that facilitates Firestore collection migrations. This migrator uses batch writes when writing to docs so the entire operation will fail if a single write isn't successful.
+Creates a migrator that facilitates database migrations. You can either pass your own traverser to the migrator or let it create a default traverser with your desired traversal config. This migrator uses batch writes when writing to docs so the entire operation will fail if a single write isn't successful.
 
 ### [createTraverser](./docs/API.md#createTraverser)
 

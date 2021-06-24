@@ -1,7 +1,7 @@
 import type { firestore } from 'firebase-admin';
 
 /**
- * A collection-like traversable object.
+ * A collection-like group of documents.
  */
 export type Traversable<D = firestore.DocumentData> =
   | firestore.CollectionReference<D>
