@@ -1,7 +1,7 @@
 import type { firestore } from 'firebase-admin';
-import type { Traverser } from '../Traverser';
+import type { FastTraverser } from '../FastTraverser';
 import type { Traversable, FastTraversalConfig } from '../types';
-import { FastTraverser } from './FastTraverser';
+import { ObservableQueueBasedFastTraverser } from './ObservableQueueBasedFastTraverser';
 
 /**
  * Creates a fast traverser object that facilitates Firestore collection traversals. When traversing
@@ -13,6 +13,6 @@ import { FastTraverser } from './FastTraverser';
 export function createFastTraverser<D = firestore.DocumentData>(
   traversable: Traversable<D>,
   config?: Partial<FastTraversalConfig>
-): Traverser<D> {
-  return new FastTraverser(traversable, config);
+): FastTraverser<D> {
+  return new ObservableQueueBasedFastTraverser(traversable, config);
 }

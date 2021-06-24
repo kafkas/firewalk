@@ -1,6 +1,6 @@
 import type { firestore } from 'firebase-admin';
-import { BaseTraverser } from '../BaseTraverser';
-import type { Traverser } from '../Traverser';
+import { BaseTraverser } from '../abstract/BaseTraverser';
+import type { FastTraverser } from '../FastTraverser';
 import type {
   Traversable,
   FastTraversalConfig,
@@ -15,9 +15,9 @@ const defaultTraversalConfig: FastTraversalConfig = {
   maxInMemoryBatchCount: 10,
 };
 
-export class FastTraverser<D = firestore.DocumentData>
+export class ObservableQueueBasedFastTraverser<D = firestore.DocumentData>
   extends BaseTraverser<FastTraversalConfig, D>
-  implements Traverser<D> {
+  implements FastTraverser<D> {
   public constructor(
     public readonly traversable: Traversable<D>,
     config?: Partial<FastTraversalConfig>
@@ -26,8 +26,11 @@ export class FastTraverser<D = firestore.DocumentData>
     validateConfig(config);
   }
 
-  public withConfig(c: Partial<FastTraversalConfig>): Traverser<D> {
-    return new FastTraverser(this.traversable, { ...this.traversalConfig, ...c });
+  public withConfig(c: Partial<FastTraversalConfig>): FastTraverser<D> {
+    return new ObservableQueueBasedFastTraverser(this.traversable, {
+      ...this.traversalConfig,
+      ...c,
+    });
   }
 
   public async traverse(callback: BatchCallbackAsync<D>): Promise<TraversalResult> {

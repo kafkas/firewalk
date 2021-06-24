@@ -1,5 +1,5 @@
 import type { firestore } from 'firebase-admin';
-import { BaseTraverser } from '../BaseTraverser';
+import { BaseTraverser } from '../abstract/BaseTraverser';
 import type { Traverser } from '../Traverser';
 import type {
   Traversable,
