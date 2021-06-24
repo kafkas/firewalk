@@ -3,3 +3,4 @@
  */
 
 export { isTraverser } from './isTraverser';
+export { ObservableQueue, ObservableQueueObserver } from './ObservableQueue';

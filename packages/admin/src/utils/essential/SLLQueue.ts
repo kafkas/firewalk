@@ -39,6 +39,9 @@ export class SLLQueue<E> {
     this.itemCount++;
   }
 
+  /**
+   * Removes an item from the queue.
+   */
   public dequeue(): E {
     // Items are dequeued from the bottom
     this.validateNonEmptyQueue();
