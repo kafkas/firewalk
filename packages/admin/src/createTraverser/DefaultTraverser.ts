@@ -11,21 +11,21 @@ import { sleep } from '../utils';
 
 const defaultTraversalConfig: BaseTraversalConfig = BaseTraverser.getDefaultConfig();
 
-export class DefaultTraverser<T = firestore.DocumentData>
-  extends BaseTraverser<BaseTraversalConfig, T>
-  implements Traverser<T> {
+export class DefaultTraverser<D = firestore.DocumentData>
+  extends BaseTraverser<BaseTraversalConfig, D>
+  implements Traverser<D> {
   public constructor(
-    public readonly traversable: Traversable<T>,
+    public readonly traversable: Traversable<D>,
     config?: Partial<BaseTraversalConfig>
   ) {
     super({ ...defaultTraversalConfig, ...config });
   }
 
-  public withConfig(c: Partial<BaseTraversalConfig>): Traverser<T> {
+  public withConfig(c: Partial<BaseTraversalConfig>): Traverser<D> {
     return new DefaultTraverser(this.traversable, { ...this.traversalConfig, ...c });
   }
 
-  public async traverse(callback: BatchCallbackAsync<T>): Promise<TraversalResult> {
+  public async traverse(callback: BatchCallbackAsync<D>): Promise<TraversalResult> {
     const {
       batchSize,
       sleepBetweenBatches,

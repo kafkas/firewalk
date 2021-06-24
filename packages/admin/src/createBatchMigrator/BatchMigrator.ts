@@ -13,11 +13,11 @@ import { createTraverser } from '../createTraverser';
 import { isTraverser } from '../utils';
 import { validateConfig } from './validateConfig';
 
-export class BatchMigrator<T = firestore.DocumentData> implements Migrator<T> {
-  public readonly traverser: Traverser<T>;
+export class BatchMigrator<D = firestore.DocumentData> implements Migrator<D> {
+  public readonly traverser: Traverser<D>;
 
   public constructor(
-    traversableOrTraverser: Traverser<T> | Traversable<T>,
+    traversableOrTraverser: Traverser<D> | Traversable<D>,
     traversalConfig?: Partial<BaseTraversalConfig>
   ) {
     validateConfig(traversalConfig);
@@ -27,9 +27,9 @@ export class BatchMigrator<T = firestore.DocumentData> implements Migrator<T> {
   }
 
   public async set<M extends boolean | undefined>(
-    dataOrGetData: SetData<T, M> | SetDataGetter<T, M>,
+    dataOrGetData: SetData<D, M> | SetDataGetter<D, M>,
     options?: SetOptions<M>,
-    predicate?: MigrationPredicate<T>
+    predicate?: MigrationPredicate<D>
   ): Promise<MigrationResult> {
     let migratedDocCount = 0;
 
@@ -42,11 +42,11 @@ export class BatchMigrator<T = firestore.DocumentData> implements Migrator<T> {
           const data = (() => {
             if (typeof dataOrGetData === 'function') {
               // Signature 1
-              const getData = dataOrGetData as SetDataGetter<T, M>;
+              const getData = dataOrGetData as SetDataGetter<D, M>;
               return getData(snapshot);
             } else {
               // Signature 2
-              return dataOrGetData as SetData<T, M>;
+              return dataOrGetData as SetData<D, M>;
             }
           })();
 
@@ -67,9 +67,9 @@ export class BatchMigrator<T = firestore.DocumentData> implements Migrator<T> {
   }
 
   public async update(
-    arg1: firestore.UpdateData | string | firestore.FieldPath | UpdateDataGetter<T>,
+    arg1: firestore.UpdateData | string | firestore.FieldPath | UpdateDataGetter<D>,
     arg2?: any,
-    arg3?: MigrationPredicate<T>
+    arg3?: MigrationPredicate<D>
   ): Promise<MigrationResult> {
     const argCount = [arg1, arg2, arg3].filter((a) => a !== undefined).length;
     let migratedDocCount = 0;
@@ -82,8 +82,8 @@ export class BatchMigrator<T = firestore.DocumentData> implements Migrator<T> {
         snapshots.forEach((snapshot) => {
           if (typeof arg1 === 'function') {
             // Signature 1
-            const getUpdateData = arg1 as UpdateDataGetter<T>;
-            const predicate = arg2 as MigrationPredicate<T> | undefined;
+            const getUpdateData = arg1 as UpdateDataGetter<D>;
+            const predicate = arg2 as MigrationPredicate<D> | undefined;
             const shouldMigrate = predicate?.(snapshot) ?? true;
             if (shouldMigrate) {
               writeBatch.update(snapshot.ref, getUpdateData(snapshot));
@@ -92,7 +92,7 @@ export class BatchMigrator<T = firestore.DocumentData> implements Migrator<T> {
           } else if (argCount < 2 || typeof arg2 === 'function') {
             // Signature 2
             const updateData = arg1 as firestore.UpdateData;
-            const predicate = arg2 as MigrationPredicate<T> | undefined;
+            const predicate = arg2 as MigrationPredicate<D> | undefined;
             const shouldMigrate = predicate?.(snapshot) ?? true;
             if (shouldMigrate) {
               writeBatch.update(snapshot.ref, updateData);
@@ -102,7 +102,7 @@ export class BatchMigrator<T = firestore.DocumentData> implements Migrator<T> {
             // Signature 3
             const field = arg1 as string | firestore.FieldPath;
             const value = arg2 as any;
-            const predicate = arg3 as MigrationPredicate<T> | undefined;
+            const predicate = arg3 as MigrationPredicate<D> | undefined;
             const shouldMigrate = predicate?.(snapshot) ?? true;
             if (shouldMigrate) {
               writeBatch.update(snapshot.ref, field, value);

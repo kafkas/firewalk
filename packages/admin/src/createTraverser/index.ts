@@ -8,9 +8,9 @@ import { DefaultTraverser } from './DefaultTraverser';
  * this traverser invokes a specified async callback for each batch of document snapshots and waits for the callback
  * Promise to resolve before moving to the next batch.
  */
-export function createTraverser<T = firestore.DocumentData>(
-  traversable: Traversable<T>,
+export function createTraverser<D = firestore.DocumentData>(
+  traversable: Traversable<D>,
   config?: Partial<BaseTraversalConfig>
-): Traverser<T> {
+): Traverser<D> {
   return new DefaultTraverser(traversable, config);
 }

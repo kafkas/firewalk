@@ -1,11 +1,11 @@
 import type { firestore } from 'firebase-admin';
 
-export type BatchCallback<T = firestore.DocumentData> = (
-  batchSnapshots: firestore.QueryDocumentSnapshot<T>[],
+export type BatchCallback<D = firestore.DocumentData> = (
+  batchSnapshots: firestore.QueryDocumentSnapshot<D>[],
   batchIndex: number
 ) => void;
 
-export type BatchCallbackAsync<T = firestore.DocumentData> = (
-  batchSnapshots: firestore.QueryDocumentSnapshot<T>[],
+export type BatchCallbackAsync<D = firestore.DocumentData> = (
+  batchSnapshots: firestore.QueryDocumentSnapshot<D>[],
   batchIndex: number
 ) => Promise<void>;

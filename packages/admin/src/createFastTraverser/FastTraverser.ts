@@ -15,22 +15,22 @@ const defaultTraversalConfig: FastTraversalConfig = {
   maxInMemoryBatchCount: 10,
 };
 
-export class FastTraverser<T = firestore.DocumentData>
-  extends BaseTraverser<FastTraversalConfig, T>
-  implements Traverser<T> {
+export class FastTraverser<D = firestore.DocumentData>
+  extends BaseTraverser<FastTraversalConfig, D>
+  implements Traverser<D> {
   public constructor(
-    public readonly traversable: Traversable<T>,
+    public readonly traversable: Traversable<D>,
     config?: Partial<FastTraversalConfig>
   ) {
     super({ ...defaultTraversalConfig, ...config });
     validateConfig(config);
   }
 
-  public withConfig(c: Partial<FastTraversalConfig>): Traverser<T> {
+  public withConfig(c: Partial<FastTraversalConfig>): Traverser<D> {
     return new FastTraverser(this.traversable, { ...this.traversalConfig, ...c });
   }
 
-  public async traverse(callback: BatchCallbackAsync<T>): Promise<TraversalResult> {
+  public async traverse(callback: BatchCallbackAsync<D>): Promise<TraversalResult> {
     const {
       batchSize,
       sleepBetweenBatches,
@@ -44,7 +44,7 @@ export class FastTraverser<T = firestore.DocumentData>
     let query = this.traversable.limit(Math.min(batchSize, maxDocCount));
 
     type QueueItem = {
-      batchDocs: firestore.QueryDocumentSnapshot<T>[];
+      batchDocs: firestore.QueryDocumentSnapshot<D>[];
       batchIndex: number;
       promise: Promise<void>;
     };

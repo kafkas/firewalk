@@ -1,6 +1,6 @@
 # API Reference
 
-To create traversers and migrators, you will be using factory functions provided by this library. We also provide you with the TypeScript types for the important objects that you will be interacting with. The generic parameter `T` that we use throughout the docs refers to the shape of the documents in the traversable and defaults to [FirebaseFirestore.DocumentData](https://github.com/googleapis/nodejs-firestore/blob/28d645bd3e368abde592bfa2611de3378ca175a6/types/firestore.d.ts#L28).
+To create traversers and migrators, you will be using factory functions provided by this library. We also provide you with the TypeScript types for the important objects that you will be interacting with. The generic parameter `D` that we use throughout the docs refers to the shape of the documents in the traversable and defaults to [FirebaseFirestore.DocumentData](https://github.com/googleapis/nodejs-firestore/blob/28d645bd3e368abde592bfa2611de3378ca175a6/types/firestore.d.ts#L28).
 
 Please note that although the Github docs for this project are work-in-progress, the JSDocs and TypeScript types are solid and I'm sure you'll find them useful!
 
@@ -11,7 +11,7 @@ Creates a batch migrator object that facilitates Firestore collection migrations
 #### Signature
 
 ```
-createBatchMigrator<T>(traversable: Traversable<T>, config?: TraversalConfig): Migrator<T>
+createBatchMigrator<D>(traversable: Traversable<D>, config?: TraversalConfig): Migrator<D>
 ```
 
 #### Arguments
@@ -30,7 +30,7 @@ Creates a traverser object that facilitates Firestore collection traversals. Whe
 #### Signature
 
 ```
-createTraverser<T>(traversable: Traversable<T>, config?: TraversalConfig): Traverser<T>
+createTraverser<D>(traversable: Traversable<D>, config?: TraversalConfig): Traverser<D>
 ```
 
 #### Arguments
@@ -49,7 +49,7 @@ Creates a fast traverser object that facilitates Firestore collection traversals
 #### Signature
 
 ```
-createFastTraverser<T>(traversable: Traversable<T>, config?: TraversalConfig): FastTraverser<T>
+createFastTraverser<D>(traversable: Traversable<D>, config?: TraversalConfig): FastTraverser<D>
 ```
 
 #### Arguments

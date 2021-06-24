@@ -2,23 +2,23 @@ import type { firestore } from 'firebase-admin';
 import type { Traverser } from './Traverser';
 import type { MigrationResult } from './types';
 
-export type MigrationPredicate<T> = (snapshot: firestore.QueryDocumentSnapshot<T>) => boolean;
+export type MigrationPredicate<D> = (snapshot: firestore.QueryDocumentSnapshot<D>) => boolean;
 
-export type UpdateDataGetter<T> = (
-  snapshot: firestore.QueryDocumentSnapshot<T>
+export type UpdateDataGetter<D> = (
+  snapshot: firestore.QueryDocumentSnapshot<D>
 ) => firestore.UpdateData;
 
-export type SetData<T, M> = undefined extends M ? T : false extends M ? T : Partial<T>;
+export type SetData<D, M> = undefined extends M ? D : false extends M ? D : Partial<D>;
 
 export type SetOptions<M> = {
   merge?: M;
   mergeFields?: (string | firestore.FieldPath)[];
 };
 
-export type SetDataGetter<T, M> = (snapshot: firestore.QueryDocumentSnapshot<T>) => SetData<T, M>;
+export type SetDataGetter<D, M> = (snapshot: firestore.QueryDocumentSnapshot<D>) => SetData<D, M>;
 
-export interface Migrator<T = firestore.DocumentData> {
-  readonly traverser: Traverser<T>;
+export interface Migrator<D = firestore.DocumentData> {
+  readonly traverser: Traverser<D>;
 
   /**
    * Sets all documents in this collection with the provided data.
@@ -28,9 +28,9 @@ export interface Migrator<T = firestore.DocumentData> {
    * @returns A Promise resolving to an object representing the details of the migration.
    */
   set<M extends boolean | undefined>(
-    getData: SetDataGetter<T, M>,
+    getData: SetDataGetter<D, M>,
     options?: SetOptions<M>,
-    predicate?: MigrationPredicate<T>
+    predicate?: MigrationPredicate<D>
   ): Promise<MigrationResult>;
 
   /**
@@ -41,9 +41,9 @@ export interface Migrator<T = firestore.DocumentData> {
    * @returns A Promise resolving to an object representing the details of the migration.
    */
   set<M extends boolean | undefined>(
-    data: SetData<T, M>,
+    data: SetData<D, M>,
     options?: SetOptions<M>,
-    predicate?: MigrationPredicate<T>
+    predicate?: MigrationPredicate<D>
   ): Promise<MigrationResult>;
 
   /**
@@ -52,7 +52,7 @@ export interface Migrator<T = firestore.DocumentData> {
    * @param predicate - Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
    * @returns A Promise resolving to an object representing the details of the migration.
    */
-  update(getData: UpdateDataGetter<T>, predicate?: MigrationPredicate<T>): Promise<MigrationResult>;
+  update(getData: UpdateDataGetter<D>, predicate?: MigrationPredicate<D>): Promise<MigrationResult>;
 
   /**
    * Updates all documents in this collection with the provided data.
@@ -60,7 +60,7 @@ export interface Migrator<T = firestore.DocumentData> {
    * @param predicate - Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
    * @returns A Promise resolving to an object representing the details of the migration.
    */
-  update(data: firestore.UpdateData, predicate?: MigrationPredicate<T>): Promise<MigrationResult>;
+  update(data: firestore.UpdateData, predicate?: MigrationPredicate<D>): Promise<MigrationResult>;
 
   /**
    * Updates all documents in this collection with the provided field-value pair.
@@ -72,6 +72,6 @@ export interface Migrator<T = firestore.DocumentData> {
   update(
     field: string | firestore.FieldPath,
     value: any,
-    predicate?: MigrationPredicate<T>
+    predicate?: MigrationPredicate<D>
   ): Promise<MigrationResult>;
 }

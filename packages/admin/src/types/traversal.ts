@@ -3,10 +3,10 @@ import type { firestore } from 'firebase-admin';
 /**
  * A collection-like traversable object.
  */
-export type Traversable<T = firestore.DocumentData> =
-  | firestore.CollectionReference<T>
-  | firestore.CollectionGroup<T>
-  | firestore.Query<T>;
+export type Traversable<D = firestore.DocumentData> =
+  | firestore.CollectionReference<D>
+  | firestore.CollectionGroup<D>
+  | firestore.Query<D>;
 
 /**
  * The configuration with which a traverser is created.

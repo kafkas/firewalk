@@ -1,7 +1,7 @@
 import type { Traverser } from '../../Traverser';
 
-export function isTraverser<T>(candidate: Traverser<T> | unknown): candidate is Traverser<T> {
-  const t = candidate as Traverser<T>;
+export function isTraverser<D>(candidate: Traverser<D> | unknown): candidate is Traverser<D> {
+  const t = candidate as Traverser<D>;
   return (
     !!t &&
     typeof t.withConfig === 'function' &&

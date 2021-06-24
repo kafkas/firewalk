@@ -10,9 +10,9 @@ import { FastTraverser } from './FastTraverser';
  * before moving to the next batch so there is no guarantee that any given batch will finish processing
  * before a later batch. This traverser uses more memory but is significantly faster than the default traverser.
  */
-export function createFastTraverser<T = firestore.DocumentData>(
-  traversable: Traversable<T>,
+export function createFastTraverser<D = firestore.DocumentData>(
+  traversable: Traversable<D>,
   config?: Partial<FastTraversalConfig>
-): Traverser<T> {
+): Traverser<D> {
   return new FastTraverser(traversable, config);
 }

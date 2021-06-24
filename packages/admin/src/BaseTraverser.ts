@@ -39,15 +39,15 @@ function validateTraversalConfig(c: Partial<BaseTraversalConfig> = {}): void {
   }
 }
 
-export abstract class BaseTraverser<C extends BaseTraversalConfig, T = firestore.DocumentData> {
+export abstract class BaseTraverser<C extends BaseTraversalConfig, D = firestore.DocumentData> {
   public static getDefaultConfig(): BaseTraversalConfig {
     return { ...defaultTraversalConfig };
   }
 
   protected readonly traversalConfig: C;
   protected readonly registeredCallbacks: {
-    onBeforeBatchStart?: BatchCallback<T>;
-    onAfterBatchComplete?: BatchCallback<T>;
+    onBeforeBatchStart?: BatchCallback<D>;
+    onAfterBatchComplete?: BatchCallback<D>;
   };
 
   protected constructor(c: C) {
@@ -56,16 +56,16 @@ export abstract class BaseTraverser<C extends BaseTraversalConfig, T = firestore
     this.registeredCallbacks = {};
   }
 
-  public onBeforeBatchStart(callback: BatchCallback<T>): void {
+  public onBeforeBatchStart(callback: BatchCallback<D>): void {
     this.registeredCallbacks.onBeforeBatchStart = callback;
   }
 
-  public onAfterBatchComplete(callback: BatchCallback<T>): void {
+  public onAfterBatchComplete(callback: BatchCallback<D>): void {
     this.registeredCallbacks.onAfterBatchComplete = callback;
   }
 
   public async traverseEach(
-    callback: (snapshot: firestore.QueryDocumentSnapshot<T>) => Promise<void>,
+    callback: (snapshot: firestore.QueryDocumentSnapshot<D>) => Promise<void>,
     c: Partial<TraverseEachConfig> = {}
   ): Promise<TraversalResult> {
     const { sleepBetweenDocs, sleepTimeBetweenDocs } = {
@@ -85,5 +85,5 @@ export abstract class BaseTraverser<C extends BaseTraversalConfig, T = firestore
     return { batchCount, docCount };
   }
 
-  public abstract traverse(callback: BatchCallbackAsync<T>): Promise<TraversalResult>;
+  public abstract traverse(callback: BatchCallbackAsync<D>): Promise<TraversalResult>;
 }
