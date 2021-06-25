@@ -5,15 +5,15 @@ export interface MigrationResult {
   /**
    * The number of batches that have been retrieved in this traversal.
    */
-  batchCount: number;
+  readonly batchCount: number;
 
   /**
    * The number of documents that have been retrieved in this traversal.
    */
-  traversedDocCount: number;
+  readonly traversedDocCount: number;
 
   /**
    * The number of documents that have been migrated.
    */
-  migratedDocCount: number;
+  readonly migratedDocCount: number;
 }

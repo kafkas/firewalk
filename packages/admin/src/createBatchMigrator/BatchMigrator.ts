@@ -1,6 +1,6 @@
 import type { firestore } from 'firebase-admin';
 import type { Traverser } from '../Traverser';
-import type {
+import {
   Migrator,
   MigrationPredicate,
   UpdateDataGetter,
@@ -9,22 +9,17 @@ import type {
   SetDataGetter,
 } from '../Migrator';
 import type { Traversable, BaseTraversalConfig, MigrationResult } from '../types';
-import { createTraverser } from '../createTraverser';
-import { isTraverser } from '../utils';
 import { validateConfig } from './validateConfig';
 
-export class BatchMigrator<T extends Traversable<D>, D = firestore.DocumentData>
-  implements Migrator<T, D> {
-  public readonly traverser: Traverser<T, D>;
-
-  public constructor(
-    traversableOrTraverser: Traverser<T, D> | T,
-    traversalConfig?: Partial<BaseTraversalConfig>
-  ) {
-    validateConfig(traversalConfig);
-    this.traverser = isTraverser(traversableOrTraverser)
-      ? traversableOrTraverser
-      : createTraverser(traversableOrTraverser, traversalConfig);
+export class BatchMigrator<
+  TR extends Traverser<T, C, D>,
+  T extends Traversable<D>,
+  C extends BaseTraversalConfig,
+  D = firestore.DocumentData
+> extends Migrator<T, C, D> {
+  public constructor(public readonly traverser: TR) {
+    super();
+    validateConfig(traverser.traversalConfig);
   }
 
   public async set<M extends boolean | undefined>(

@@ -1,45 +1,59 @@
 import type { firestore } from 'firebase-admin';
 import type {
   Traversable,
+  BaseTraversalConfig,
   TraverseEachConfig,
   TraversalResult,
-  BaseTraversalConfig,
   BatchCallbackAsync,
 } from './types';
+import { sleep, isPositiveInteger } from './utils';
 
-export interface Traverser<T extends Traversable<D>, D = firestore.DocumentData> {
-  /**
-   * The underlying traversable.
-   */
-  readonly traversable: T;
+const defaultTraversalConfig: BaseTraversalConfig = {
+  batchSize: 250,
+  sleepBetweenBatches: false,
+  sleepTimeBetweenBatches: 500,
+  maxDocCount: Infinity,
+};
 
-  /**
-   * Applies the specified traversal config values. Creates and returns a new traverser rather than
-   * modify the existing instance.
-   * @param config Partial traversal configuration.
-   * @returns The newly created traverser.
-   */
-  withConfig(config: Partial<BaseTraversalConfig>): Traverser<T, D>;
+const defaultTraverseEachConfig: TraverseEachConfig = {
+  sleepBetweenDocs: false,
+  sleepTimeBetweenDocs: 500,
+};
 
-  /**
-   * Traverses the entire collection in batches of the size specified in traversal config. Invokes the specified
-   * async callback for each batch of document snapshots. Waits for the callback Promise to resolve before moving to the next batch.
-   *
-   * - Time complexity: O((N / `batchSize`) * (Q(`batchSize`) + C))
-   * - Space complexity: O(`batchSize` * D)
-   * - Billing: N reads
-   *
-   * where:
-   *
-   * - N: number of docs in the traversable
-   * - Q(`batchSize`): average batch query time
-   * - C: average processing time
-   * - D: document size
-   *
-   * @param callback An asynchronous callback function to invoke for each batch of document snapshots.
-   * @returns A Promise resolving to an object representing the details of the traversal.
-   */
-  traverse(callback: BatchCallbackAsync<D>): Promise<TraversalResult>;
+function assertPositiveIntegerInConfig(
+  num: number | undefined,
+  field: keyof BaseTraversalConfig
+): asserts num {
+  if (typeof num === 'number' && !isPositiveInteger(num)) {
+    throw new Error(`The '${field}' field in traversal config must be a positive integer.`);
+  }
+}
+
+function validateTraversalConfig(c: Partial<BaseTraversalConfig> = {}): void {
+  const { batchSize, sleepTimeBetweenBatches, maxDocCount } = c;
+
+  assertPositiveIntegerInConfig(batchSize, 'batchSize');
+  assertPositiveIntegerInConfig(sleepTimeBetweenBatches, 'sleepTimeBetweenBatches');
+  if (maxDocCount !== Infinity) {
+    assertPositiveIntegerInConfig(maxDocCount, 'maxDocCount');
+  }
+}
+
+export abstract class Traverser<
+  T extends Traversable<D>,
+  C extends BaseTraversalConfig,
+  D = firestore.DocumentData
+> {
+  public static getDefaultConfig(): BaseTraversalConfig {
+    return { ...defaultTraversalConfig };
+  }
+
+  public readonly traversalConfig: C;
+
+  protected constructor(c: C) {
+    validateTraversalConfig(c);
+    this.traversalConfig = c;
+  }
 
   /**
    * Traverses the entire collection in batches of the size specified in traversal config. Invokes the specified
@@ -48,8 +62,39 @@ export interface Traverser<T extends Traversable<D>, D = firestore.DocumentData>
    * @param config The sequential traversal configuration.
    * @returns A Promise resolving to an object representing the details of the traversal.
    */
-  traverseEach(
+  public async traverseEach(
     callback: (snapshot: firestore.QueryDocumentSnapshot<D>) => Promise<void>,
-    config?: Partial<TraverseEachConfig>
-  ): Promise<TraversalResult>;
+    c: Partial<TraverseEachConfig> = {}
+  ): Promise<TraversalResult> {
+    const { sleepBetweenDocs, sleepTimeBetweenDocs } = {
+      ...defaultTraverseEachConfig,
+      ...c,
+    };
+
+    const { batchCount, docCount } = await this.traverse(async (snapshots) => {
+      for (let i = 0; i < snapshots.length; i++) {
+        await callback(snapshots[i]);
+        if (sleepBetweenDocs) {
+          await sleep(sleepTimeBetweenDocs);
+        }
+      }
+    });
+
+    return { batchCount, docCount };
+  }
+
+  /**
+   * The underlying traversable.
+   */
+  public abstract readonly traversable: T;
+
+  /**
+   * Applies the specified traversal config values. Creates and returns a new traverser rather than
+   * modify the existing instance.
+   * @param config Partial traversal configuration.
+   * @returns The newly created traverser.
+   */
+  public abstract withConfig(config: Partial<BaseTraversalConfig>): Traverser<T, C, D>;
+
+  public abstract traverse(callback: BatchCallbackAsync<D>): Promise<TraversalResult>;
 }

@@ -1,6 +1,6 @@
 import type { firestore } from 'firebase-admin';
 import type { Traverser } from './Traverser';
-import type { Traversable, MigrationResult } from './types';
+import type { Traversable, BaseTraversalConfig, MigrationResult } from './types';
 
 export type MigrationPredicate<D> = (snapshot: firestore.QueryDocumentSnapshot<D>) => boolean;
 
@@ -17,8 +17,15 @@ export type SetOptions<M> = {
 
 export type SetDataGetter<D, M> = (snapshot: firestore.QueryDocumentSnapshot<D>) => SetData<D, M>;
 
-export interface Migrator<T extends Traversable<D>, D = firestore.DocumentData> {
-  readonly traverser: Traverser<T, D>;
+export abstract class Migrator<
+  T extends Traversable<D>,
+  C extends BaseTraversalConfig,
+  D = firestore.DocumentData
+> {
+  /**
+   * The underlying traverser.
+   */
+  public abstract readonly traverser: Traverser<T, C, D>;
 
   /**
    * Sets all documents in this collection with the provided data.
@@ -27,7 +34,7 @@ export interface Migrator<T extends Traversable<D>, D = firestore.DocumentData> 
    * @param predicate - Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
    * @returns A Promise resolving to an object representing the details of the migration.
    */
-  set<M extends boolean | undefined>(
+  public abstract set<M extends boolean | undefined>(
     getData: SetDataGetter<D, M>,
     options?: SetOptions<M>,
     predicate?: MigrationPredicate<D>
@@ -40,7 +47,7 @@ export interface Migrator<T extends Traversable<D>, D = firestore.DocumentData> 
    * @param predicate - Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
    * @returns A Promise resolving to an object representing the details of the migration.
    */
-  set<M extends boolean | undefined>(
+  public abstract set<M extends boolean | undefined>(
     data: SetData<D, M>,
     options?: SetOptions<M>,
     predicate?: MigrationPredicate<D>
@@ -52,7 +59,10 @@ export interface Migrator<T extends Traversable<D>, D = firestore.DocumentData> 
    * @param predicate - Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
    * @returns A Promise resolving to an object representing the details of the migration.
    */
-  update(getData: UpdateDataGetter<D>, predicate?: MigrationPredicate<D>): Promise<MigrationResult>;
+  public abstract update(
+    getData: UpdateDataGetter<D>,
+    predicate?: MigrationPredicate<D>
+  ): Promise<MigrationResult>;
 
   /**
    * Updates all documents in this collection with the provided data.
@@ -60,7 +70,10 @@ export interface Migrator<T extends Traversable<D>, D = firestore.DocumentData> 
    * @param predicate - Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
    * @returns A Promise resolving to an object representing the details of the migration.
    */
-  update(data: firestore.UpdateData, predicate?: MigrationPredicate<D>): Promise<MigrationResult>;
+  public abstract update(
+    data: firestore.UpdateData,
+    predicate?: MigrationPredicate<D>
+  ): Promise<MigrationResult>;
 
   /**
    * Updates all documents in this collection with the provided field-value pair.
@@ -69,7 +82,7 @@ export interface Migrator<T extends Traversable<D>, D = firestore.DocumentData> 
    * @param predicate - Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
    * @returns A Promise resolving to an object representing the details of the migration.
    */
-  update(
+  public abstract update(
     field: string | firestore.FieldPath,
     value: any,
     predicate?: MigrationPredicate<D>

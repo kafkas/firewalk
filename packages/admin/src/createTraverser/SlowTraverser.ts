@@ -1,6 +1,5 @@
 import type { firestore } from 'firebase-admin';
-import { BaseTraverser } from '../abstract/BaseTraverser';
-import type { Traverser } from '../Traverser';
+import { Traverser } from '../Traverser';
 import type {
   Traversable,
   BaseTraversalConfig,
@@ -9,19 +8,37 @@ import type {
 } from '../types';
 import { sleep } from '../utils';
 
-const defaultTraversalConfig: BaseTraversalConfig = BaseTraverser.getDefaultConfig();
+const defaultTraversalConfig: BaseTraversalConfig = Traverser.getDefaultConfig();
 
-export class DefaultTraverser<T extends Traversable<D>, D = firestore.DocumentData>
-  extends BaseTraverser<BaseTraversalConfig, D>
-  implements Traverser<T, D> {
+export class SlowTraverser<T extends Traversable<D>, D = firestore.DocumentData>
+  extends Traverser<T, BaseTraversalConfig, D>
+  implements Traverser<T, BaseTraversalConfig, D> {
   public constructor(public readonly traversable: T, config?: Partial<BaseTraversalConfig>) {
     super({ ...defaultTraversalConfig, ...config });
   }
 
-  public withConfig(c: Partial<BaseTraversalConfig>): Traverser<T, D> {
-    return new DefaultTraverser(this.traversable, { ...this.traversalConfig, ...c });
+  public withConfig(c: Partial<BaseTraversalConfig>): SlowTraverser<T, D> {
+    return new SlowTraverser(this.traversable, { ...this.traversalConfig, ...c });
   }
 
+  /**
+   * Traverses the entire collection in batches of the size specified in traversal config. Invokes the specified
+   * async callback for each batch of document snapshots. Waits for the callback Promise to resolve before moving to the next batch.
+   *
+   * - Time complexity: O((N / `batchSize`) * (Q(`batchSize`) + C))
+   * - Space complexity: O(`batchSize` * D)
+   * - Billing: N reads
+   *
+   * where:
+   *
+   * - N: number of docs in the traversable
+   * - Q(`batchSize`): average batch query time
+   * - C: average processing time
+   * - D: document size
+   *
+   * @param callback An asynchronous callback function to invoke for each batch of document snapshots.
+   * @returns A Promise resolving to an object representing the details of the traversal.
+   */
   public async traverse(callback: BatchCallbackAsync<D>): Promise<TraversalResult> {
     const {
       batchSize,
