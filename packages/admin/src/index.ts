@@ -1,8 +1,12 @@
-export { createBatchMigrator, BatchMigrator } from './createBatchMigrator';
-export { createFastTraverser, FastTraverser } from './createFastTraverser';
-export { createTraverser, SlowTraverser } from './createTraverser';
+export { createBatchMigrator } from './createBatchMigrator';
+export { createFastTraverser } from './createFastTraverser';
+export { createTraverser } from './createTraverser';
 
-export { Migrator } from './Migrator';
-export { Traverser } from './Traverser';
+export type { BatchMigrator } from './createBatchMigrator';
+export type { FastTraverser } from './createFastTraverser';
+export type { SlowTraverser } from './createTraverser';
+
+export type { Migrator } from './Migrator';
+export type { Traverser } from './Traverser';
 
 export * from './types';
