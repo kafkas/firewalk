@@ -166,15 +166,15 @@ Creates a traverser object that facilitates Firestore collection traversals. Whe
 
 #### Traversal properties
 
-- Time complexity: O((_N_ / `batchSize`) \* (_Q_ + _C_))
+- Time complexity: O((_N_ / `batchSize`) \* (_Q_(`batchSize`) + _C_))
 - Space complexity: O(`batchSize` \* _D_)
 - Billing: _N_ reads
 
 where:
 
 - _N_: number of docs in the traversable
-- _Q_: batch query time
-- _C_: callback (average) processing time
+- _Q_(`batchSize`): average batch query time
+- _C_: average callback processing time
 - _D_: document size
 
 ### [createFastTraverser](./packages/admin/docs/API.md#createFastTraverser) (coming in the next release)
@@ -183,15 +183,15 @@ Creates a fast traverser object that facilitates Firestore collection traversals
 
 #### Traversal properties
 
-- Time complexity: O((_N_ / `batchSize`) \* _Q_)
+- Time complexity: O((_N_ / `batchSize`) \* (_Q_(`batchSize`))
 - Space complexity: O(`maxInMemoryBatchCount` \* `batchSize` \* _D_ )
 - Billing: _N_ reads
 
 where:
 
 - _N_: number of docs in the traversable
-- _Q_: batch query time
-- _C_: callback (average) processing time
+- _Q_(`batchSize`): average batch query time
+- _C_: average callback processing time
 - _D_: document size
 
 ### [createBatchMigrator](./packages/admin/docs/API.md#createBatchMigrator)

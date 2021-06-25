@@ -23,15 +23,15 @@ export interface FastTraverser<T extends Traversable<D>, D = firestore.DocumentD
    * Promise to resolve before moving to the next batch so there is no guarantee that any given batch will finish processing
    * before a later batch.
    *
-   * - Time complexity: O((N / `batchSize`) * Q)
+   * - Time complexity: O((N / `batchSize`) * Q(`batchSize`))
    * - Space complexity: O(`maxInMemoryBatchCount` * `batchSize` * D)
    * - Billing: N reads
    *
    * where:
    *
    * - N: number of docs in the traversable
-   * - Q: batch query time
-   * - C: callback (average) processing time
+   * - Q(`batchSize`): average batch query time
+   * - C: average callback processing time
    * - D: document size
    *
    * @param callback An asynchronous callback function to invoke for each batch of document snapshots.
