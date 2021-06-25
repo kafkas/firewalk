@@ -16,9 +16,10 @@ const defaultTraversalConfig: FastTraversalConfig = {
 
 const QUEUE_PROCESS_INTERVAL = 100;
 
-export class FastTraverser<D extends firestore.DocumentData, T extends Traversable<D>>
-  extends Traverser<D, T, FastTraversalConfig>
-  implements FastTraverser<D, T> {
+export class FastTraverser<
+  D extends firestore.DocumentData,
+  T extends Traversable<D>
+> extends Traverser<D, T, FastTraversalConfig> {
   public constructor(public readonly traversable: T, config?: Partial<FastTraversalConfig>) {
     super({ ...defaultTraversalConfig, ...config });
     validateConfig(config);

@@ -26,8 +26,6 @@ slowTraverser.traverse(async (docs) => {
   //
 });
 
-const sss = slowTraverser.someWeirdStuff({});
-
 const slowTraversable = slowTraverser.traversable;
 
 fastTraverser.traversable; // Should be typed as a Query
