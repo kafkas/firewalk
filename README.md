@@ -90,7 +90,23 @@ This pretty much sums up the core functionality of this library! The `.traverse(
 
 ## More Examples
 
-### Add a new field
+### Use a fast traverser
+
+```ts
+const projectsColRef = firestore().collection('projects');
+const traverser = createFastTraverser(projectsColRef, {
+  batchSize: 500,
+  maxConcurrentBatchCount: 20,
+});
+// This means we should expect to hold 500 * 20 = 10,000 projects in memory
+const { docCount } = await traverser.traverse(async (_, batchIndex) => {
+  console.log(`Gonna process batch ${batchIndex} now!`);
+  // ...
+});
+console.log(`Traversed ${docCount} projects super-fast!`);
+```
+
+### Add a new field using a migrator
 
 ```ts
 const projectsColRef = firestore().collection('projects');
@@ -115,6 +131,16 @@ const { migratedDocCount } = await migrator.update((snap) => {
   };
 });
 console.log(`Updated ${migratedDocCount} users!`);
+```
+
+### Use a fast migrator
+
+```ts
+const projectsColRef = firestore().collection('projects');
+const fastTraverser = createFastTraverser(projectsColRef, { maxConcurrentBatchCount: 25 });
+const fastMigrator = createBatchMigrator(fastTraverser);
+const { migratedDocCount } = await fastMigrator.update('isCompleted', false);
+console.log(`Updated ${migratedDocCount} projects super-fast!`);
 ```
 
 ### Change traversal config
