@@ -24,7 +24,7 @@ export abstract class Migrator<D extends firestore.DocumentData, C extends BaseT
   } = {};
 
   /**
-   * Registers a callback function that fires right before the current batch starts processing.
+   * Registers a callback function that fires right before a batch starts processing.
    * @param callback A synchronous callback that takes batch doc snapshots and the 0-based batch index as its arguments.
    */
   public onBeforeBatchStart(callback: BatchCallback<D>): void {
@@ -32,7 +32,7 @@ export abstract class Migrator<D extends firestore.DocumentData, C extends BaseT
   }
 
   /**
-   * Registers a callback function that fires after the current batch is processed.
+   * Registers a callback function that fires after a batch is processed.
    * @param callback A synchronous callback that takes batch doc snapshots and the 0-based batch index as its arguments.
    */
   public onAfterBatchComplete(callback: BatchCallback<D>): void {
