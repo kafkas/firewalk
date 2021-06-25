@@ -29,16 +29,19 @@ export class SlowTraverser<D extends firestore.DocumentData> extends Traverser<
    * Traverses the entire collection in batches of the size specified in traversal config. Invokes the specified
    * async callback for each batch of document snapshots. Waits for the callback Promise to resolve before moving to the next batch.
    *
-   * - Time complexity: O((N / `batchSize`) * (Q(`batchSize`) + C))
-   * - Space complexity: O(`batchSize` * D)
-   * - Billing: N reads
+   * **Properties:**
+   *
+   * - Time complexity: _O_((_N_ / `batchSize`) * (_Q_(`batchSize`) + _C_))
+   * - Space complexity: _O_(`batchSize` * _D_ + _S_)
+   * - Billing: _N_ reads
    *
    * where:
    *
-   * - N: number of docs in the traversable
-   * - Q(`batchSize`): average batch query time
-   * - C: average processing time
-   * - D: document size
+   * - _N_: number of docs in the traversable
+   * - _Q_(`batchSize`): average batch query time
+   * - _C_: average processing time
+   * - _D_: document size
+   * - _S_: average extra space used by the callback
    *
    * @param callback An asynchronous callback function to invoke for each batch of document snapshots.
    * @returns A Promise resolving to an object representing the details of the traversal.

@@ -166,16 +166,17 @@ Creates a traverser that facilitates Firestore collection traversals. When trave
 
 #### Traversal properties
 
-- Time complexity: O((_N_ / `batchSize`) \* (_Q_(`batchSize`) + _C_))
-- Space complexity: O(`batchSize` \* _D_)
+- Time complexity: _O_((_N_ / `batchSize`) \* (_Q_(`batchSize`) + _C_))
+- Space complexity: _O_(`batchSize` \* _D_ + _S_)
 - Billing: _N_ reads
 
 where:
 
 - _N_: number of docs in the traversable
 - _Q_(`batchSize`): average batch query time
-- _C_: average callback processing time
+- _C_: average processing time
 - _D_: document size
+- _S_: average extra space used by the callback
 
 ### [createFastTraverser](./docs/API.md#createFastTraverser) (coming in the next release)
 
@@ -183,8 +184,8 @@ Creates a fast traverser that facilitates Firestore collection traversals. When 
 
 #### Traversal properties
 
-- Time complexity: O((_N_ / `batchSize`) \* (_Q_(`batchSize`))
-- Space complexity: O(`maxConcurrentBatchCount` \* `batchSize` \* _D_ )
+- Time complexity: _O_(_C_ + (_N_ / `batchSize`) \* _Q_(`batchSize`))
+- Space complexity: _O_(`maxConcurrentBatchCount` \* (`batchSize` \* _D_ + _S_))
 - Billing: _N_ reads
 
 where:
@@ -193,14 +194,43 @@ where:
 - _Q_(`batchSize`): average batch query time
 - _C_: average callback processing time
 - _D_: document size
+- _S_: average extra space used by the callback
 
 ### [createMigrator](./docs/API.md#createMigrator) (coming in v0.7)
 
 Creates a migrator that facilitates database migrations. The migrator accepts a custom traverser to traverse the collection. Otherwise it will create a default traverser with your desired traversal config. This migrator does not use atomic writes so it is possible that when a write fails other writes go through.
 
+#### Write properties
+
+- Time complexity: _TC_(`traverser`) where _C_ = _W_(`batchSize`)
+- Space complexity: _SC_(`traverser`) where _S_ = _O_(`batchSize`)
+- Billing: _N_ reads, _K_ writes
+
+where:
+
+- _N_: number of docs in the traversable
+- _K_: number of docs that passed the migration predicate (_K_<=_N_)
+- _W_(`batchSize`): average batch write time
+- _TC_(`traverser`): time complexity of the underlying traverser
+- _SC_(`traverser`): space complexity of the underlying traverser
+
 ### [createBatchMigrator](./docs/API.md#createBatchMigrator)
 
 Creates a migrator that facilitates database migrations. The migrator accepts a custom traverser to traverse the collection. Otherwise it will create a default traverser with your desired traversal config. This migrator uses batch writes so the entire operation will fail if a single write isn't successful.
+
+#### Write properties
+
+- Time complexity: _TC_(`traverser`) where _C_ = _W_(`batchSize`)
+- Space complexity: _SC_(`traverser`) where _S_ = _O_(`batchSize`)
+- Billing: _N_ reads, _K_ writes
+
+where:
+
+- _N_: number of docs in the traversable
+- _K_: number of docs that passed the migration predicate (_K_<=_N_)
+- _W_(`batchSize`): average batch write time
+- _TC_(`traverser`): time complexity of the underlying traverser
+- _SC_(`traverser`): space complexity of the underlying traverser
 
 ## Upgrading
 

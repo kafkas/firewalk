@@ -23,6 +23,21 @@ export class BatchMigrator<
 
   /**
    * Sets all documents in this collection with the provided data.
+   *
+   * **Properties:**
+   *
+   * - Time complexity: _TC_(`traverser`) where _C_ = _W_(`batchSize`)
+   * - Space complexity: _SC_(`traverser`) where _S_ = _O_(`batchSize`)
+   * - Billing: _N_ reads, _K_ writes
+   *
+   * where:
+   *
+   * - _N_: number of docs in the traversable
+   * - _K_: number of docs that passed the migration predicate (_K_<=_N_)
+   * - _W_(`batchSize`): average batch write time
+   * - _TC_(`traverser`): time complexity of the underlying traverser
+   * - _SC_(`traverser`): space complexity of the underlying traverser
+   *
    * @param getData - A function that returns an object with which to set each document.
    * @param options - Optional. An object to configure the set behavior.
    * @param predicate - Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
@@ -36,6 +51,21 @@ export class BatchMigrator<
 
   /**
    * Sets all documents in this collection with the provided data.
+   *
+   * **Properties:**
+   *
+   * - Time complexity: _TC_(`traverser`) where _C_ = _W_(`batchSize`)
+   * - Space complexity: _SC_(`traverser`) where _S_ = _O_(`batchSize`)
+   * - Billing: _N_ reads, _K_ writes
+   *
+   * where:
+   *
+   * - _N_: number of docs in the traversable
+   * - _K_: number of docs that passed the migration predicate (_K_<=_N_)
+   * - _W_(`batchSize`): average batch write time
+   * - _TC_(`traverser`): time complexity of the underlying traverser
+   * - _SC_(`traverser`): space complexity of the underlying traverser
+   *
    * @param data - The data with which to set each document.
    * @param options - Optional. An object to configure the set behavior.
    * @param predicate - Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
@@ -93,6 +123,21 @@ export class BatchMigrator<
 
   /**
    * Updates all documents in this collection with the provided data.
+   *
+   * **Properties:**
+   *
+   * - Time complexity: _TC_(`traverser`) where _C_ = _W_(`batchSize`)
+   * - Space complexity: _SC_(`traverser`) where _S_ = _O_(`batchSize`)
+   * - Billing: _N_ reads, _K_ writes
+   *
+   * where:
+   *
+   * - _N_: number of docs in the traversable
+   * - _K_: number of docs that passed the migration predicate (_K_<=_N_)
+   * - _W_(`batchSize`): average batch write time
+   * - _TC_(`traverser`): time complexity of the underlying traverser
+   * - _SC_(`traverser`): space complexity of the underlying traverser
+   *
    * @param getData - A function that returns the data with which to update each document.
    * @param predicate - Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
    * @returns A Promise resolving to an object representing the details of the migration.
@@ -104,6 +149,21 @@ export class BatchMigrator<
 
   /**
    * Updates all documents in this collection with the provided data.
+   *
+   * **Properties:**
+   *
+   * - Time complexity: _TC_(`traverser`) where _C_ = _W_(`batchSize`)
+   * - Space complexity: _SC_(`traverser`) where _S_ = _O_(`batchSize`)
+   * - Billing: _N_ reads, _K_ writes
+   *
+   * where:
+   *
+   * - _N_: number of docs in the traversable
+   * - _K_: number of docs that passed the migration predicate (_K_<=_N_)
+   * - _W_(`batchSize`): average batch write time
+   * - _TC_(`traverser`): time complexity of the underlying traverser
+   * - _SC_(`traverser`): space complexity of the underlying traverser
+   *
    * @param data - The data with which to update each document. Must be a non-empty object.
    * @param predicate - Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
    * @returns A Promise resolving to an object representing the details of the migration.
@@ -115,6 +175,21 @@ export class BatchMigrator<
 
   /**
    * Updates all documents in this collection with the provided field-value pair.
+   *
+   * **Properties:**
+   *
+   * - Time complexity: _TC_(`traverser`) where _C_ = _W_(`batchSize`)
+   * - Space complexity: _SC_(`traverser`) where _S_ = _O_(`batchSize`)
+   * - Billing: _N_ reads, _K_ writes
+   *
+   * where:
+   *
+   * - _N_: number of docs in the traversable
+   * - _K_: number of docs that passed the migration predicate (_K_<=_N_)
+   * - _W_(`batchSize`): average batch write time
+   * - _TC_(`traverser`): time complexity of the underlying traverser
+   * - _SC_(`traverser`): space complexity of the underlying traverser
+   *
    * @param field - The field to update in each document.
    * @param value - The value with which to update the specified field in each document. Must not be `undefined`.
    * @param predicate - Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.

@@ -42,16 +42,19 @@ export class FastTraverser<D extends firestore.DocumentData> extends Traverser<
    * Promise to resolve before moving to the next batch so there is no guarantee that any given batch will finish processing
    * before a later batch.
    *
-   * - Time complexity: O((N / `batchSize`) * Q(`batchSize`))
-   * - Space complexity: O(`maxConcurrentBatchCount` * `batchSize` * D)
-   * - Billing: N reads
+   * **Properties:**
+   *
+   * - Time complexity: _O_(_C_ + (_N_ / `batchSize`) * _Q_(`batchSize`))
+   * - Space complexity: _O_(`maxConcurrentBatchCount` * (`batchSize` * _D_ + _S_))
+   * - Billing: _N_ reads
    *
    * where:
    *
-   * - N: number of docs in the traversable
-   * - Q(`batchSize`): average batch query time
-   * - C: average callback processing time
-   * - D: document size
+   * - _N_: number of docs in the traversable
+   * - _Q_(`batchSize`): average batch query time
+   * - _C_: average callback processing time
+   * - _D_: document size
+   * - _S_: average extra space used by the callback
    *
    * @param callback An asynchronous callback function to invoke for each batch of document snapshots.
    * @returns A Promise resolving to an object representing the details of the traversal.
