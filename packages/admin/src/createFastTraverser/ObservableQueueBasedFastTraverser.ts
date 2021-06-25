@@ -56,23 +56,17 @@ export class ObservableQueueBasedFastTraverser<T extends Traversable<D>, D = fir
           return;
         }
         while (queueState.hasNewItems) {
-          queueState.isProcessing = true;
           await processQueue();
-          queueState.isProcessing = false;
         }
       },
     });
 
     const processQueue = async (): Promise<void> => {
-      // Clear resolved promises
-      const dequeuedPromises: Promise<void>[] = [];
-
-      while (!callbackPromiseQueue.isEmpty()) {
-        dequeuedPromises.push(callbackPromiseQueue.dequeue());
-      }
+      queueState.isProcessing = true;
+      const dequeuedPromises = callbackPromiseQueue.extractToArray();
       queueState.hasNewItems = false;
-
       await Promise.all(dequeuedPromises);
+      queueState.isProcessing = false;
     };
 
     while (true) {

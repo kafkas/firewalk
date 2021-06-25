@@ -32,7 +32,7 @@ async function main(): Promise<void> {
 
   let totalQueryCount = 0;
 
-  while (++totalQueryCount < 100) {
+  while (++totalQueryCount < 10) {
     console.log('Sending API request 1', totalQueryCount);
     await sleep(1000);
 
