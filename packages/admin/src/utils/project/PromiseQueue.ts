@@ -22,12 +22,12 @@ export class PromiseQueue<T> {
   }
 
   public enqueue(promise: Promise<T>): void {
-    const promiseId = this.getIdForNewItem();
+    const promiseId = this.getIdForNewPromise();
     this.queue.enqueue(promiseId);
     this.map.set(promiseId, promise);
   }
 
-  private getIdForNewItem(): number {
+  private getIdForNewPromise(): number {
     return ++this.lastPromiseId;
   }
 
