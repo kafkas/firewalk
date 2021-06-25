@@ -8,6 +8,9 @@ import type {
 } from './types';
 
 export interface Traverser<T extends Traversable<D>, D = firestore.DocumentData> {
+  /**
+   * The underlying traversable.
+   */
   readonly traversable: T;
 
   /**

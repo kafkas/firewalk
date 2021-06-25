@@ -1,14 +1,18 @@
 import type { firestore } from 'firebase-admin';
-import type { Traverser } from './Traverser';
 import type {
   Traversable,
   TraversalResult,
   FastTraversalConfig,
   BatchCallbackAsync,
+  TraverseEachConfig,
 } from './types';
 
-export interface FastTraverser<T extends Traversable<D>, D = firestore.DocumentData>
-  extends Traverser<T, D> {
+export interface FastTraverser<T extends Traversable<D>, D = firestore.DocumentData> {
+  /**
+   * The underlying traversable.
+   */
+  readonly traversable: T;
+
   /**
    * Applies the specified traversal config values. Creates and returns a new traverser rather than
    * modify the existing instance.
@@ -38,4 +42,16 @@ export interface FastTraverser<T extends Traversable<D>, D = firestore.DocumentD
    * @returns A Promise resolving to an object representing the details of the traversal.
    */
   traverse(callback: BatchCallbackAsync<D>): Promise<TraversalResult>;
+
+  /**
+   * Traverses the entire collection in batches of the size specified in traversal config. Invokes the specified
+   * callback sequentially for each document snapshot in each batch.
+   * @param callback An asynchronous callback function to invoke for each document snapshot in each batch.
+   * @param config The sequential traversal configuration.
+   * @returns A Promise resolving to an object representing the details of the traversal.
+   */
+  traverseEach(
+    callback: (snapshot: firestore.QueryDocumentSnapshot<D>) => Promise<void>,
+    config?: Partial<TraverseEachConfig>
+  ): Promise<TraversalResult>;
 }
