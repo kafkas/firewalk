@@ -1,6 +1,6 @@
 import type { firestore } from 'firebase-admin';
 import type { Traverser } from './Traverser';
-import type { BaseTraversalConfig, MigrationResult } from './types';
+import type { BaseTraversalConfig, MigrationResult, BatchCallback } from './types';
 
 export type MigrationPredicate<D> = (snapshot: firestore.QueryDocumentSnapshot<D>) => boolean;
 
@@ -18,6 +18,27 @@ export type SetOptions<M> = {
 export type SetDataGetter<D, M> = (snapshot: firestore.QueryDocumentSnapshot<D>) => SetData<D, M>;
 
 export abstract class Migrator<D extends firestore.DocumentData, C extends BaseTraversalConfig> {
+  protected registeredCallbacks: {
+    onBeforeBatchStart?: BatchCallback<D>;
+    onAfterBatchComplete?: BatchCallback<D>;
+  } = {};
+
+  /**
+   * Registers a callback function that fires right before the current batch starts processing.
+   * @param callback A synchronous callback that takes batch doc snapshots and the 0-based batch index as its arguments.
+   */
+  public onBeforeBatchStart(callback: BatchCallback<D>): void {
+    this.registeredCallbacks.onBeforeBatchStart = callback;
+  }
+
+  /**
+   * Registers a callback function that fires after the current batch is processed.
+   * @param callback A synchronous callback that takes batch doc snapshots and the 0-based batch index as its arguments.
+   */
+  public onAfterBatchComplete(callback: BatchCallback<D>): void {
+    this.registeredCallbacks.onAfterBatchComplete = callback;
+  }
+
   /**
    * The underlying traverser.
    */
