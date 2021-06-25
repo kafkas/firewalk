@@ -66,7 +66,7 @@ export class SLLQueue<E> {
   private validateNode(node: SLLNode<E> | null): asserts node {
     if (node === null) {
       throw new Error(
-        'Node does not exist. This indicates an expected error which is likely caused by an incorrect implementation of this data structure.'
+        'Node does not exist. This indicates an unexpected error which is likely caused by an incorrect implementation of this data structure.'
       );
     }
   }
