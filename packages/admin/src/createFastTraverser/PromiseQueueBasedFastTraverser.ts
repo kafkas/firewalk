@@ -7,7 +7,7 @@ import type {
   TraversalResult,
   BatchCallbackAsync,
 } from '../types';
-import { sleep, ObservableQueue } from '../utils';
+import { sleep, PromiseQueue, registerInterval } from '../utils';
 import { validateConfig } from './validateConfig';
 
 const defaultTraversalConfig: FastTraversalConfig = {
@@ -15,7 +15,9 @@ const defaultTraversalConfig: FastTraversalConfig = {
   maxInMemoryBatchCount: 10,
 };
 
-export class ObservableQueueBasedFastTraverser<T extends Traversable<D>, D = firestore.DocumentData>
+const QUEUE_PROCESS_INTERVAL = 100;
+
+export class PromiseQueueBasedFastTraverser<T extends Traversable<D>, D = firestore.DocumentData>
   extends BaseTraverser<FastTraversalConfig, D>
   implements FastTraverser<T, D> {
   public constructor(public readonly traversable: T, config?: Partial<FastTraversalConfig>) {
@@ -24,7 +26,7 @@ export class ObservableQueueBasedFastTraverser<T extends Traversable<D>, D = fir
   }
 
   public withConfig(c: Partial<FastTraversalConfig>): FastTraverser<T, D> {
-    return new ObservableQueueBasedFastTraverser(this.traversable, {
+    return new PromiseQueueBasedFastTraverser(this.traversable, {
       ...this.traversalConfig,
       ...c,
     });
@@ -43,31 +45,13 @@ export class ObservableQueueBasedFastTraverser<T extends Traversable<D>, D = fir
     let docCount = 0;
     let query = this.traversable.limit(Math.min(batchSize, maxDocCount));
 
-    const callbackPromiseQueue = new ObservableQueue<Promise<void>>();
-    const queueState = {
-      isProcessing: false,
-      hasNewItems: false,
-    };
+    const callbackPromiseQueue = new PromiseQueue<void>();
 
-    const unregisterEnqueueObserver = callbackPromiseQueue.registerEnqueueObserver({
-      receiveUpdate: async () => {
-        queueState.hasNewItems = true;
-        if (queueState.isProcessing) {
-          return;
-        }
-        while (queueState.hasNewItems) {
-          await processQueue();
-        }
-      },
-    });
-
-    const processQueue = async (): Promise<void> => {
-      queueState.isProcessing = true;
-      const dequeuedPromises = callbackPromiseQueue.extractToArray();
-      queueState.hasNewItems = false;
-      await Promise.all(dequeuedPromises);
-      queueState.isProcessing = false;
-    };
+    const unregisterQueueProcessor = registerInterval(async () => {
+      if (!callbackPromiseQueue.isProcessing()) {
+        await callbackPromiseQueue.process();
+      }
+    }, QUEUE_PROCESS_INTERVAL);
 
     while (true) {
       const { docs: batchDocSnapshots } = await query.get();
@@ -87,16 +71,8 @@ export class ObservableQueueBasedFastTraverser<T extends Traversable<D>, D = fir
         break;
       }
 
-      while (callbackPromiseQueue.size > maxInMemoryBatchCount) {
-        // The queue is getting too large. Wait until its emptied a little.
-        let unregisterDequeueObserver = (): void => {};
-        const dequeuePromise = new Promise<void>((res) => {
-          unregisterDequeueObserver = callbackPromiseQueue.registerDequeueObserver({
-            receiveUpdate: () => res(),
-          });
-        });
-        await dequeuePromise;
-        unregisterDequeueObserver();
+      while (callbackPromiseQueue.size >= maxInMemoryBatchCount) {
+        await sleep(QUEUE_PROCESS_INTERVAL);
       }
 
       if (sleepBetweenBatches) {
@@ -107,12 +83,12 @@ export class ObservableQueueBasedFastTraverser<T extends Traversable<D>, D = fir
       curBatchIndex++;
     }
 
-    unregisterEnqueueObserver();
+    unregisterQueueProcessor();
 
     // There may still be some Promises left in the queue but there won't be any new items coming in.
     // Wait for the existing ones to resolve and exit.
 
-    await processQueue();
+    await callbackPromiseQueue.process();
 
     return { batchCount: curBatchIndex, docCount };
   }
