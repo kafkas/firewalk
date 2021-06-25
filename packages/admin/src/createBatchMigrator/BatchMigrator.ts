@@ -8,15 +8,14 @@ import {
   SetOptions,
   SetDataGetter,
 } from '../Migrator';
-import type { Traversable, BaseTraversalConfig, MigrationResult } from '../types';
+import type { BaseTraversalConfig, MigrationResult } from '../types';
 import { validateConfig } from './validateConfig';
 
 export class BatchMigrator<
   D extends firestore.DocumentData,
-  T extends Traversable<D>,
   C extends BaseTraversalConfig,
-  TR extends Traverser<D, T, C>
-> extends Migrator<D, T, C> {
+  TR extends Traverser<D, C>
+> extends Migrator<D, C> {
   public constructor(public readonly traverser: TR) {
     super();
     validateConfig(traverser.traversalConfig);

@@ -10,15 +10,18 @@ import { sleep } from '../utils';
 
 const defaultTraversalConfig: BaseTraversalConfig = Traverser.getDefaultConfig();
 
-export class SlowTraverser<
-  D extends firestore.DocumentData,
-  T extends Traversable<D>
-> extends Traverser<D, T, BaseTraversalConfig> {
-  public constructor(public readonly traversable: T, config?: Partial<BaseTraversalConfig>) {
+export class SlowTraverser<D extends firestore.DocumentData> extends Traverser<
+  D,
+  BaseTraversalConfig
+> {
+  public constructor(
+    public readonly traversable: Traversable<D>,
+    config?: Partial<BaseTraversalConfig>
+  ) {
     super({ ...defaultTraversalConfig, ...config });
   }
 
-  public withConfig(c: Partial<BaseTraversalConfig>): SlowTraverser<D, T> {
+  public withConfig(c: Partial<BaseTraversalConfig>): SlowTraverser<D> {
     return new SlowTraverser(this.traversable, { ...this.traversalConfig, ...c });
   }
 

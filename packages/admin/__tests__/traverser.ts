@@ -28,7 +28,8 @@ slowTraverser.traverse(async (docs) => {
 
 const slowTraversable = slowTraverser.traversable;
 
-fastTraverser.traversable; // Should be typed as a Query
+// Ideally this should have a narrow type
+fastTraverser.traversable;
 
 const defaultMigrator1 = createBatchMigrator(fastTraverser);
 const defaultMigrator2 = createBatchMigrator(projects, { batchSize: 250 });

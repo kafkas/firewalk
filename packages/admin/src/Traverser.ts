@@ -39,11 +39,7 @@ function validateTraversalConfig(c: Partial<BaseTraversalConfig> = {}): void {
   }
 }
 
-export abstract class Traverser<
-  D extends firestore.DocumentData,
-  T extends Traversable<D>,
-  C extends BaseTraversalConfig
-> {
+export abstract class Traverser<D extends firestore.DocumentData, C extends BaseTraversalConfig> {
   public static getDefaultConfig(): BaseTraversalConfig {
     return { ...defaultTraversalConfig };
   }
@@ -86,7 +82,7 @@ export abstract class Traverser<
   /**
    * The underlying traversable.
    */
-  public abstract readonly traversable: T;
+  public abstract readonly traversable: Traversable<D>;
 
   /**
    * Applies the specified traversal config values. Creates and returns a new traverser rather than
@@ -94,7 +90,7 @@ export abstract class Traverser<
    * @param config Partial traversal configuration.
    * @returns The newly created traverser.
    */
-  public abstract withConfig(config: Partial<BaseTraversalConfig>): Traverser<D, T, C>;
+  public abstract withConfig(config: Partial<BaseTraversalConfig>): Traverser<D, C>;
 
   public abstract traverse(callback: BatchCallbackAsync<D>): Promise<TraversalResult>;
 }

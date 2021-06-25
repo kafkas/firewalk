@@ -1,6 +1,6 @@
 import type { firestore } from 'firebase-admin';
 import type { Traverser } from './Traverser';
-import type { Traversable, BaseTraversalConfig, MigrationResult } from './types';
+import type { BaseTraversalConfig, MigrationResult } from './types';
 
 export type MigrationPredicate<D> = (snapshot: firestore.QueryDocumentSnapshot<D>) => boolean;
 
@@ -17,15 +17,11 @@ export type SetOptions<M> = {
 
 export type SetDataGetter<D, M> = (snapshot: firestore.QueryDocumentSnapshot<D>) => SetData<D, M>;
 
-export abstract class Migrator<
-  D extends firestore.DocumentData,
-  T extends Traversable<D>,
-  C extends BaseTraversalConfig
-> {
+export abstract class Migrator<D extends firestore.DocumentData, C extends BaseTraversalConfig> {
   /**
    * The underlying traverser.
    */
-  public abstract readonly traverser: Traverser<D, T, C>;
+  public abstract readonly traverser: Traverser<D, C>;
 
   /**
    * Sets all documents in this collection with the provided data.

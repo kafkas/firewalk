@@ -14,18 +14,21 @@ const defaultTraversalConfig: FastTraversalConfig = {
   maxConcurrentBatchCount: 10,
 };
 
-const QUEUE_PROCESS_INTERVAL = 100;
+const PROCESS_QUEUE_INTERVAL = 100;
 
-export class FastTraverser<
-  D extends firestore.DocumentData,
-  T extends Traversable<D>
-> extends Traverser<D, T, FastTraversalConfig> {
-  public constructor(public readonly traversable: T, config?: Partial<FastTraversalConfig>) {
+export class FastTraverser<D extends firestore.DocumentData> extends Traverser<
+  D,
+  FastTraversalConfig
+> {
+  public constructor(
+    public readonly traversable: Traversable<D>,
+    config?: Partial<FastTraversalConfig>
+  ) {
     super({ ...defaultTraversalConfig, ...config });
     validateConfig(config);
   }
 
-  public withConfig(c: Partial<FastTraversalConfig>): FastTraverser<D, T> {
+  public withConfig(c: Partial<FastTraversalConfig>): FastTraverser<D> {
     return new FastTraverser(this.traversable, {
       ...this.traversalConfig,
       ...c,
@@ -71,7 +74,7 @@ export class FastTraverser<
       if (!callbackPromiseQueue.isProcessing()) {
         await callbackPromiseQueue.process();
       }
-    }, QUEUE_PROCESS_INTERVAL);
+    }, PROCESS_QUEUE_INTERVAL);
 
     while (true) {
       const { docs: batchDocSnapshots } = await query.get();
@@ -92,7 +95,7 @@ export class FastTraverser<
       }
 
       while (callbackPromiseQueue.size >= maxConcurrentBatchCount) {
-        await sleep(QUEUE_PROCESS_INTERVAL);
+        await sleep(PROCESS_QUEUE_INTERVAL);
       }
 
       if (sleepBetweenBatches) {

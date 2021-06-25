@@ -7,10 +7,10 @@ import { SlowTraverser } from './SlowTraverser';
  * this traverser invokes a specified async callback for each batch of document snapshots and waits for the callback
  * Promise to resolve before moving to the next batch.
  */
-export function createTraverser<D extends firestore.DocumentData, T extends Traversable<D>>(
-  traversable: T,
+export function createTraverser<D extends firestore.DocumentData>(
+  traversable: Traversable<D>,
   config?: Partial<BaseTraversalConfig>
-): SlowTraverser<D, T> {
+): SlowTraverser<D> {
   return new SlowTraverser(traversable, config);
 }
 
