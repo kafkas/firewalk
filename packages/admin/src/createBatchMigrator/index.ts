@@ -13,11 +13,11 @@ import { BatchMigrator } from './BatchMigrator';
  * @param traverser The traverser object that this migrator will use when traversing the collection and writing to documents.
  */
 export function createBatchMigrator<
-  TR extends Traverser<T, C, D>,
+  D extends firestore.DocumentData,
   T extends Traversable<D>,
   C extends BaseTraversalConfig,
-  D = firestore.DocumentData
->(traverser: TR): BatchMigrator<TR, T, C, D>;
+  TR extends Traverser<D, T, C>
+>(traverser: TR): BatchMigrator<D, T, C, TR>;
 
 /**
  * Creates a migrator that facilitates database migrations. The migrator creates a default (slow) traverser that
@@ -27,25 +27,25 @@ export function createBatchMigrator<
  * @param traversable A collection-like traversable group of documents to migrate.
  * @param traversalConfig Optional. The traversal configuration with which the default traverser will be created.
  */
-export function createBatchMigrator<T extends Traversable<D>, D = firestore.DocumentData>(
+export function createBatchMigrator<T extends Traversable<D>, D extends firestore.DocumentData>(
   traversable: T,
   traversalConfig?: Partial<BaseTraversalConfig>
-): BatchMigrator<SlowTraverser<T, D>, T, BaseTraversalConfig, D>;
+): BatchMigrator<D, T, BaseTraversalConfig, SlowTraverser<D, T>>;
 
 export function createBatchMigrator<
-  TR extends Traverser<T, C, D>,
+  D extends firestore.DocumentData,
   T extends Traversable<D>,
-  D = firestore.DocumentData,
-  C extends BaseTraversalConfig = BaseTraversalConfig
+  C extends BaseTraversalConfig,
+  TR extends Traverser<D, T, C>
 >(
   traversableOrTraverser: TR | T,
   traversalConfig?: Partial<BaseTraversalConfig>
-): BatchMigrator<TR, T, C, D> | BatchMigrator<SlowTraverser<T, D>, T, BaseTraversalConfig, D> {
+): BatchMigrator<D, T, C, TR> | BatchMigrator<D, T, BaseTraversalConfig, SlowTraverser<D, T>> {
   if (isTraverser(traversableOrTraverser)) {
     const traverser = traversableOrTraverser;
     return new BatchMigrator(traverser);
   } else {
-    const traverser = createTraverser<T, D>(traversableOrTraverser, traversalConfig);
+    const traverser = createTraverser<D, T>(traversableOrTraverser, traversalConfig);
     return new BatchMigrator(traverser);
   }
 }

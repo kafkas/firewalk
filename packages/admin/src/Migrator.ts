@@ -18,14 +18,14 @@ export type SetOptions<M> = {
 export type SetDataGetter<D, M> = (snapshot: firestore.QueryDocumentSnapshot<D>) => SetData<D, M>;
 
 export abstract class Migrator<
+  D extends firestore.DocumentData,
   T extends Traversable<D>,
-  C extends BaseTraversalConfig,
-  D = firestore.DocumentData
+  C extends BaseTraversalConfig
 > {
   /**
    * The underlying traverser.
    */
-  public abstract readonly traverser: Traverser<T, C, D>;
+  public abstract readonly traverser: Traverser<D, T, C>;
 
   /**
    * Sets all documents in this collection with the provided data.

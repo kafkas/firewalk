@@ -3,11 +3,11 @@ import type { BaseTraversalConfig, Traversable } from '../../types';
 import type { Traverser } from '../../Traverser';
 
 export function isTraverser<
+  D extends firestore.DocumentData,
   T extends Traversable<D>,
-  C extends BaseTraversalConfig,
-  D = firestore.DocumentData
->(candidate: Traverser<T, C, D> | unknown): candidate is Traverser<T, C, D> {
-  const t = candidate as Traverser<T, C, D>;
+  C extends BaseTraversalConfig
+>(candidate: Traverser<D, T, C> | unknown): candidate is Traverser<D, T, C> {
+  const t = candidate as Traverser<D, T, C>;
   return (
     !!t &&
     typeof t.withConfig === 'function' &&
