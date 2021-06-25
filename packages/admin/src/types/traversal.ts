@@ -38,9 +38,9 @@ export interface BaseTraversalConfig {
  */
 export interface FastTraversalConfig extends BaseTraversalConfig {
   /**
-   * The maximum number of batches to hold in memory. Defaults to 10.
+   * The maximum number of batches that can be held in memory and processed concurrently. Defaults to 10.
    */
-  maxInMemoryBatchCount: number;
+  maxConcurrentBatchCount: number;
 }
 
 /**

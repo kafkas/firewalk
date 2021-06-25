@@ -11,6 +11,6 @@ function assertPositiveIntegerInConfig(
 }
 
 export function validateConfig(c: Partial<FastTraversalConfig> = {}): void {
-  const { maxInMemoryBatchCount } = c;
-  assertPositiveIntegerInConfig(maxInMemoryBatchCount, 'maxInMemoryBatchCount');
+  const { maxConcurrentBatchCount } = c;
+  assertPositiveIntegerInConfig(maxConcurrentBatchCount, 'maxConcurrentBatchCount');
 }

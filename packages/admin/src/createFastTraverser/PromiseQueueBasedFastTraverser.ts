@@ -12,7 +12,7 @@ import { validateConfig } from './validateConfig';
 
 const defaultTraversalConfig: FastTraversalConfig = {
   ...BaseTraverser.getDefaultConfig(),
-  maxInMemoryBatchCount: 10,
+  maxConcurrentBatchCount: 10,
 };
 
 const QUEUE_PROCESS_INTERVAL = 100;
@@ -38,7 +38,7 @@ export class PromiseQueueBasedFastTraverser<T extends Traversable<D>, D = firest
       sleepBetweenBatches,
       sleepTimeBetweenBatches,
       maxDocCount,
-      maxInMemoryBatchCount,
+      maxConcurrentBatchCount,
     } = this.traversalConfig;
 
     let curBatchIndex = 0;
@@ -71,7 +71,7 @@ export class PromiseQueueBasedFastTraverser<T extends Traversable<D>, D = firest
         break;
       }
 
-      while (callbackPromiseQueue.size >= maxInMemoryBatchCount) {
+      while (callbackPromiseQueue.size >= maxConcurrentBatchCount) {
         await sleep(QUEUE_PROCESS_INTERVAL);
       }
 

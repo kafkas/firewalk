@@ -24,7 +24,7 @@ export interface FastTraverser<T extends Traversable<D>, D = firestore.DocumentD
    * before a later batch.
    *
    * - Time complexity: O((N / `batchSize`) * Q(`batchSize`))
-   * - Space complexity: O(`maxInMemoryBatchCount` * `batchSize` * D)
+   * - Space complexity: O(`maxConcurrentBatchCount` * `batchSize` * D)
    * - Billing: N reads
    *
    * where:

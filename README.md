@@ -184,7 +184,7 @@ Creates a fast traverser that facilitates Firestore collection traversals. When 
 #### Traversal properties
 
 - Time complexity: O((_N_ / `batchSize`) \* (_Q_(`batchSize`))
-- Space complexity: O(`maxInMemoryBatchCount` \* `batchSize` \* _D_ )
+- Space complexity: O(`maxConcurrentBatchCount` \* `batchSize` \* _D_ )
 - Billing: _N_ reads
 
 where:
