@@ -162,7 +162,7 @@ You can find the full API reference for `@firecode/admin` [here](./docs/API.md).
 
 ### [createTraverser](./docs/API.md#createTraverser)
 
-Creates a traverser object that facilitates Firestore collection traversals. When traversing the collection, this traverser invokes a specified async callback for each batch of document snapshots and waits for the callback Promise to resolve before moving to the next batch.
+Creates a traverser that facilitates Firestore collection traversals. When traversing the collection, this traverser invokes a specified async callback for each batch of document snapshots and waits for the callback Promise to resolve before moving to the next batch.
 
 #### Traversal properties
 
@@ -179,7 +179,7 @@ where:
 
 ### [createFastTraverser](./docs/API.md#createFastTraverser) (coming in the next release)
 
-Creates a fast traverser object that facilitates Firestore collection traversals. When traversing the collection, this traverser invokes a specified async callback for each batch of document snapshots and immediately moves to the next batch. It does not wait for the callback Promise to resolve before moving to the next batch so there is no guarantee that any given batch will finish processing before a later batch. This traverser uses more memory but is significantly faster than the default traverser.
+Creates a fast traverser that facilitates Firestore collection traversals. When traversing the collection, this traverser invokes a specified async callback for each batch of document snapshots and immediately moves to the next batch. It does not wait for the callback Promise to resolve before moving to the next batch so there is no guarantee that any given batch will finish processing before a later batch. This traverser uses more memory but is significantly faster than the default traverser.
 
 #### Traversal properties
 
@@ -194,9 +194,13 @@ where:
 - _C_: average callback processing time
 - _D_: document size
 
+### [createMigrator](./docs/API.md#createMigrator) (coming in v0.7)
+
+Creates a migrator that facilitates database migrations. The migrator accepts a custom traverser to traverse the collection. Otherwise it will create a default traverser with your desired traversal config. This migrator does not use atomic writes so it is possible that when a write fails other writes go through.
+
 ### [createBatchMigrator](./docs/API.md#createBatchMigrator)
 
-Creates a migrator that facilitates database migrations. You can either pass your own traverser to the migrator or let it create a default traverser with your desired traversal config. This migrator uses batch writes when writing to docs so the entire operation will fail if a single write isn't successful.
+Creates a migrator that facilitates database migrations. The migrator accepts a custom traverser to traverse the collection. Otherwise it will create a default traverser with your desired traversal config. This migrator uses batch writes so the entire operation will fail if a single write isn't successful.
 
 ## Upgrading
 

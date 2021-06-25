@@ -64,6 +64,10 @@ createFastTraverser<T, D>(traversable: Traversable<D>, config?: TraversalConfig)
 
 ([Traverser](#Traverser)) A traverser object.
 
+## createMigrator (coming in v0.7)
+
+Creates a migrator that facilitates database migrations. The migrator accepts a custom traverser to traverse the collection. Otherwise it will create a default traverser with your desired traversal config. This migrator does not use atomic writes so it is possible that when a write fails other writes go through.
+
 ## createTraverser
 
 Creates a traverser object that facilitates Firestore collection traversals. When traversing the collection, this traverser invokes a specified async callback for each batch of document snapshots and waits for the callback Promise to resolve before moving to the next batch.
