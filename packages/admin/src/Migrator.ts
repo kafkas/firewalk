@@ -44,61 +44,28 @@ export abstract class Migrator<D extends firestore.DocumentData, C extends BaseT
    */
   public abstract readonly traverser: Traverser<D, C>;
 
-  /**
-   * Sets all documents in this collection with the provided data.
-   * @param getData - A function that returns an object with which to set each document.
-   * @param options - Optional. An object to configure the set behavior.
-   * @param predicate - Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
-   * @returns A Promise resolving to an object representing the details of the migration.
-   */
   public abstract set<M extends boolean | undefined>(
     getData: SetDataGetter<D, M>,
     options?: SetOptions<M>,
     predicate?: MigrationPredicate<D>
   ): Promise<MigrationResult>;
 
-  /**
-   * Sets all documents in this collection with the provided data.
-   * @param data - The data with which to set each document.
-   * @param options - Optional. An object to configure the set behavior.
-   * @param predicate - Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
-   * @returns A Promise resolving to an object representing the details of the migration.
-   */
   public abstract set<M extends boolean | undefined>(
     data: SetData<D, M>,
     options?: SetOptions<M>,
     predicate?: MigrationPredicate<D>
   ): Promise<MigrationResult>;
 
-  /**
-   * Updates all documents in this collection with the provided data.
-   * @param getData - A function that returns the data with which to update each document.
-   * @param predicate - Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
-   * @returns A Promise resolving to an object representing the details of the migration.
-   */
   public abstract update(
     getData: UpdateDataGetter<D>,
     predicate?: MigrationPredicate<D>
   ): Promise<MigrationResult>;
 
-  /**
-   * Updates all documents in this collection with the provided data.
-   * @param data - The data with which to update each document. Must be a non-empty object.
-   * @param predicate - Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
-   * @returns A Promise resolving to an object representing the details of the migration.
-   */
   public abstract update(
     data: firestore.UpdateData,
     predicate?: MigrationPredicate<D>
   ): Promise<MigrationResult>;
 
-  /**
-   * Updates all documents in this collection with the provided field-value pair.
-   * @param field - The field to update in each document.
-   * @param value - The value with which to update the specified field in each document. Must not be `undefined`.
-   * @param predicate - Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
-   * @returns A Promise resolving to an object representing the details of the migration.
-   */
   public abstract update(
     field: string | firestore.FieldPath,
     value: any,

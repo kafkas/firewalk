@@ -21,6 +21,32 @@ export class BatchMigrator<
     validateConfig(traverser.traversalConfig);
   }
 
+  /**
+   * Sets all documents in this collection with the provided data.
+   * @param getData - A function that returns an object with which to set each document.
+   * @param options - Optional. An object to configure the set behavior.
+   * @param predicate - Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
+   * @returns A Promise resolving to an object representing the details of the migration.
+   */
+  public set<M extends boolean | undefined>(
+    getData: SetDataGetter<D, M>,
+    options?: SetOptions<M>,
+    predicate?: MigrationPredicate<D>
+  ): Promise<MigrationResult>;
+
+  /**
+   * Sets all documents in this collection with the provided data.
+   * @param data - The data with which to set each document.
+   * @param options - Optional. An object to configure the set behavior.
+   * @param predicate - Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
+   * @returns A Promise resolving to an object representing the details of the migration.
+   */
+  public set<M extends boolean | undefined>(
+    data: SetData<D, M>,
+    options?: SetOptions<M>,
+    predicate?: MigrationPredicate<D>
+  ): Promise<MigrationResult>;
+
   public async set<M extends boolean | undefined>(
     dataOrGetData: SetData<D, M> | SetDataGetter<D, M>,
     options?: SetOptions<M>,
@@ -64,6 +90,41 @@ export class BatchMigrator<
 
     return { batchCount, traversedDocCount, migratedDocCount };
   }
+
+  /**
+   * Updates all documents in this collection with the provided data.
+   * @param getData - A function that returns the data with which to update each document.
+   * @param predicate - Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
+   * @returns A Promise resolving to an object representing the details of the migration.
+   */
+  public update(
+    getData: UpdateDataGetter<D>,
+    predicate?: MigrationPredicate<D>
+  ): Promise<MigrationResult>;
+
+  /**
+   * Updates all documents in this collection with the provided data.
+   * @param data - The data with which to update each document. Must be a non-empty object.
+   * @param predicate - Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
+   * @returns A Promise resolving to an object representing the details of the migration.
+   */
+  public update(
+    data: firestore.UpdateData,
+    predicate?: MigrationPredicate<D>
+  ): Promise<MigrationResult>;
+
+  /**
+   * Updates all documents in this collection with the provided field-value pair.
+   * @param field - The field to update in each document.
+   * @param value - The value with which to update the specified field in each document. Must not be `undefined`.
+   * @param predicate - Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
+   * @returns A Promise resolving to an object representing the details of the migration.
+   */
+  public update(
+    field: string | firestore.FieldPath,
+    value: any,
+    predicate?: MigrationPredicate<D>
+  ): Promise<MigrationResult>;
 
   public async update(
     arg1: firestore.UpdateData | string | firestore.FieldPath | UpdateDataGetter<D>,
