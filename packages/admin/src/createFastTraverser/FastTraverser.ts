@@ -14,7 +14,8 @@ const defaultTraversalConfig: FastTraversalConfig = {
   maxConcurrentBatchCount: 10,
 };
 
-const PROCESS_QUEUE_INTERVAL = 100;
+// TODO: This should probably be a function of traversal config
+const PROCESS_QUEUE_INTERVAL = 250;
 
 export class FastTraverser<D extends firestore.DocumentData> extends Traverser<
   D,
