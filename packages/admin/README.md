@@ -26,11 +26,12 @@ Firecode is an extremely light, well-typed, zero-dependency library that is usef
 ## Overview
 
 1. [Installation](#Installation)
-2. [Quick Start](#Quick-Start)
-3. [More Examples](#More-Examples)
-4. [API](#API)
-5. [Upgrading](#Upgrading)
-6. [License](#License)
+2. [Core Concepts](#Core-Concepts)
+3. [Quick Start](#Quick-Start)
+4. [More Examples](#More-Examples)
+5. [API](#API)
+6. [Upgrading](#Upgrading)
+7. [License](#License)
 
 ## Installation
 
@@ -45,6 +46,14 @@ Then run
 ```
 npm install @firecode/admin
 ```
+
+## Core Concepts
+
+There are only 2 kinds of objects you need to be familiar with when using this library:
+
+1. **Traverser**: An object that walks you through a collection of documents (or more generally a [Traversable](./packages/admin/docs/API.md#Traversable)).
+
+2. **Migrator**: A convenience object used for database migrations. It lets you easily write to the documents within a given traversable and uses a traverser to do that.
 
 ## Quick Start
 
@@ -149,23 +158,45 @@ console.log(`Updated ${migratedDocCount} posts!`);
 
 ## [API](./docs/API.md)
 
-When using Firecode, there are 2 kinds of objects that you need to be familiar with: traverser and migrator. A **traverser** is an object that walks you through a collection of documents (or more generally a [Traversable](./docs/API.md#Traversable)). A **migrator** is a convenience object that lets you easily write to documents within a given traversable. It uses a traverser to do that.
-
-You can find the full API reference for `@firecode/admin` [here](./docs/API.md). Here are the core functions that this library provides.
-
-### [createBatchMigrator](./docs/API.md#createBatchMigrator)
-
-Creates a migrator that facilitates database migrations. You can either pass your own traverser to the migrator or let it create a default traverser with your desired traversal config. This migrator uses batch writes when writing to docs so the entire operation will fail if a single write isn't successful.
+You can find the full API reference for `@firecode/admin` [here](./docs/API.md). Here are some of the core functions that this library provides.
 
 ### [createTraverser](./docs/API.md#createTraverser)
 
 Creates a traverser object that facilitates Firestore collection traversals. When traversing the collection, this traverser invokes a specified async callback for each batch of document snapshots and waits for the callback Promise to resolve before moving to the next batch.
 
+#### Traversal properties
+
+- Time complexity: O((_N_ / `batchSize`) \* (_Q_ + _C_))
+- Space complexity: O(`batchSize` \* _D_)
+- Billing: _N_ reads
+
+where:
+
+- _N_: number of docs in the traversable
+- _Q_: batch query time
+- _C_: callback (average) processing time
+- _D_: document size
+
 ### [createFastTraverser](./docs/API.md#createFastTraverser) (coming in the next release)
 
 Creates a fast traverser object that facilitates Firestore collection traversals. When traversing the collection, this traverser invokes a specified async callback for each batch of document snapshots and immediately moves to the next batch. It does not wait for the callback Promise to resolve before moving to the next batch so there is no guarantee that any given batch will finish processing before a later batch. This traverser uses more memory but is significantly faster than the default traverser.
 
-<!-- TODO: Add space complexity -->
+#### Traversal properties
+
+- Time complexity: O((_N_ / `batchSize`) \* _Q_)
+- Space complexity: O(`maxInMemoryBatchCount` \* `batchSize` \* _D_ )
+- Billing: _N_ reads
+
+where:
+
+- _N_: number of docs in the traversable
+- _Q_: batch query time
+- _C_: callback (average) processing time
+- _D_: document size
+
+### [createBatchMigrator](./docs/API.md#createBatchMigrator)
+
+Creates a migrator that facilitates database migrations. You can either pass your own traverser to the migrator or let it create a default traverser with your desired traversal config. This migrator uses batch writes when writing to docs so the entire operation will fail if a single write isn't successful.
 
 ## Upgrading
 

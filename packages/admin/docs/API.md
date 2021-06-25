@@ -1,6 +1,12 @@
 # API Reference
 
-When using Firecode, there are 2 kinds of objects that you need to be familiar with: traverser and migrator. A **traverser** is an object that walks you through a collection of documents (or more generally a [Traversable](#Traversable)). A **migrator** is a convenience object that lets you easily write to documents within a given traversable. It uses a traverser to do that.
+## Core Concepts
+
+There are only 2 kinds of objects you need to be familiar with when using this library:
+
+1. **Traverser**: An object that walks you through a collection of documents (or more generally a [Traversable](./packages/admin/docs/API.md#Traversable)).
+
+2. **Migrator**: A convenience object used for database migrations. It lets you easily write to the documents within a given traversable and uses a traverser to do that.
 
 To create traversers and migrators, you will be using factory functions provided by this library. We also provide you with the TypeScript types for the important objects that you will be interacting with. The generic parameter `D` that we use throughout the docs refers to the shape of the documents in the traversable and defaults to [FirebaseFirestore.DocumentData](https://github.com/googleapis/nodejs-firestore/blob/28d645bd3e368abde592bfa2611de3378ca175a6/types/firestore.d.ts#L28).
 

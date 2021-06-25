@@ -26,11 +26,12 @@ Firecode is an extremely light, well-typed, zero-dependency library that is usef
 ## Overview
 
 1. [Installation](#Installation)
-2. [Quick Start](#Quick-Start)
-3. [More Examples](#More-Examples)
-4. [API](#API)
-5. [Upgrading](#Upgrading)
-6. [License](#License)
+2. [Core Concepts](#Core-Concepts)
+3. [Quick Start](#Quick-Start)
+4. [More Examples](#More-Examples)
+5. [API](#API)
+6. [Upgrading](#Upgrading)
+7. [License](#License)
 
 ## Installation
 
@@ -45,6 +46,14 @@ Then run
 ```
 npm install @firecode/admin
 ```
+
+## Core Concepts
+
+There are only 2 kinds of objects you need to be familiar with when using this library:
+
+1. **Traverser**: An object that walks you through a collection of documents (or more generally a [Traversable](./packages/admin/docs/API.md#Traversable)).
+
+2. **Migrator**: A convenience object used for database migrations. It lets you easily write to the documents within a given traversable and uses a traverser to do that.
 
 ## Quick Start
 
@@ -148,8 +157,6 @@ console.log(`Updated ${migratedDocCount} posts!`);
 ```
 
 ## [API](./packages/admin/docs/API.md)
-
-When using Firecode, there are 2 kinds of objects that you need to be familiar with: traverser and migrator. A **traverser** is an object that walks you through a collection of documents (or more generally a [Traversable](./packages/admin/docs/API.md#Traversable)). A **migrator** is a convenience object that lets you easily write to documents within a given traversable. It uses a traverser to do that.
 
 You can find the full API reference for `@firecode/admin` [here](./packages/admin/docs/API.md). Here are some of the core functions that this library provides.
 
