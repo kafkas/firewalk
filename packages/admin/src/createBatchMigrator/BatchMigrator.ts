@@ -4,9 +4,9 @@ import {
   Migrator,
   MigrationPredicate,
   UpdateDataGetter,
-  SetData,
-  SetOptions,
   SetDataGetter,
+  SetPartialDataGetter,
+  SetOptions,
 } from '../Migrator';
 import type { BaseTraversalConfig, MigrationResult } from '../types';
 import { validateConfig } from './validateConfig';
@@ -56,10 +56,30 @@ export class BatchMigrator<
    * @param options - Optional. An object to configure the set behavior.
    * @returns A Promise resolving to an object representing the details of the migration.
    */
-  public set<M extends boolean | undefined>(
-    getData: SetDataGetter<D, M>,
-    options?: SetOptions<M>
-  ): Promise<MigrationResult>;
+  public set(getData: SetDataGetter<D>): Promise<MigrationResult>;
+
+  /**
+   * Sets all documents in this collection with the provided data.
+   *
+   * **Properties:**
+   *
+   * - Time complexity: _TC_(`traverser`) where _C_ = _W_(`batchSize`)
+   * - Space complexity: _SC_(`traverser`) where _S_ = _O_(`batchSize`)
+   * - Billing: _N_ reads, _K_ writes
+   *
+   * where:
+   *
+   * - _N_: number of docs in the traversable
+   * - _K_: number of docs that passed the migration predicate (_K_<=_N_)
+   * - _W_(`batchSize`): average batch write time
+   * - _TC_(`traverser`): time complexity of the underlying traverser
+   * - _SC_(`traverser`): space complexity of the underlying traverser
+   *
+   * @param getData - A function that returns an object with which to set each document.
+   * @param options - An object to configure the set behavior.
+   * @returns A Promise resolving to an object representing the details of the migration.
+   */
+  public set(getData: SetPartialDataGetter<D>, options: SetOptions): Promise<MigrationResult>;
 
   /**
    * Sets all documents in this collection with the provided data.
@@ -79,17 +99,36 @@ export class BatchMigrator<
    * - _SC_(`traverser`): space complexity of the underlying traverser
    *
    * @param data - The data with which to set each document.
-   * @param options - Optional. An object to configure the set behavior.
    * @returns A Promise resolving to an object representing the details of the migration.
    */
-  public set<M extends boolean | undefined>(
-    data: SetData<D, M>,
-    options?: SetOptions<M>
-  ): Promise<MigrationResult>;
+  public set(data: D): Promise<MigrationResult>;
 
-  public async set<M extends boolean | undefined>(
-    dataOrGetData: SetData<D, M> | SetDataGetter<D, M>,
-    options?: SetOptions<M>
+  /**
+   * Sets all documents in this collection with the provided data.
+   *
+   * **Properties:**
+   *
+   * - Time complexity: _TC_(`traverser`) where _C_ = _W_(`batchSize`)
+   * - Space complexity: _SC_(`traverser`) where _S_ = _O_(`batchSize`)
+   * - Billing: _N_ reads, _K_ writes
+   *
+   * where:
+   *
+   * - _N_: number of docs in the traversable
+   * - _K_: number of docs that passed the migration predicate (_K_<=_N_)
+   * - _W_(`batchSize`): average batch write time
+   * - _TC_(`traverser`): time complexity of the underlying traverser
+   * - _SC_(`traverser`): space complexity of the underlying traverser
+   *
+   * @param data - The data with which to set each document.
+   * @param options - An object to configure the set behavior.
+   * @returns A Promise resolving to an object representing the details of the migration.
+   */
+  public set(data: Partial<D>, options: SetOptions): Promise<MigrationResult>;
+
+  public async set(
+    dataOrGetData: SetDataGetter<D> | SetPartialDataGetter<D> | D | Partial<D>,
+    options?: SetOptions
   ): Promise<MigrationResult> {
     let migratedDocCount = 0;
 
@@ -101,22 +140,36 @@ export class BatchMigrator<
         let migratableDocCount = 0;
 
         snapshots.forEach((snapshot) => {
-          const data = (() => {
-            if (typeof dataOrGetData === 'function') {
-              // Signature 1
-              const getData = dataOrGetData as SetDataGetter<D, M>;
-              return getData(snapshot);
-            } else {
-              // Signature 2
-              return dataOrGetData as SetData<D, M>;
-            }
-          })();
-
           const shouldMigrate = this.migrationPredicate(snapshot);
 
-          if (shouldMigrate) {
-            writeBatch.set(snapshot.ref, data, options as any);
-            migratableDocCount++;
+          if (!shouldMigrate) {
+            return;
+          }
+
+          migratableDocCount++;
+
+          if (typeof dataOrGetData === 'function') {
+            if (options === undefined) {
+              // Signature 1
+              const getData = dataOrGetData as SetDataGetter<D>;
+              const data = getData(snapshot);
+              writeBatch.set(snapshot.ref, data);
+            } else {
+              // Signature 2
+              const getData = dataOrGetData as SetPartialDataGetter<D>;
+              const data = getData(snapshot);
+              writeBatch.set(snapshot.ref, data, options);
+            }
+          } else {
+            if (options === undefined) {
+              // Signature 3
+              const data = dataOrGetData as D;
+              writeBatch.set(snapshot.ref, data);
+            } else {
+              // Signature 4
+              const data = dataOrGetData as Partial<D>;
+              writeBatch.set(snapshot.ref, data, options);
+            }
           }
         });
 

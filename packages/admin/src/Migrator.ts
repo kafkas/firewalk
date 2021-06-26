@@ -1,21 +1,19 @@
 import type { firestore } from 'firebase-admin';
+import type { SetOptions } from '@google-cloud/firestore';
 import type { Traverser } from './Traverser';
 import type { BaseTraversalConfig, MigrationResult, BatchCallback } from './types';
 
+export type { SetOptions } from '@google-cloud/firestore';
+
 export type MigrationPredicate<D> = (snapshot: firestore.QueryDocumentSnapshot<D>) => boolean;
+
+export type SetDataGetter<D> = (snapshot: firestore.QueryDocumentSnapshot<D>) => D;
+
+export type SetPartialDataGetter<D> = (snapshot: firestore.QueryDocumentSnapshot<D>) => Partial<D>;
 
 export type UpdateDataGetter<D> = (
   snapshot: firestore.QueryDocumentSnapshot<D>
 ) => firestore.UpdateData;
-
-export type SetData<D, M> = undefined extends M ? D : false extends M ? D : Partial<D>;
-
-export type SetOptions<M> = {
-  merge?: M;
-  mergeFields?: (string | firestore.FieldPath)[];
-};
-
-export type SetDataGetter<D, M> = (snapshot: firestore.QueryDocumentSnapshot<D>) => SetData<D, M>;
 
 export abstract class Migrator<D extends firestore.DocumentData, C extends BaseTraversalConfig> {
   protected registeredCallbacks: {
@@ -44,15 +42,16 @@ export abstract class Migrator<D extends firestore.DocumentData, C extends BaseT
    */
   public abstract readonly traverser: Traverser<D, C>;
 
-  public abstract set<M extends boolean | undefined>(
-    getData: SetDataGetter<D, M>,
-    options?: SetOptions<M>
+  public abstract set(getData: SetDataGetter<D>): Promise<MigrationResult>;
+
+  public abstract set(
+    getData: SetPartialDataGetter<D>,
+    options: SetOptions
   ): Promise<MigrationResult>;
 
-  public abstract set<M extends boolean | undefined>(
-    data: SetData<D, M>,
-    options?: SetOptions<M>
-  ): Promise<MigrationResult>;
+  public abstract set(data: D): Promise<MigrationResult>;
+
+  public abstract set(data: Partial<D>, options: SetOptions): Promise<MigrationResult>;
 
   public abstract update(getData: UpdateDataGetter<D>): Promise<MigrationResult>;
 
