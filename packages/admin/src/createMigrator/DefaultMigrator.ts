@@ -12,7 +12,7 @@ import type {
 } from '../types';
 import { validateConfig } from './validateConfig';
 
-export class BatchMigrator<
+export class DefaultMigrator<
   D extends firestore.DocumentData,
   C extends BaseTraversalConfig,
   T extends Traverser<D, C>
@@ -30,10 +30,10 @@ export class BatchMigrator<
    * If this is not provided, all documents will be migrated.
    *
    * @param predicate A function that takes a document snapshot and returns a boolean indicating whether to migrate it.
-   * @returns A new BatchMigrator object.
+   * @returns A new DefaultMigrator object.
    */
-  public withPredicate(predicate: MigrationPredicate<D>): BatchMigrator<D, C, T> {
-    return new BatchMigrator(this.traverser, predicate);
+  public withPredicate(predicate: MigrationPredicate<D>): DefaultMigrator<D, C, T> {
+    return new DefaultMigrator(this.traverser, predicate);
   }
 
   /**
@@ -136,10 +136,9 @@ export class BatchMigrator<
       async (snapshots, batchIndex) => {
         this.registeredCallbacks.onBeforeBatchStart?.(snapshots, batchIndex);
 
-        const writeBatch = this.traverser.traversable.firestore.batch();
         let migratableDocCount = 0;
 
-        snapshots.forEach((snapshot) => {
+        const promises = snapshots.map(async (snapshot) => {
           const shouldMigrate = this.migrationPredicate(snapshot);
 
           if (!shouldMigrate) {
@@ -152,28 +151,29 @@ export class BatchMigrator<
             if (options !== undefined) {
               // Signature 1
               const data = dataOrGetData as Partial<D>;
-              writeBatch.set(snapshot.ref, data, options);
+              await snapshot.ref.set(data, options);
             } else {
               // Signature 2
               const data = dataOrGetData as D;
-              writeBatch.set(snapshot.ref, data);
+              await snapshot.ref.set(data);
             }
           } else {
             if (options !== undefined) {
               // Signature 3
               const getData = dataOrGetData as SetPartialDataGetter<D>;
               const data = getData(snapshot);
-              writeBatch.set(snapshot.ref, data, options);
+              await snapshot.ref.set(data, options);
             } else {
               // Signature 4
               const getData = dataOrGetData as SetDataGetter<D>;
               const data = getData(snapshot);
-              writeBatch.set(snapshot.ref, data);
+              await snapshot.ref.set(data);
             }
           }
         });
 
-        await writeBatch.commit();
+        await Promise.all(promises);
+
         migratedDocCount += migratableDocCount;
 
         this.registeredCallbacks.onAfterBatchComplete?.(snapshots, batchIndex);
@@ -259,25 +259,24 @@ export class BatchMigrator<
 
     const { batchCount, docCount: traversedDocCount } = await this.traverser.traverse(
       async (snapshots) => {
-        const writeBatch = this.traverser.traversable.firestore.batch();
         let migratableDocCount = 0;
 
-        snapshots.forEach((snapshot) => {
+        const promises = snapshots.map(async (snapshot) => {
           if (typeof arg1 === 'function') {
             // Signature 1
             const getUpdateData = arg1 as UpdateDataGetter<D>;
             const shouldMigrate = this.migrationPredicate(snapshot);
             if (shouldMigrate) {
-              writeBatch.update(snapshot.ref, getUpdateData(snapshot));
               migratableDocCount++;
+              await snapshot.ref.update(getUpdateData(snapshot));
             }
           } else if (argCount === 1) {
             // Signature 2
             const updateData = arg1 as firestore.UpdateData;
             const shouldMigrate = this.migrationPredicate(snapshot);
             if (shouldMigrate) {
-              writeBatch.update(snapshot.ref, updateData);
               migratableDocCount++;
+              await snapshot.ref.update(updateData);
             }
           } else {
             // Signature 3
@@ -285,13 +284,14 @@ export class BatchMigrator<
             const value = arg2 as any;
             const shouldMigrate = this.migrationPredicate(snapshot);
             if (shouldMigrate) {
-              writeBatch.update(snapshot.ref, field, value);
               migratableDocCount++;
+              await snapshot.ref.update(field, value);
             }
           }
         });
 
-        await writeBatch.commit();
+        await Promise.all(promises);
+
         migratedDocCount += migratableDocCount;
       }
     );
