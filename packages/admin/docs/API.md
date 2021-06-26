@@ -20,8 +20,11 @@ Please note that although the Github docs for this project are work-in-progress,
 - [createFastTraverser](#createFastTraverser)
 - [createMigrator](#createMigrator)
 - [createTraverser](#createTraverser)
+- [DefaultMigrator](#DefaultMigrator)
 - [FastTraversalConfig](#FastTraversalConfig)
 - [FastTraverser](#FastTraverser)
+- [Migrator](#Migrator)
+- [Traverser](#Traverser)
 
 ## BaseTraversalConfig
 
@@ -91,7 +94,38 @@ createFastTraverser(traversable: Traversable, config?: Partial<FastTraversalConf
 
 ## createMigrator
 
-Creates a migrator that facilitates database migrations. The migrator accepts a custom traverser to traverse the collection. Otherwise it will create a default traverser with your desired traversal config. This migrator does not use atomic writes so it is possible that when a write fails other writes go through.
+#### Signature 1
+
+Creates a migrator that facilitates database migrations. Accepts a custom traverser object as argument which the migrator will use when traversing the collection and writing to documents. This migrator does not use atomic writes so it is possible that when a write fails other writes go through.
+
+```
+createMigrator(traverser: Traverser): DefaultMigrator
+```
+
+#### Arguments
+
+1. `traverser` ([Traverser](#Traverser)): The traverser object that this migrator will use when traversing the collection and writing to documents.
+
+#### Returns
+
+([DefaultMigrator](#DefaultMigrator)) A default migrator object.
+
+#### Signature 2
+
+Creates a migrator that facilitates database migrations. The migrator creates a default (slow) traverser that it uses when traversing the collection and writing to documents.
+
+```
+createMigrator(traversable: Traversable, traversalConfig?: Partial<BaseTraversalConfig>): DefaultMigrator
+```
+
+#### Arguments
+
+1. `traversable` ([Traversable](#Traversable)): A collection-like traversable object.
+2. `traversalConfig` (Partial\<[BaseTraversalConfig](#BaseTraversalConfig)\>): Optional. The traversal configuration with which the migrator is created.
+
+#### Returns
+
+([DefaultMigrator](#DefaultMigrator)) A default migrator object.
 
 ## createTraverser
 
@@ -112,11 +146,23 @@ createTraverser<T, D>(traversable: Traversable<D>, config?: TraversalConfig): Tr
 
 ([Traverser](#Traverser)) A traverser object.
 
+## DefaultMigrator
+
+TODO
+
 ## FastTraversalConfig
 
 TODO
 
 ## FastTraverser
+
+TODO
+
+## Migrator
+
+TODO
+
+## Traverser
 
 TODO
 
