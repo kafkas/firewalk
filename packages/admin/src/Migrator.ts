@@ -44,9 +44,16 @@ export abstract class Migrator<D extends firestore.DocumentData, C extends BaseT
     options: SetOptions
   ): Promise<MigrationResult>;
 
+  public abstract set(data: Partial<D>, options: SetOptions): Promise<MigrationResult>;
+
   public abstract set(data: D): Promise<MigrationResult>;
 
-  public abstract set(data: Partial<D>, options: SetOptions): Promise<MigrationResult>;
+  public abstract set(
+    getData: SetPartialDataGetter<D>,
+    options: SetOptions
+  ): Promise<MigrationResult>;
+
+  public abstract set(getData: SetDataGetter<D>): Promise<MigrationResult>;
 
   public abstract update(getData: UpdateDataGetter<D>): Promise<MigrationResult>;
 
