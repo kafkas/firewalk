@@ -33,7 +33,7 @@ export class SlowTraverser<D extends firestore.DocumentData> extends Traverser<
    *
    * - Time complexity: _O_((_N_ / `batchSize`) * (_Q_(`batchSize`) + _C_))
    * - Space complexity: _O_(`batchSize` * _D_ + _S_)
-   * - Billing: _N_ reads
+   * - Billing: max(1, _N_) reads
    *
    * where:
    *

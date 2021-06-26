@@ -2,7 +2,7 @@
 
 Firecode is a Node.js library that lets you efficiently traverse Firestore collections.
 
-When you have millions of documents in a collection, you can't just get all of them at once as your program's memory will explode. Firecode's configurable traverser objects let you do this in a simple, intuitive and memory-efficient way using batching.
+When you have millions of documents in a collection, you can't just get all of them at once as your program's memory usage will explode. Firecode's configurable traverser objects let you do this in a simple, intuitive and memory-efficient way using batching.
 
 Firecode is an extremely light, well-typed, zero-dependency library that is useful in a variety of scenarios. You can use it in database migration scripts (e.g. when you need to add a new field to all docs) or a scheduled Cloud Function that needs to check every doc in a collection periodically or a locally run script that retrieves some data from a collection.
 
@@ -51,7 +51,7 @@ npm install @firecode/admin
 
 There are only 2 kinds of objects you need to be familiar with when using this library:
 
-1. **Traverser**: An object that walks you through a collection of documents (or more generally a [Traversable](./packages/admin/docs/API.md#Traversable)).
+1. **Traverser**: An object that walks you through a collection of documents (or more generally a [Traversable](./docs/API.md#Traversable)).
 
 2. **Migrator**: A convenience object used for database migrations. It lets you easily write to the documents within a given traversable and uses a traverser to do that.
 
@@ -96,9 +96,9 @@ This pretty much sums up the core functionality of this library! The `.traverse(
 const projectsColRef = firestore().collection('projects');
 const traverser = createFastTraverser(projectsColRef, {
   batchSize: 500,
+  // This means we are prepared to hold 500 * 20 = 10,000 docs in memory
   maxConcurrentBatchCount: 20,
 });
-// This means we should expect to hold 500 * 20 = 10,000 projects in memory
 const { docCount } = await traverser.traverse(async (_, batchIndex) => {
   console.log(`Gonna process batch ${batchIndex} now!`);
   // ...
@@ -194,7 +194,7 @@ Creates a traverser that facilitates Firestore collection traversals. When trave
 
 - Time complexity: _O_((_N_ / `batchSize`) \* (_Q_(`batchSize`) + _C_))
 - Space complexity: _O_(`batchSize` \* _D_ + _S_)
-- Billing: _N_ reads
+- Billing: _max_(1, _N_) reads
 
 where:
 
@@ -212,7 +212,7 @@ Creates a fast traverser that facilitates Firestore collection traversals. When 
 
 - Time complexity: _O_(_C_ + (_N_ / `batchSize`) \* _Q_(`batchSize`))
 - Space complexity: _O_(`maxConcurrentBatchCount` \* (`batchSize` \* _D_ + _S_))
-- Billing: _N_ reads
+- Billing: _max_(1, _N_) reads
 
 where:
 
@@ -230,7 +230,7 @@ Creates a migrator that facilitates database migrations. The migrator accepts a 
 
 - Time complexity: _TC_(`traverser`) where _C_ = _W_(`batchSize`)
 - Space complexity: _SC_(`traverser`) where _S_ = _O_(`batchSize`)
-- Billing: _N_ reads, _K_ writes
+- Billing: _max_(1, _N_) reads, _K_ writes
 
 where:
 
@@ -248,7 +248,7 @@ Creates a migrator that facilitates database migrations. The migrator accepts a 
 
 - Time complexity: _TC_(`traverser`) where _C_ = _W_(`batchSize`)
 - Space complexity: _SC_(`traverser`) where _S_ = _O_(`batchSize`)
-- Billing: _N_ reads, _K_ writes
+- Billing: _max_(1, _N_) reads, _K_ writes
 
 where:
 

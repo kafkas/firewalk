@@ -55,7 +55,7 @@ export class DefaultMigrator<
    *
    * - Time complexity: _TC_(`traverser`) where _C_ = _W_(`batchSize`)
    * - Space complexity: _SC_(`traverser`) where _S_ = _O_(`batchSize`)
-   * - Billing: _N_ reads, _K_ writes
+   * - Billing: _max_(1, _N_) reads, _K_ writes
    *
    * where:
    *
@@ -78,7 +78,7 @@ export class DefaultMigrator<
    *
    * - Time complexity: _TC_(`traverser`) where _C_ = _W_(`batchSize`)
    * - Space complexity: _SC_(`traverser`) where _S_ = _O_(`batchSize`)
-   * - Billing: _N_ reads, _K_ writes
+   * - Billing: _max_(1, _N_) reads, _K_ writes
    *
    * where:
    *
@@ -100,7 +100,7 @@ export class DefaultMigrator<
    *
    * - Time complexity: _TC_(`traverser`) where _C_ = _W_(`batchSize`)
    * - Space complexity: _SC_(`traverser`) where _S_ = _O_(`batchSize`)
-   * - Billing: _N_ reads, _K_ writes
+   * - Billing: _max_(1, _N_) reads, _K_ writes
    *
    * where:
    *
@@ -123,7 +123,7 @@ export class DefaultMigrator<
    *
    * - Time complexity: _TC_(`traverser`) where _C_ = _W_(`batchSize`)
    * - Space complexity: _SC_(`traverser`) where _S_ = _O_(`batchSize`)
-   * - Billing: _N_ reads, _K_ writes
+   * - Billing: _max_(1, _N_) reads, _K_ writes
    *
    * where:
    *
@@ -202,7 +202,7 @@ export class DefaultMigrator<
    *
    * - Time complexity: _TC_(`traverser`) where _C_ = _W_(`batchSize`)
    * - Space complexity: _SC_(`traverser`) where _S_ = _O_(`batchSize`)
-   * - Billing: _N_ reads, _K_ writes
+   * - Billing: _max_(1, _N_) reads, _K_ writes
    *
    * where:
    *
@@ -224,7 +224,7 @@ export class DefaultMigrator<
    *
    * - Time complexity: _TC_(`traverser`) where _C_ = _W_(`batchSize`)
    * - Space complexity: _SC_(`traverser`) where _S_ = _O_(`batchSize`)
-   * - Billing: _N_ reads, _K_ writes
+   * - Billing: _max_(1, _N_) reads, _K_ writes
    *
    * where:
    *
@@ -246,7 +246,7 @@ export class DefaultMigrator<
    *
    * - Time complexity: _TC_(`traverser`) where _C_ = _W_(`batchSize`)
    * - Space complexity: _SC_(`traverser`) where _S_ = _O_(`batchSize`)
-   * - Billing: _N_ reads, _K_ writes
+   * - Billing: _max_(1, _N_) reads, _K_ writes
    *
    * where:
    *

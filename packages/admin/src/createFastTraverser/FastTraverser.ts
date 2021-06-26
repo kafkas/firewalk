@@ -46,7 +46,7 @@ export class FastTraverser<D extends firestore.DocumentData> extends Traverser<
    *
    * - Time complexity: _O_(_C_ + (_N_ / `batchSize`) * _Q_(`batchSize`))
    * - Space complexity: _O_(`maxConcurrentBatchCount` * (`batchSize` * _D_ + _S_))
-   * - Billing: _N_ reads
+   * - Billing: _max_(1, _N_) reads
    *
    * where:
    *
