@@ -7,6 +7,7 @@ import type {
   SetDataGetter,
   SetPartialDataGetter,
   UpdateDataGetter,
+  MigrationPredicate,
   MigrationResult,
 } from './types';
 
@@ -36,6 +37,8 @@ export abstract class Migrator<D extends firestore.DocumentData, C extends BaseT
    * The underlying traverser.
    */
   public abstract readonly traverser: Traverser<D, C>;
+
+  public abstract withPredicate(predicate: MigrationPredicate<D>): Migrator<D, C>;
 
   public abstract set(getData: SetDataGetter<D>): Promise<MigrationResult>;
 
