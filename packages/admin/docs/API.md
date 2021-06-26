@@ -8,7 +8,7 @@ There are only 2 kinds of objects you need to be familiar with when using this l
 
 2. **Migrator**: A convenience object used for database migrations. It lets you easily write to the documents within a given traversable and uses a traverser to do that. You can easily write your own migration logic in the traverser callback if you don't want to use a migrator.
 
-To create traversers and migrators, you will be using factory functions provided by this library. We also provide you with the TypeScript types for the important objects that you will be interacting with. The generic parameter `D` that we use throughout the docs refers to the shape of the documents in the traversable and defaults to [FirebaseFirestore.DocumentData](https://github.com/googleapis/nodejs-firestore/blob/28d645bd3e368abde592bfa2611de3378ca175a6/types/firestore.d.ts#L28).
+To create traversers and migrators, you will be using factory functions provided by this library. We also provide you with the TypeScript types for the important objects that you will be interacting with. The generic parameter `D` that we use throughout the docs refers to the shape of the documents in the traversable and defaults to [firestore.DocumentData](https://github.com/googleapis/nodejs-firestore/blob/28d645bd3e368abde592bfa2611de3378ca175a6/types/firestore.d.ts#L28).
 
 Please note that although the Github docs for this project are work-in-progress, the JSDocs and TypeScript types that we provide are solid and I'm sure you'll find them useful!
 
@@ -23,13 +23,22 @@ Please note that although the Github docs for this project are work-in-progress,
 - [DefaultMigrator](#DefaultMigrator)
 - [FastTraversalConfig](#FastTraversalConfig)
 - [FastTraverser](#FastTraverser)
+- [MigrationResult](#MigrationResult)
 - [Migrator](#Migrator)
 - [SlowTraverser](#SlowTraverser)
+- [Traversable](#Traversable)
+- [TraversalResult](#TraversalResult)
+- [TraverseEachConfig](#TraverseEachConfig)
 - [Traverser](#Traverser)
 
 ## BaseTraversalConfig
 
-TODO
+A plain object representing traversal configuration. The keys allowed are:
+
+- `batchSize` (number): The number of documents that will be traversed in each batch. Defaults to 250.
+- `sleepBetweenBatches` (boolean): Whether to sleep between batches. Defaults to `false`.
+- `sleepTimeBetweenBatches` (number): The amount of time (in ms) to "sleep" before moving on to the next batch. Defaults to 500.
+- `maxDocCount` (number): The maximum number of documents that will be traversed. Defaults to `Infinity`.
 
 ## BatchMigrator
 
@@ -159,18 +168,6 @@ TODO
 
 TODO
 
-## Migrator
-
-TODO
-
-## SlowTraverser
-
-TODO
-
-## Traverser
-
-TODO
-
 ## MigrationResult
 
 A plain object representing the details of a migration. Contains the following keys:
@@ -181,19 +178,86 @@ A plain object representing the details of a migration. Contains the following k
 
 ## Migrator
 
-A migrator object responsible for efficiently traversing collection-like document groups (collections, queries, collection groups) and writing to the docs retrieved in each batch. Batch migrators rely on a traverser internally to traverse the entire collection.
+Represents the general interface of a migrator.
+
+## SlowTraverser
+
+A slow traverser object that facilitates Firestore collection traversals.
 
 ### .withConfig(config)
 
-Updates the specified keys of the traversal configuration.
+Applies a the specified config values to the traverser.
 
 #### Arguments
 
-1. `config` (Partial\<[TraversalConfig](#TraversalConfig)\>): Partial traversal configuration.
+1. `config` (Partial\<[BaseTraversalConfig](#BaseTraversalConfig)\>): Partial traversal configuration.
 
 #### Returns
 
-([Migrator](#Migrator)) A new migrator object.
+([SlowTraverser](#SlowTraverser)) A new SlowTraverser object.
+
+### .traverse(callback)
+
+Traverses the entire collection in batches of the size specified in traversal config. Invokes the specified async callback for each batch of document snapshots. Waits for the callback Promise to resolve before moving to the next batch.
+
+#### Properties
+
+- Time complexity: _O_((_N_ / `batchSize`) \* (_Q_(`batchSize`) + _C_))
+- Space complexity: _O_(`batchSize` \* _D_ + _S_)
+- Billing: max(1, _N_) reads
+
+where:
+
+- _N_: number of docs in the traversable
+- _Q_(`batchSize`): average batch query time
+- _C_: average processing time
+- _D_: document size
+- _S_: average extra space used by the callback
+
+#### Arguments
+
+1. `callback` ((batchSnapshots: QueryDocumentSnapshot[], batchIndex: number) => Promise\<void\>): An asynchronous callback function to invoke for each batch of document snapshots. Takes batch document snapshots and the 0-based batch index as its arguments.
+
+#### Returns
+
+(Promise<[TraversalResult](#TraversalResult)>) A Promise resolving to an object representing the details of the traversal. The Promise resolves when the entire traversal ends.
+
+### .traverseEach(callback, config)
+
+Traverses the entire collection in batches of the size specified in traversal config. Invokes the specified callback sequentially for each document snapshot in each batch.
+
+#### Arguments
+
+1. `callback` ((snapshot: QueryDocumentSnapshot) => Promise\<void\>): An asynchronous callback function to invoke for each document snapshot in each batch.
+2. `config` ([TraverseEachConfig](#TraverseEachConfig)): Optional. The sequential traversal configuration.
+
+#### Returns
+
+(Promise\<[TraversalResult](#TraversalResult)\>) A Promise resolving to an object representing the details of the traversal. The Promise resolves when the entire traversal ends.
+
+## Traversable
+
+A collection-like group of documents. Can be one of [CollectionReference](https://googleapis.dev/nodejs/firestore/latest/CollectionReference.html), [CollectionGroup](https://googleapis.dev/nodejs/firestore/latest/CollectionGroup.html) and [Query](https://googleapis.dev/nodejs/firestore/latest/Query.html).
+
+## TraversalResult
+
+A plain object representing the details of a traversal. Contains the following keys:
+
+- `batchCount` (number): The number of batches that have been retrieved in this traversal.
+- `docCount` (number): The number of documents that have been retrieved in this traversal.
+
+## TraverseEachConfig
+
+A plain object representing sequential traversal configuration. The keys allowed are:
+
+- `sleepBetweenDocs` (boolean): Whether to sleep before moving to the next doc. Defaults to `false`.
+- `sleepTimeBetweenDocs` (number): The amount of time (in ms) to "sleep" before moving to the next doc. Defaults to 500.
+
+## Traverser
+
+Represents the general interface of a traverser.
+
+######################################################################################################
 
 ### .set(getData, options, predicate)
 
@@ -263,33 +327,6 @@ Updates all documents in this collection with the provided field-value pair.
 
 (Promise\<[MigrationResult](#MigrationResult)\>) A Promise resolving to an object representing the details of the migration.
 
-## Traversable
-
-A collection-like group of documents. Can be one of [CollectionReference](https://googleapis.dev/nodejs/firestore/latest/CollectionReference.html), [CollectionGroup](https://googleapis.dev/nodejs/firestore/latest/CollectionGroup.html) and [Query](https://googleapis.dev/nodejs/firestore/latest/Query.html).
-
-## TraversalConfig
-
-A plain object representing traversal configuration. The keys allowed are:
-
-- `batchSize` (number): The number of documents that will be traversed in each batch. Defaults to 100.
-- `sleepBetweenBatches` (boolean): Whether to sleep between batches. Defaults to `true`.
-- `sleepTimeBetweenBatches` (number): The amount of time (in ms) to "sleep" before moving on to the next batch. Defaults to 1000.
-- `maxDocCount` (number): The maximum number of documents that will be traversed. Defaults to `Infinity`.
-
-## TraversalResult
-
-A plain object representing the details of a traversal. Contains the following keys:
-
-- `batchCount` (number): The number of batches that have been retrieved in this traversal.
-- `docCount` (number): The number of documents that have been retrieved in this traversal.
-
-## TraverseEachConfig
-
-A plain object representing sequential traversal configuration. The keys allowed are:
-
-- `sleepBetweenDocs` (boolean): Whether to sleep before moving to the next doc. Defaults to `false`.
-- `sleepTimeBetweenDocs` (number): The amount of time (in ms) to "sleep" before moving to the next doc. Defaults to 500.
-
 ## Traverser
 
 A traverser object responsible for efficiently traversing collection-like document groups (collections, queries, collection groups).
@@ -313,19 +350,6 @@ Traverses the entire collection in batches of the size specified in traversal co
 #### Arguments
 
 1. `callback` ((batchSnapshots: QueryDocumentSnapshot[]) => Promise\<void\>): An asynchronous callback function to invoke for each batch of document snapshots.
-
-#### Returns
-
-(Promise\<[TraversalResult](#TraversalResult)\>) A Promise resolving to an object representing the details of the traversal.
-
-### .traverseEach(callback, config)
-
-Traverses the entire collection in batches of the size specified in traversal config. Invokes the specified callback sequentially for each document snapshot in each batch.
-
-#### Arguments
-
-1. `callback` ((snapshot: QueryDocumentSnapshot) => Promise\<void\>): An asynchronous callback function to invoke for each document snapshot in each batch.
-2. `config` ([TraverseEachConfig](#TraverseEachConfig)): Optional. The sequential traversal configuration.
 
 #### Returns
 

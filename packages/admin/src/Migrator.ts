@@ -11,6 +11,9 @@ import type {
   MigrationResult,
 } from './types';
 
+/**
+ * Represents the general interface of a migrator.
+ */
 export abstract class Migrator<D extends firestore.DocumentData, C extends BaseTraversalConfig> {
   protected registeredCallbacks: {
     onBeforeBatchStart?: BatchCallback<D>;

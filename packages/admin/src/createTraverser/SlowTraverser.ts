@@ -21,8 +21,14 @@ export class SlowTraverser<D extends firestore.DocumentData> extends Traverser<
     super({ ...defaultTraversalConfig, ...config });
   }
 
-  public withConfig(c: Partial<BaseTraversalConfig>): SlowTraverser<D> {
-    return new SlowTraverser(this.traversable, { ...this.traversalConfig, ...c });
+  /**
+   * Applies a the specified config values to the traverser.
+   *
+   * @param config Partial traversal configuration.
+   * @returns A new SlowTraverser object.
+   */
+  public withConfig(config: Partial<BaseTraversalConfig>): SlowTraverser<D> {
+    return new SlowTraverser(this.traversable, { ...this.traversalConfig, ...config });
   }
 
   /**
@@ -44,7 +50,7 @@ export class SlowTraverser<D extends firestore.DocumentData> extends Traverser<
    * - _S_: average extra space used by the callback
    *
    * @param callback An asynchronous callback function to invoke for each batch of document snapshots.
-   * @returns A Promise resolving to an object representing the details of the traversal.
+   * @returns A Promise resolving to an object representing the details of the traversal. The Promise resolves when the entire traversal ends.
    */
   public async traverse(callback: BatchCallbackAsync<D>): Promise<TraversalResult> {
     const {

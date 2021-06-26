@@ -39,6 +39,9 @@ function validateTraversalConfig(c: Partial<BaseTraversalConfig> = {}): void {
   }
 }
 
+/**
+ * Represents the general interface of a traverser.
+ */
 export abstract class Traverser<D extends firestore.DocumentData, C extends BaseTraversalConfig> {
   public static getDefaultConfig(): BaseTraversalConfig {
     return { ...defaultTraversalConfig };
@@ -56,7 +59,7 @@ export abstract class Traverser<D extends firestore.DocumentData, C extends Base
    * callback sequentially for each document snapshot in each batch.
    * @param callback An asynchronous callback function to invoke for each document snapshot in each batch.
    * @param config The sequential traversal configuration.
-   * @returns A Promise resolving to an object representing the details of the traversal.
+   * @returns A Promise resolving to an object representing the details of the traversal. The Promise resolves when the entire traversal ends.
    */
   public async traverseEach(
     callback: (snapshot: firestore.QueryDocumentSnapshot<D>) => Promise<void>,
