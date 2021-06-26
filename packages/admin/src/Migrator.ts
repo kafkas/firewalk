@@ -46,29 +46,17 @@ export abstract class Migrator<D extends firestore.DocumentData, C extends BaseT
 
   public abstract set<M extends boolean | undefined>(
     getData: SetDataGetter<D, M>,
-    options?: SetOptions<M>,
-    predicate?: MigrationPredicate<D>
+    options?: SetOptions<M>
   ): Promise<MigrationResult>;
 
   public abstract set<M extends boolean | undefined>(
     data: SetData<D, M>,
-    options?: SetOptions<M>,
-    predicate?: MigrationPredicate<D>
+    options?: SetOptions<M>
   ): Promise<MigrationResult>;
 
-  public abstract update(
-    getData: UpdateDataGetter<D>,
-    predicate?: MigrationPredicate<D>
-  ): Promise<MigrationResult>;
+  public abstract update(getData: UpdateDataGetter<D>): Promise<MigrationResult>;
 
-  public abstract update(
-    data: firestore.UpdateData,
-    predicate?: MigrationPredicate<D>
-  ): Promise<MigrationResult>;
+  public abstract update(data: firestore.UpdateData): Promise<MigrationResult>;
 
-  public abstract update(
-    field: string | firestore.FieldPath,
-    value: any,
-    predicate?: MigrationPredicate<D>
-  ): Promise<MigrationResult>;
+  public abstract update(field: string | firestore.FieldPath, value: any): Promise<MigrationResult>;
 }

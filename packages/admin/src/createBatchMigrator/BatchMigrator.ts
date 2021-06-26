@@ -16,9 +16,23 @@ export class BatchMigrator<
   C extends BaseTraversalConfig,
   T extends Traverser<D, C>
 > extends Migrator<D, C> {
-  public constructor(public readonly traverser: T) {
+  public constructor(
+    public readonly traverser: T,
+    private migrationPredicate: MigrationPredicate<D> = () => true
+  ) {
     super();
     validateConfig(traverser.traversalConfig);
+  }
+
+  /**
+   * Applies a migration predicate that returns a boolean indicating whether to migrate the current document.
+   * If this is not provided, all documents will be migrated.
+   *
+   * @param predicate A function that takes a document snapshot and returns a boolean indicating whether to migrate it.
+   * @returns A new BatchMigrator object.
+   */
+  public withPredicate(predicate: MigrationPredicate<D>): BatchMigrator<D, C, T> {
+    return new BatchMigrator(this.traverser, predicate);
   }
 
   /**
@@ -40,13 +54,11 @@ export class BatchMigrator<
    *
    * @param getData - A function that returns an object with which to set each document.
    * @param options - Optional. An object to configure the set behavior.
-   * @param predicate - Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
    * @returns A Promise resolving to an object representing the details of the migration.
    */
   public set<M extends boolean | undefined>(
     getData: SetDataGetter<D, M>,
-    options?: SetOptions<M>,
-    predicate?: MigrationPredicate<D>
+    options?: SetOptions<M>
   ): Promise<MigrationResult>;
 
   /**
@@ -68,19 +80,16 @@ export class BatchMigrator<
    *
    * @param data - The data with which to set each document.
    * @param options - Optional. An object to configure the set behavior.
-   * @param predicate - Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
    * @returns A Promise resolving to an object representing the details of the migration.
    */
   public set<M extends boolean | undefined>(
     data: SetData<D, M>,
-    options?: SetOptions<M>,
-    predicate?: MigrationPredicate<D>
+    options?: SetOptions<M>
   ): Promise<MigrationResult>;
 
   public async set<M extends boolean | undefined>(
     dataOrGetData: SetData<D, M> | SetDataGetter<D, M>,
-    options?: SetOptions<M>,
-    predicate?: MigrationPredicate<D>
+    options?: SetOptions<M>
   ): Promise<MigrationResult> {
     let migratedDocCount = 0;
 
@@ -103,7 +112,7 @@ export class BatchMigrator<
             }
           })();
 
-          const shouldMigrate = predicate?.(snapshot) ?? true;
+          const shouldMigrate = this.migrationPredicate(snapshot);
 
           if (shouldMigrate) {
             writeBatch.set(snapshot.ref, data, options as any);
@@ -139,13 +148,9 @@ export class BatchMigrator<
    * - _SC_(`traverser`): space complexity of the underlying traverser
    *
    * @param getData - A function that returns the data with which to update each document.
-   * @param predicate - Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
    * @returns A Promise resolving to an object representing the details of the migration.
    */
-  public update(
-    getData: UpdateDataGetter<D>,
-    predicate?: MigrationPredicate<D>
-  ): Promise<MigrationResult>;
+  public update(getData: UpdateDataGetter<D>): Promise<MigrationResult>;
 
   /**
    * Updates all documents in this collection with the provided data.
@@ -165,13 +170,9 @@ export class BatchMigrator<
    * - _SC_(`traverser`): space complexity of the underlying traverser
    *
    * @param data - The data with which to update each document. Must be a non-empty object.
-   * @param predicate - Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
    * @returns A Promise resolving to an object representing the details of the migration.
    */
-  public update(
-    data: firestore.UpdateData,
-    predicate?: MigrationPredicate<D>
-  ): Promise<MigrationResult>;
+  public update(data: firestore.UpdateData): Promise<MigrationResult>;
 
   /**
    * Updates all documents in this collection with the provided field-value pair.
@@ -192,21 +193,15 @@ export class BatchMigrator<
    *
    * @param field - The field to update in each document.
    * @param value - The value with which to update the specified field in each document. Must not be `undefined`.
-   * @param predicate - Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
    * @returns A Promise resolving to an object representing the details of the migration.
    */
-  public update(
-    field: string | firestore.FieldPath,
-    value: any,
-    predicate?: MigrationPredicate<D>
-  ): Promise<MigrationResult>;
+  public update(field: string | firestore.FieldPath, value: any): Promise<MigrationResult>;
 
   public async update(
     arg1: firestore.UpdateData | string | firestore.FieldPath | UpdateDataGetter<D>,
-    arg2?: any,
-    arg3?: MigrationPredicate<D>
+    arg2?: any
   ): Promise<MigrationResult> {
-    const argCount = [arg1, arg2, arg3].filter((a) => a !== undefined).length;
+    const argCount = [arg1, arg2].filter((a) => a !== undefined).length;
     let migratedDocCount = 0;
 
     const { batchCount, docCount: traversedDocCount } = await this.traverser.traverse(
@@ -218,17 +213,15 @@ export class BatchMigrator<
           if (typeof arg1 === 'function') {
             // Signature 1
             const getUpdateData = arg1 as UpdateDataGetter<D>;
-            const predicate = arg2 as MigrationPredicate<D> | undefined;
-            const shouldMigrate = predicate?.(snapshot) ?? true;
+            const shouldMigrate = this.migrationPredicate(snapshot);
             if (shouldMigrate) {
               writeBatch.update(snapshot.ref, getUpdateData(snapshot));
               migratableDocCount++;
             }
-          } else if (argCount < 2 || typeof arg2 === 'function') {
+          } else if (argCount === 1) {
             // Signature 2
             const updateData = arg1 as firestore.UpdateData;
-            const predicate = arg2 as MigrationPredicate<D> | undefined;
-            const shouldMigrate = predicate?.(snapshot) ?? true;
+            const shouldMigrate = this.migrationPredicate(snapshot);
             if (shouldMigrate) {
               writeBatch.update(snapshot.ref, updateData);
               migratableDocCount++;
@@ -237,8 +230,7 @@ export class BatchMigrator<
             // Signature 3
             const field = arg1 as string | firestore.FieldPath;
             const value = arg2 as any;
-            const predicate = arg3 as MigrationPredicate<D> | undefined;
-            const shouldMigrate = predicate?.(snapshot) ?? true;
+            const shouldMigrate = this.migrationPredicate(snapshot);
             if (shouldMigrate) {
               writeBatch.update(snapshot.ref, field, value);
               migratableDocCount++;
