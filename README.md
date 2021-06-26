@@ -204,7 +204,7 @@ where:
 - _D_: document size
 - _S_: average extra space used by the callback
 
-### [createFastTraverser](./packages/admin/docs/API.md#createFastTraverser) (coming in the next release)
+### [createFastTraverser](./packages/admin/docs/API.md#createFastTraverser)
 
 Creates a fast traverser that facilitates Firestore collection traversals. When traversing the collection, this traverser invokes a specified async callback for each batch of document snapshots and immediately moves to the next batch. It does not wait for the callback Promise to resolve before moving to the next batch so there is no guarantee that any given batch will finish processing before a later batch. This traverser uses more memory but is significantly faster than the default traverser.
 
@@ -222,7 +222,7 @@ where:
 - _D_: document size
 - _S_: average extra space used by the callback
 
-### [createMigrator](./packages/admin/docs/API.md#createMigrator) (coming in v0.7)
+### [createMigrator](./packages/admin/docs/API.md#createMigrator)
 
 Creates a migrator that facilitates database migrations. The migrator accepts a custom traverser to traverse the collection. Otherwise it will create a default traverser with your desired traversal config. This migrator does not use atomic writes so it is possible that when a write fails other writes go through.
 
