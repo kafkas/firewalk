@@ -258,7 +258,9 @@ export class BatchMigrator<
     let migratedDocCount = 0;
 
     const { batchCount, docCount: traversedDocCount } = await this.traverser.traverse(
-      async (snapshots) => {
+      async (snapshots, batchIndex) => {
+        this.registeredCallbacks.onBeforeBatchStart?.(snapshots, batchIndex);
+
         const writeBatch = this.traverser.traversable.firestore.batch();
         let migratableDocCount = 0;
 
@@ -293,6 +295,8 @@ export class BatchMigrator<
 
         await writeBatch.commit();
         migratedDocCount += migratableDocCount;
+
+        this.registeredCallbacks.onAfterBatchComplete?.(snapshots, batchIndex);
       }
     );
 

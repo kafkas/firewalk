@@ -258,7 +258,9 @@ export class DefaultMigrator<
     let migratedDocCount = 0;
 
     const { batchCount, docCount: traversedDocCount } = await this.traverser.traverse(
-      async (snapshots) => {
+      async (snapshots, batchIndex) => {
+        this.registeredCallbacks.onBeforeBatchStart?.(snapshots, batchIndex);
+
         let migratableDocCount = 0;
 
         const promises = snapshots.map(async (snapshot) => {
@@ -293,6 +295,8 @@ export class DefaultMigrator<
         await Promise.all(promises);
 
         migratedDocCount += migratableDocCount;
+
+        this.registeredCallbacks.onAfterBatchComplete?.(snapshots, batchIndex);
       }
     );
 
