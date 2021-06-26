@@ -169,16 +169,18 @@ type PostDoc = {
 };
 const postsColGroup = firestore().collectionGroup('posts') as firestore.CollectionGroup<PostDoc>;
 const migrator = createBatchMigrator(postsColGroup);
-const { migratedDocCount } = await migrator.update(
-  (snap) => {
+const { migratedDocCount } = await migrator
+  .withPredicate(
+    // Ignore if it doesn't have a `postedAt` field
+    (snap) => snap.data().postedAt !== undefined
+  )
+  .update((snap) => {
     const { postedAt } = snap.data();
     return {
-      publishedAt: postedAt!, // Safe to assert
+      publishedAt: postedAt!, // Safe to assert now
       postedAt: firestore.FieldValue.delete(),
     };
-  },
-  (snap) => snap.data().postedAt !== undefined // Ignore if it doesn't have a `postedAt` field
-);
+  });
 console.log(`Updated ${migratedDocCount} posts!`);
 ```
 
