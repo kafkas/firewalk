@@ -54,7 +54,6 @@ export class BatchMigrator<
    * - _SC_(`traverser`): space complexity of the underlying traverser
    *
    * @param getData - A function that returns an object with which to set each document.
-   * @param options - Optional. An object to configure the set behavior.
    * @returns A Promise resolving to an object representing the details of the migration.
    */
   public set(getData: SetDataGetter<D>): Promise<MigrationResult>;
