@@ -24,6 +24,7 @@ Please note that although the Github docs for this project are work-in-progress,
 - [FastTraversalConfig](#FastTraversalConfig)
 - [FastTraverser](#FastTraverser)
 - [Migrator](#Migrator)
+- [SlowTraverser](#SlowTraverser)
 - [Traverser](#Traverser)
 
 ## BaseTraversalConfig
@@ -134,17 +135,17 @@ Creates a traverser object that facilitates Firestore collection traversals. Whe
 #### Signature
 
 ```
-createTraverser<T, D>(traversable: Traversable<D>, config?: TraversalConfig): Traverser<D>
+createTraverser(traversable: Traversable, config?: Partial<BaseTraversalConfig>): SlowTraverser
 ```
 
 #### Arguments
 
-1. `traversable` ([Traversable](#Traversable)): A collection-like traversable object.
-2. `config` ([TraversalConfig](#TraversalConfig)): Optional. The traversal configuration with which the traverser is created.
+1. `traversable` ([Traversable](#Traversable)): A collection-like traversable group of documents.
+2. `config` (Partial\<[BaseTraversalConfig](#BaseTraversalConfig)\>): Optional. The traversal configuration with which the traverser will be created.
 
 #### Returns
 
-([Traverser](#Traverser)) A traverser object.
+([SlowTraverser](#SlowTraverser)) A default (slow) traverser object.
 
 ## DefaultMigrator
 
@@ -159,6 +160,10 @@ TODO
 TODO
 
 ## Migrator
+
+TODO
+
+## SlowTraverser
 
 TODO
 
