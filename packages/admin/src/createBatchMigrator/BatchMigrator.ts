@@ -1,14 +1,15 @@
 import type { firestore } from 'firebase-admin';
 import type { Traverser } from '../Traverser';
-import {
-  Migrator,
+import { Migrator } from '../Migrator';
+import type {
+  BaseTraversalConfig,
   MigrationPredicate,
   UpdateDataGetter,
   SetDataGetter,
   SetPartialDataGetter,
   SetOptions,
-} from '../Migrator';
-import type { BaseTraversalConfig, MigrationResult } from '../types';
+  MigrationResult,
+} from '../types';
 import { validateConfig } from './validateConfig';
 
 export class BatchMigrator<
