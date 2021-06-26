@@ -10,6 +10,7 @@ import { BatchMigrator } from './BatchMigrator';
  * migrator will use when traversing the collection and writing to documents.
  *
  * This migrator uses batch writes when writing to docs so the entire operation will fail if a single write isn't successful.
+ *
  * @param traverser The traverser object that this migrator will use when traversing the collection and writing to documents.
  * @returns A batch migrator object.
  */
@@ -24,7 +25,8 @@ export function createBatchMigrator<
  * it uses when traversing the collection and writing to documents.
  *
  * This migrator uses batch writes when writing to docs so the entire operation will fail if a single write isn't successful.
- * @param traversable A collection-like traversable group of documents to migrate.
+ *
+ * @param traversable A collection-like traversable group of documents.
  * @param traversalConfig Optional. The traversal configuration with which the default traverser will be created.
  * @returns A batch migrator object.
  */

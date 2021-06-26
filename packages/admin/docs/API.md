@@ -14,21 +14,25 @@ Please note that although the Github docs for this project are work-in-progress,
 
 ## API Overview
 
-[BatchMigrator](#BatchMigrator)
+- [BaseTraversalConfig](#BaseTraversalConfig)
+- [BatchMigrator](#BatchMigrator)
+- [createBatchMigrator](#createBatchMigrator)
+- [createFastTraverser](#createFastTraverser)
+- [createMigrator](#createMigrator)
+- [createTraverser](#createTraverser)
+- [FastTraversalConfig](#FastTraversalConfig)
+- [FastTraverser](#FastTraverser)
 
-[createBatchMigrator](#createBatchMigrator)
+## BaseTraversalConfig
 
-[createFastTraverser](#createFastTraverser)
-
-[createMigrator](#createMigrator)
-
-[createTraverser](#createTraverser)
+TODO
 
 ## BatchMigrator
 
 A migrator that uses batch Firestore batch writes when writing to documents.
 
 ### Methods
+
 TODO
 
 ## createBatchMigrator
@@ -73,17 +77,17 @@ Creates a fast traverser object that facilitates Firestore collection traversals
 #### Signature
 
 ```
-createFastTraverser<T, D>(traversable: Traversable<D>, config?: TraversalConfig): FastTraverser<D>
+createFastTraverser(traversable: Traversable, config?: Partial<FastTraversalConfig>): FastTraverser
 ```
 
 #### Arguments
 
-1. `traversable` ([Traversable](#Traversable)): A collection-like traversable object.
-2. `config` ([TraversalConfig](#TraversalConfig)): Optional. The traversal configuration with which the traverser is created.
+1. `traversable` ([Traversable](#Traversable)): A collection-like traversable group of documents.
+2. `config` (Partial\<[FastTraversalConfig](#FastTraversalConfig)\>): Optional. The traversal configuration with which the traverser will be created.
 
 #### Returns
 
-([Traverser](#Traverser)) A traverser object.
+([FastTraverser](#FastTraverser)) A fast traverser object.
 
 ## createMigrator
 
@@ -107,6 +111,14 @@ createTraverser<T, D>(traversable: Traversable<D>, config?: TraversalConfig): Tr
 #### Returns
 
 ([Traverser](#Traverser)) A traverser object.
+
+## FastTraversalConfig
+
+TODO
+
+## FastTraverser
+
+TODO
 
 ## MigrationResult
 

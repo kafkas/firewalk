@@ -8,6 +8,10 @@ import { FastTraverser } from './FastTraverser';
  * snapshots and immediately moves to the next batch. It does not wait for the callback Promise to resolve
  * before moving to the next batch so there is no guarantee that any given batch will finish processing
  * before a later batch. This traverser uses more memory but is significantly faster than the default traverser.
+ *
+ * @param traversable A collection-like traversable group of documents.
+ * @param config Optional. The traversal configuration with which the traverser will be created.
+ * @returns A fast traverser object.
  */
 export function createFastTraverser<D extends firestore.DocumentData>(
   traversable: Traversable<D>,
