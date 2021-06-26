@@ -10,40 +10,61 @@ There are only 2 kinds of objects you need to be familiar with when using this l
 
 To create traversers and migrators, you will be using factory functions provided by this library. We also provide you with the TypeScript types for the important objects that you will be interacting with. The generic parameter `D` that we use throughout the docs refers to the shape of the documents in the traversable and defaults to [FirebaseFirestore.DocumentData](https://github.com/googleapis/nodejs-firestore/blob/28d645bd3e368abde592bfa2611de3378ca175a6/types/firestore.d.ts#L28).
 
-Please note that although the Github docs for this project are work-in-progress, the JSDocs and TypeScript types are solid and I'm sure you'll find them useful!
+Please note that although the Github docs for this project are work-in-progress, the JSDocs and TypeScript types that we provide are solid and I'm sure you'll find them useful!
+
+## API Overview
+
+[BatchMigrator](#BatchMigrator)
+
+[createBatchMigrator](#createBatchMigrator)
+
+[createFastTraverser](#createFastTraverser)
+
+[createMigrator](#createMigrator)
+
+[createTraverser](#createTraverser)
+
+## BatchMigrator
+
+A migrator that uses batch Firestore batch writes when writing to documents.
+
+### Methods
+TODO
 
 ## createBatchMigrator
 
-Creates a migrator that facilitates database migrations. You can either pass your own traverser to the migrator or let it create a default traverser with your desired traversal config. This migrator uses batch writes when writing to docs so the entire operation will fail if a single write isn't successful.
-
 #### Signature 1
 
+Creates a migrator that facilitates database migrations. Accepts a custom traverser object as argument which the migrator will use when traversing the collection and writing to documents. This migrator uses batch writes when writing to docs so the entire operation will fail if a single write isn't successful.
+
 ```
-createBatchMigrator<T, D>(traverser: Traverser<T, D>): Migrator<D>
+createBatchMigrator(traverser: Traverser): BatchMigrator
 ```
 
 #### Arguments
 
-1. `traverser` ([Traverser](#Traverser)): The traverser object that the migrator will use to traverse the collection.
+1. `traverser` ([Traverser](#Traverser)): The traverser object that this migrator will use when traversing the collection and writing to documents.
 
 #### Returns
 
-([Migrator](#Migrator)) A batch migrator object.
+([BatchMigrator](#BatchMigrator)) A batch migrator object.
 
 #### Signature 2
 
+Creates a migrator that facilitates database migrations. The migrator creates a default (slow) traverser that it uses when traversing the collection and writing to documents.
+
 ```
-createBatchMigrator<T, D>(traversable: Traversable<D>, config?: TraversalConfig): Migrator<D>
+createBatchMigrator(traversable: Traversable, traversalConfig?: Partial<BaseTraversalConfig>): BatchMigrator
 ```
 
 #### Arguments
 
 1. `traversable` ([Traversable](#Traversable)): A collection-like traversable object.
-2. `config` ([TraversalConfig](#TraversalConfig)): Optional. The traversal configuration with which the migrator is created.
+2. `traversalConfig` (Partial\<[BaseTraversalConfig](#BaseTraversalConfig)\>): Optional. The traversal configuration with which the migrator is created.
 
 #### Returns
 
-([Migrator](#Migrator)) A batch migrator object.
+([BatchMigrator](#BatchMigrator)) A batch migrator object.
 
 ## createFastTraverser
 
