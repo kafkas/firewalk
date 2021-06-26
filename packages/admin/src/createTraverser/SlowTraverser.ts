@@ -10,6 +10,9 @@ import { sleep } from '../utils';
 
 const defaultTraversalConfig: BaseTraversalConfig = Traverser.getDefaultConfig();
 
+/**
+ * A slow traverser object that facilitates Firestore collection traversals.
+ */
 export class SlowTraverser<D extends firestore.DocumentData> extends Traverser<
   D,
   BaseTraversalConfig

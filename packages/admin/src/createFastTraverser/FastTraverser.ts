@@ -17,6 +17,9 @@ const defaultTraversalConfig: FastTraversalConfig = {
 // TODO: This should probably be a function of traversal config
 const PROCESS_QUEUE_INTERVAL = 250;
 
+/**
+ * A fast traverser object that facilitates Firestore collection traversals.
+ */
 export class FastTraverser<D extends firestore.DocumentData> extends Traverser<
   D,
   FastTraversalConfig

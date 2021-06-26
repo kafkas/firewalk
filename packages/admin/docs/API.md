@@ -44,7 +44,7 @@ A plain object representing traversal configuration. The keys allowed are:
 
 A migrator that uses batch Firestore batch writes when writing to documents.
 
-Same interface as [Migrator](#Migrator)
+Same interface as [Migrator](#Migrator).
 
 ## createBatchMigrator
 
@@ -158,7 +158,7 @@ createTraverser(traversable: Traversable, config?: Partial<BaseTraversalConfig>)
 
 A migrator that does not use Firestore batch writes when writing to documents.
 
-Same interface as [Migrator](#Migrator)
+Same interface as [Migrator](#Migrator).
 
 ## FastTraversalConfig
 
@@ -168,7 +168,58 @@ A plain object representing fast traversal configuration. In addition to the key
 
 ## FastTraverser
 
-TODO
+A fast traverser object that facilitates Firestore collection traversals.
+
+### .withConfig(config)
+
+Applies the specified config values to the traverser.
+
+#### Arguments
+
+1. `config` (Partial\<[FastTraversalConfig](#FastTraversalConfig)\>): Partial traversal configuration.
+
+#### Returns
+
+([FastTraverser](#FastTraverser)) A new FastTraverser object.
+
+### .traverse(callback)
+
+Traverses the entire collection in batches of the size specified in traversal config. Invokes the specified async callback for each batch of document snapshots and immediately moves to the next batch. Does not wait for the callback Promise to resolve before moving to the next batch so there is no guarantee that any given batch will finish processing before a later batch.
+
+#### Properties
+
+- Time complexity: _O_(_C_ + (_N_ / `batchSize`) \* _Q_(`batchSize`))
+- Space complexity: _O_(`maxConcurrentBatchCount` \* (`batchSize` \* _D_ + _S_))
+- Billing: _max_(1, _N_) reads
+
+where:
+
+- _N_: number of docs in the traversable
+- _Q_(`batchSize`): average batch query time
+- _C_: average callback processing time
+- _D_: document size
+- _S_: average extra space used by the callback
+
+#### Arguments
+
+1. `callback` ((batchSnapshots: QueryDocumentSnapshot[], batchIndex: number) => Promise\<void\>): An asynchronous callback function to invoke for each batch of document snapshots. Takes batch document snapshots and the 0-based batch index as its arguments.
+
+#### Returns
+
+(Promise<[TraversalResult](#TraversalResult)>) A Promise resolving to an object representing the details of the traversal. The Promise resolves when the entire traversal ends.
+
+### .traverseEach(callback, config)
+
+Traverses the entire collection in batches of the size specified in traversal config. Invokes the specified callback sequentially for each document snapshot in each batch.
+
+#### Arguments
+
+1. `callback` ((snapshot: QueryDocumentSnapshot) => Promise\<void\>): An asynchronous callback function to invoke for each document snapshot in each batch.
+2. `config` ([TraverseEachConfig](#TraverseEachConfig)): Optional. The sequential traversal configuration.
+
+#### Returns
+
+(Promise\<[TraversalResult](#TraversalResult)\>) A Promise resolving to an object representing the details of the traversal. The Promise resolves when the entire traversal ends.
 
 ## MigrationResult
 
@@ -267,7 +318,7 @@ A slow traverser object that facilitates Firestore collection traversals.
 
 ### .withConfig(config)
 
-Applies a the specified config values to the traverser.
+Applies the specified config values to the traverser.
 
 #### Arguments
 
