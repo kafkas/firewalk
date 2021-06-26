@@ -16,7 +16,7 @@ export function createBatchMigrator<
   D extends firestore.DocumentData,
   C extends BaseTraversalConfig,
   T extends Traverser<D, C>
->(traverser: T): BatchMigrator<D, C, T>;
+>(traverser: Traverser<D, C>): BatchMigrator<D, C, T>;
 
 /**
  * Creates a migrator that facilitates database migrations. The migrator creates a default (slow) traverser that
