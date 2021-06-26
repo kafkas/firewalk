@@ -40,6 +40,10 @@ export abstract class Migrator<D extends firestore.DocumentData, C extends BaseT
 
   public abstract withPredicate(predicate: MigrationPredicate<D>): Migrator<D, C>;
 
+  public abstract withTraverser<C2 extends BaseTraversalConfig>(
+    traverser: Traverser<D, C2>
+  ): Migrator<D, C2>;
+
   public abstract set(getData: SetDataGetter<D>): Promise<MigrationResult>;
 
   public abstract set(

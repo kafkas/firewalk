@@ -37,6 +37,18 @@ export class DefaultMigrator<
   }
 
   /**
+   * Applies a new traverser that will be used by the migrator.
+   *
+   * @param traverser The new traverser that the migrator will use.
+   * @returns A new DefaultMigrator object.
+   */
+  public withTraverser<C2 extends BaseTraversalConfig>(
+    traverser: Traverser<D, C2>
+  ): DefaultMigrator<D, C2, Traverser<D, C2>> {
+    return new DefaultMigrator(traverser);
+  }
+
+  /**
    * Sets all documents in this collection with the provided data.
    *
    * **Properties:**
