@@ -44,9 +44,7 @@ A plain object representing traversal configuration. The keys allowed are:
 
 A migrator that uses batch Firestore batch writes when writing to documents.
 
-### Methods
-
-TODO
+Same interface as [Migrator](#Migrator)
 
 ## createBatchMigrator
 
@@ -158,11 +156,15 @@ createTraverser(traversable: Traversable, config?: Partial<BaseTraversalConfig>)
 
 ## DefaultMigrator
 
-TODO
+A migrator that does not use Firestore batch writes when writing to documents.
+
+Same interface as [Migrator](#Migrator)
 
 ## FastTraversalConfig
 
-TODO
+A plain object representing fast traversal configuration. In addition to the keys in [BaseTraversalConfig](#BaseTraversalConfig), the following keys are accepted:
+
+- `maxConcurrentBatchCount` (number): The maximum number of batches that can be held in memory and processed concurrently. Defaults to 10.
 
 ## FastTraverser
 
@@ -179,6 +181,85 @@ A plain object representing the details of a migration. Contains the following k
 ## Migrator
 
 Represents the general interface of a migrator.
+
+#### Properties
+
+The `set()` and `update()` methods of a migrator have the following properties:
+
+- Time complexity: _TC_(`traverser`) where _C_ = _W_(`batchSize`)
+- Space complexity: _SC_(`traverser`) where _S_ = _O_(`batchSize`)
+- Billing: _max_(1, _N_) reads, _K_ writes
+
+where:
+
+- _N_: number of docs in the traversable
+- _K_: number of docs that passed the migration predicate (_K_<=_N_)
+- _W_(`batchSize`): average batch write time
+- _TC_(`traverser`): time complexity of the underlying traverser
+- _SC_(`traverser`): space complexity of the underlying traverser
+
+### .set(data, options)
+
+Sets all documents in this collection with the provided data.
+
+#### Arguments
+
+1. `data` (object): The data with which to set each document.
+2. `options` (object) Optional. An object to configure the set behavior.
+
+#### Returns
+
+(Promise\<[MigrationResult](#MigrationResult)\>) A Promise resolving to an object representing the details of the migration.
+
+### .set(getData, options)
+
+Sets all documents in this collection with the provided data.
+
+#### Arguments
+
+1. `getData` ((snapshot: QueryDocumentSnapshot) => object): A function that returns the data with which to set each document.
+2. `options` (object) Optional. An object to configure the set behavior.
+
+#### Returns
+
+(Promise\<[MigrationResult](#MigrationResult)\>) A Promise resolving to an object representing the details of the migration.
+
+### .update(getData)
+
+Updates all documents in this collection with the provided data.
+
+#### Arguments
+
+1. `getData` ((snapshot: QueryDocumentSnapshot) => object): A function that returns the data with which to update each document.
+
+#### Returns
+
+(Promise\<[MigrationResult](#MigrationResult)\>) A Promise resolving to an object representing the details of the migration.
+
+### .update(data)
+
+Updates all documents in this collection with the provided data.
+
+#### Arguments
+
+1. `data` (object): The data with which to update each document. Must be a non-empty object.
+
+#### Returns
+
+(Promise\<[MigrationResult](#MigrationResult)\>) A Promise resolving to an object representing the details of the migration.
+
+### .update(field, value)
+
+Updates all documents in this collection with the provided field-value pair.
+
+#### Arguments
+
+1. `field` (string | firestore.FieldPath): The field to update in each document.
+2. `value` (any): The value with which to update the specified field in each document. Must not be `undefined`.
+
+#### Returns
+
+(Promise\<[MigrationResult](#MigrationResult)\>) A Promise resolving to an object representing the details of the migration.
 
 ## SlowTraverser
 
@@ -256,101 +337,3 @@ A plain object representing sequential traversal configuration. The keys allowed
 ## Traverser
 
 Represents the general interface of a traverser.
-
-######################################################################################################
-
-### .set(getData, options, predicate)
-
-Sets all documents in this collection with the provided data.
-
-#### Arguments
-
-1. `getData` ((snapshot: QueryDocumentSnapshot) => object): A function that returns the data with which to set each document.
-2. `options` (object) Optional. An object to configure the set behavior.
-3. `predicate` ((snapshot: QueryDocumentSnapshot) => boolean): Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
-
-#### Returns
-
-(Promise\<[MigrationResult](#MigrationResult)\>) A Promise resolving to an object representing the details of the migration.
-
-### .set(data, options, predicate)
-
-Sets all documents in this collection with the provided data.
-
-#### Arguments
-
-1. `data` (object): The data with which to set each document.
-2. `options` (object) Optional. An object to configure the set behavior.
-3. `predicate` ((snapshot: QueryDocumentSnapshot) => boolean): Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
-
-#### Returns
-
-(Promise\<[MigrationResult](#MigrationResult)\>) A Promise resolving to an object representing the details of the migration.
-
-### .update(getData, predicate)
-
-Updates all documents in this collection with the provided data.
-
-#### Arguments
-
-1. `getData` ((snapshot: QueryDocumentSnapshot) => object): A function that returns the data with which to update each document.
-2. `predicate` ((snapshot: QueryDocumentSnapshot) => boolean): Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
-
-#### Returns
-
-(Promise\<[MigrationResult](#MigrationResult)\>) A Promise resolving to an object representing the details of the migration.
-
-### .update(data, predicate)
-
-Updates all documents in this collection with the provided data.
-
-#### Arguments
-
-1. `data` (object): The data with which to update each document. Must be a non-empty object.
-2. `predicate` ((snapshot: QueryDocumentSnapshot) => boolean): Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
-
-#### Returns
-
-(Promise\<[MigrationResult](#MigrationResult)\>) A Promise resolving to an object representing the details of the migration.
-
-### .update(field, value, predicate)
-
-Updates all documents in this collection with the provided field-value pair.
-
-#### Arguments
-
-1. `field` (string | firestore.FieldPath): The field to update in each document.
-2. `value` (any): The value with which to update the specified field in each document. Must not be `undefined`.
-3. `predicate` ((snapshot: QueryDocumentSnapshot) => boolean): Optional. A function that returns a boolean indicating whether to migrate the current document. If this is not provided, all documents will be migrated.
-
-#### Returns
-
-(Promise\<[MigrationResult](#MigrationResult)\>) A Promise resolving to an object representing the details of the migration.
-
-## Traverser
-
-A traverser object responsible for efficiently traversing collection-like document groups (collections, queries, collection groups).
-
-### .withConfig(config)
-
-Applies the specified traversal config values. Creates and returns a new traverser rather than modify the existing instance.
-
-#### Arguments
-
-1. `config` (Partial\<[TraversalConfig](#TraversalConfig)\>): Partial traversal configuration.
-
-#### Returns
-
-([Traverser](#Traverser)) The newly created traverser.
-
-### .traverse(callback)
-
-Traverses the entire collection in batches of the size specified in traversal config. Invokes the specified callback for each batch of document snapshots.
-
-#### Arguments
-
-1. `callback` ((batchSnapshots: QueryDocumentSnapshot[]) => Promise\<void\>): An asynchronous callback function to invoke for each batch of document snapshots.
-
-#### Returns
-
-(Promise\<[TraversalResult](#TraversalResult)\>) A Promise resolving to an object representing the details of the traversal.
