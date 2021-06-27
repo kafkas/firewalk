@@ -13,11 +13,10 @@ import type {
 
 export class DefaultMigrator<
   D extends firestore.DocumentData,
-  C extends BaseTraversalConfig,
-  T extends Traverser<D, C>
+  C extends BaseTraversalConfig
 > extends Migrator<D, C> {
   public constructor(
-    public readonly traverser: T,
+    public readonly traverser: Traverser<D, C>,
     private migrationPredicate: MigrationPredicate<D> = () => true
   ) {
     super();
@@ -36,7 +35,7 @@ export class DefaultMigrator<
    * @param predicate A function that takes a document snapshot and returns a boolean indicating whether to migrate it.
    * @returns A new DefaultMigrator object.
    */
-  public withPredicate(predicate: MigrationPredicate<D>): DefaultMigrator<D, C, T> {
+  public withPredicate(predicate: MigrationPredicate<D>): DefaultMigrator<D, C> {
     return new DefaultMigrator(this.traverser, predicate);
   }
 
@@ -48,7 +47,7 @@ export class DefaultMigrator<
    */
   public withTraverser<C2 extends BaseTraversalConfig>(
     traverser: Traverser<D, C2>
-  ): DefaultMigrator<D, C2, Traverser<D, C2>> {
+  ): DefaultMigrator<D, C2> {
     return new DefaultMigrator(traverser, this.migrationPredicate);
   }
 

@@ -1,6 +1,6 @@
 import type { firestore } from 'firebase-admin';
 import type { Traverser } from '../Traverser';
-import { createTraverser, SlowTraverser } from '../createTraverser';
+import { createTraverser } from '../createTraverser';
 import type { Traversable, BaseTraversalConfig } from '../types';
 import { isTraverser } from '../utils';
 import { DefaultMigrator } from './DefaultMigrator';
@@ -13,11 +13,9 @@ import { DefaultMigrator } from './DefaultMigrator';
  * @param traverser The traverser object that this migrator will use when traversing the collection and writing to documents.
  * @returns A default migrator object.
  */
-export function createMigrator<
-  D extends firestore.DocumentData,
-  C extends BaseTraversalConfig,
-  T extends Traverser<D, C>
->(traverser: Traverser<D, C>): DefaultMigrator<D, C, T>;
+export function createMigrator<D extends firestore.DocumentData, C extends BaseTraversalConfig>(
+  traverser: Traverser<D, C>
+): DefaultMigrator<D, C>;
 
 /**
  * Creates a migrator that facilitates database migrations. The migrator creates a default (slow) traverser that
@@ -31,16 +29,12 @@ export function createMigrator<
 export function createMigrator<D extends firestore.DocumentData>(
   traversable: Traversable<D>,
   traversalConfig?: Partial<BaseTraversalConfig>
-): DefaultMigrator<D, BaseTraversalConfig, SlowTraverser<D>>;
+): DefaultMigrator<D, BaseTraversalConfig>;
 
-export function createMigrator<
-  D extends firestore.DocumentData,
-  C extends BaseTraversalConfig,
-  T extends Traverser<D, C>
->(
-  traversableOrTraverser: T | Traversable<D>,
+export function createMigrator<D extends firestore.DocumentData, C extends BaseTraversalConfig>(
+  traversableOrTraverser: Traverser<D, C> | Traversable<D>,
   traversalConfig?: Partial<BaseTraversalConfig>
-): DefaultMigrator<D, C, T> | DefaultMigrator<D, BaseTraversalConfig, SlowTraverser<D>> {
+): DefaultMigrator<D, C> | DefaultMigrator<D, BaseTraversalConfig> {
   const traverser = isTraverser(traversableOrTraverser)
     ? traversableOrTraverser
     : createTraverser(traversableOrTraverser, traversalConfig);

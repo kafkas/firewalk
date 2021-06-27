@@ -14,13 +14,12 @@ import { isPositiveInteger } from '../utils';
 
 export class BatchMigrator<
   D extends firestore.DocumentData,
-  C extends BaseTraversalConfig,
-  T extends Traverser<D, C>
+  C extends BaseTraversalConfig
 > extends Migrator<D, C> {
   private static readonly MAX_BATCH_WRITE_DOC_COUNT = 500;
 
   public constructor(
-    public readonly traverser: T,
+    public readonly traverser: Traverser<D, C>,
     private migrationPredicate: MigrationPredicate<D> = () => true
   ) {
     super();
@@ -47,7 +46,7 @@ export class BatchMigrator<
    * @param predicate A function that takes a document snapshot and returns a boolean indicating whether to migrate it.
    * @returns A new BatchMigrator object.
    */
-  public withPredicate(predicate: MigrationPredicate<D>): BatchMigrator<D, C, T> {
+  public withPredicate(predicate: MigrationPredicate<D>): BatchMigrator<D, C> {
     return new BatchMigrator(this.traverser, predicate);
   }
 
@@ -59,7 +58,7 @@ export class BatchMigrator<
    */
   public withTraverser<C2 extends BaseTraversalConfig>(
     traverser: Traverser<D, C2>
-  ): BatchMigrator<D, C2, Traverser<D, C2>> {
+  ): BatchMigrator<D, C2> {
     return new BatchMigrator(traverser, this.migrationPredicate);
   }
 
