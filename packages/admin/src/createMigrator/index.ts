@@ -2,7 +2,7 @@ import type { firestore } from 'firebase-admin';
 import { isTraverser } from '../utils';
 import type { DefaultMigrator, Traversable, TraversalConfig, Traverser } from '../api';
 import { createTraverser } from '../createTraverser';
-import { SpecificDefaultMigrator } from './SpecificDefaultMigrator';
+import { BasicDefaultMigratorImplementation } from './BasicDefaultMigratorImplementation';
 
 /**
  * Creates a migrator that facilitates database migrations. Accepts a custom traverser object as argument which the
@@ -37,5 +37,5 @@ export function createMigrator<D extends firestore.DocumentData, C extends Trave
   const traverser = isTraverser(traversableOrTraverser)
     ? traversableOrTraverser
     : createTraverser(traversableOrTraverser, traversalConfig);
-  return new SpecificDefaultMigrator(traverser);
+  return new BasicDefaultMigratorImplementation(traverser);
 }

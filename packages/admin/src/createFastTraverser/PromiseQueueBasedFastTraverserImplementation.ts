@@ -12,7 +12,7 @@ import { AbstractTraverser } from '../AbstractTraverser';
 // TODO: This should probably be a function of traversal config
 const PROCESS_QUEUE_INTERVAL = 250;
 
-export class SpecificFastTraverser<D extends firestore.DocumentData>
+export class PromiseQueueBasedFastTraverserImplementation<D extends firestore.DocumentData>
   extends AbstractTraverser<D, FastTraversalConfig>
   implements FastTraverser<D> {
   private static readonly defaultConfig: FastTraversalConfig = {
@@ -24,7 +24,7 @@ export class SpecificFastTraverser<D extends firestore.DocumentData>
     public readonly traversable: Traversable<D>,
     config?: Partial<FastTraversalConfig>
   ) {
-    super({ ...SpecificFastTraverser.defaultConfig, ...config });
+    super({ ...PromiseQueueBasedFastTraverserImplementation.defaultConfig, ...config });
     this.validateConfig(config);
   }
 
@@ -43,7 +43,7 @@ export class SpecificFastTraverser<D extends firestore.DocumentData>
   }
 
   public withConfig(config: Partial<FastTraversalConfig>): FastTraverser<D> {
-    return new SpecificFastTraverser(this.traversable, {
+    return new PromiseQueueBasedFastTraverserImplementation(this.traversable, {
       ...this.traversalConfig,
       ...config,
     });

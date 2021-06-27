@@ -9,7 +9,7 @@ import type {
 } from '../api';
 import { AbstractTraverser } from '../AbstractTraverser';
 
-export class SpecificSlowTraverser<D extends firestore.DocumentData>
+export class BasicSlowTraverserImplementation<D extends firestore.DocumentData>
   extends AbstractTraverser<D, TraversalConfig>
   implements SlowTraverser<D> {
   private static readonly defaultConfig: TraversalConfig = {
@@ -20,14 +20,17 @@ export class SpecificSlowTraverser<D extends firestore.DocumentData>
     public readonly traversable: Traversable<D>,
     config?: Partial<TraversalConfig>
   ) {
-    super({ ...SpecificSlowTraverser.defaultConfig, ...config });
+    super({ ...BasicSlowTraverserImplementation.defaultConfig, ...config });
   }
 
   // eslint-disable-next-line
   private validateConfig(config: Partial<TraversalConfig> = {}): void {}
 
   public withConfig(config: Partial<TraversalConfig>): SlowTraverser<D> {
-    return new SpecificSlowTraverser(this.traversable, { ...this.traversalConfig, ...config });
+    return new BasicSlowTraverserImplementation(this.traversable, {
+      ...this.traversalConfig,
+      ...config,
+    });
   }
 
   public async traverse(callback: BatchCallbackAsync<D>): Promise<TraversalResult> {
