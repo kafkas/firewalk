@@ -9,11 +9,6 @@ import type {
 import { sleep, PromiseQueue, registerInterval } from '../utils';
 import { validateConfig } from './validateConfig';
 
-const defaultTraversalConfig: FastTraversalConfig = {
-  ...Traverser.getDefaultConfig(),
-  maxConcurrentBatchCount: 10,
-};
-
 // TODO: This should probably be a function of traversal config
 const PROCESS_QUEUE_INTERVAL = 250;
 
@@ -24,14 +19,25 @@ export class FastTraverser<D extends firestore.DocumentData> extends Traverser<
   D,
   FastTraversalConfig
 > {
+  private static readonly defaultConfig: FastTraversalConfig = {
+    ...Traverser.baseConfig,
+    maxConcurrentBatchCount: 10,
+  };
+
   public constructor(
     public readonly traversable: Traversable<D>,
     config?: Partial<FastTraversalConfig>
   ) {
-    super({ ...defaultTraversalConfig, ...config });
+    super({ ...FastTraverser.defaultConfig, ...config });
     validateConfig(config);
   }
 
+  /**
+   * Applies a the specified config values to the traverser.
+   *
+   * @param config Partial traversal configuration.
+   * @returns A new FastTraverser object.
+   */
   public withConfig(c: Partial<FastTraversalConfig>): FastTraverser<D> {
     return new FastTraverser(this.traversable, {
       ...this.traversalConfig,

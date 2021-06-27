@@ -8,18 +8,6 @@ import type {
 } from './types';
 import { sleep, isPositiveInteger } from './utils';
 
-const defaultTraversalConfig: BaseTraversalConfig = {
-  batchSize: 250,
-  sleepBetweenBatches: false,
-  sleepTimeBetweenBatches: 500,
-  maxDocCount: Infinity,
-};
-
-const defaultTraverseEachConfig: TraverseEachConfig = {
-  sleepBetweenDocs: false,
-  sleepTimeBetweenDocs: 500,
-};
-
 function assertPositiveIntegerInConfig(
   num: number | undefined,
   field: keyof BaseTraversalConfig
@@ -43,9 +31,17 @@ function validateTraversalConfig(c: Partial<BaseTraversalConfig> = {}): void {
  * Represents the general interface of a traverser.
  */
 export abstract class Traverser<D extends firestore.DocumentData, C extends BaseTraversalConfig> {
-  public static getDefaultConfig(): BaseTraversalConfig {
-    return { ...defaultTraversalConfig };
-  }
+  protected static readonly baseConfig: BaseTraversalConfig = {
+    batchSize: 250,
+    sleepBetweenBatches: false,
+    sleepTimeBetweenBatches: 500,
+    maxDocCount: Infinity,
+  };
+
+  protected static readonly baseTraverseEachConfig: TraverseEachConfig = {
+    sleepBetweenDocs: false,
+    sleepTimeBetweenDocs: 500,
+  };
 
   public readonly traversalConfig: C;
 
@@ -66,7 +62,7 @@ export abstract class Traverser<D extends firestore.DocumentData, C extends Base
     c: Partial<TraverseEachConfig> = {}
   ): Promise<TraversalResult> {
     const { sleepBetweenDocs, sleepTimeBetweenDocs } = {
-      ...defaultTraverseEachConfig,
+      ...Traverser.baseTraverseEachConfig,
       ...c,
     };
 
@@ -87,13 +83,7 @@ export abstract class Traverser<D extends firestore.DocumentData, C extends Base
    */
   public abstract readonly traversable: Traversable<D>;
 
-  /**
-   * Applies the specified traversal config values. Creates and returns a new traverser rather than
-   * modify the existing instance.
-   * @param config Partial traversal configuration.
-   * @returns The newly created traverser.
-   */
-  public abstract withConfig(config: Partial<BaseTraversalConfig>): Traverser<D, C>;
+  public abstract withConfig(config: Partial<C>): Traverser<D, C>;
 
   public abstract traverse(callback: BatchCallbackAsync<D>): Promise<TraversalResult>;
 }
