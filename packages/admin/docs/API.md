@@ -33,7 +33,7 @@ Please note that although the Github docs for this project are work-in-progress,
 
 ## BatchMigrator
 
-A migrator that uses batch Firestore batch writes when writing to documents.
+A migrator that uses batch Firestore atomic batch writes when writing to documents.
 
 Same interface as [Migrator](#Migrator).
 
@@ -41,7 +41,7 @@ Same interface as [Migrator](#Migrator).
 
 #### Signature 1
 
-Creates a migrator that facilitates database migrations. Accepts a custom traverser object as argument which the migrator will use when traversing the collection and writing to documents. This migrator uses batch writes when writing to docs so the entire operation will fail if a single write isn't successful.
+Creates a migrator that facilitates database migrations. Accepts a custom traverser object as argument which the migrator will use when traversing the collection and writing to documents. This migrator uses atomic batch writes when writing to docs so the entire operation will fail if a single write isn't successful.
 
 ```
 createBatchMigrator(traverser: Traverser): BatchMigrator
@@ -95,7 +95,7 @@ createFastTraverser(traversable: Traversable, config?: Partial<FastTraversalConf
 
 #### Signature 1
 
-Creates a migrator that facilitates database migrations. Accepts a custom traverser object as argument which the migrator will use when traversing the collection and writing to documents. This migrator does not use atomic writes so it is possible that when a write fails other writes go through.
+Creates a migrator that facilitates database migrations. Accepts a custom traverser object as argument which the migrator will use when traversing the collection and writing to documents. This migrator does not use atomic batch writes so it is possible that when a write fails other writes go through.
 
 ```
 createMigrator(traverser: Traverser): DefaultMigrator
@@ -147,7 +147,7 @@ createTraverser(traversable: Traversable, config?: Partial<TraversalConfig>): Sl
 
 ## DefaultMigrator
 
-A migrator that does not use Firestore batch writes when writing to documents.
+A migrator that does not use Firestore atomic batch writes when writing to documents.
 
 Same interface as [Migrator](#Migrator).
 
@@ -187,8 +187,8 @@ where:
 
 - _N_: number of docs in the traversable
 - _Q_(`batchSize`): average batch query time
+- _D_: average document size
 - _C_: average callback processing time
-- _D_: document size
 - _S_: average extra space used by the callback
 
 #### Arguments
@@ -333,8 +333,8 @@ where:
 
 - _N_: number of docs in the traversable
 - _Q_(`batchSize`): average batch query time
-- _C_: average processing time
-- _D_: document size
+- _D_: average document size
+- _C_: average callback processing time
 - _S_: average extra space used by the callback
 
 #### Arguments

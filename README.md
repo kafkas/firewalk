@@ -202,8 +202,8 @@ where:
 
 - _N_: number of docs in the traversable
 - _Q_(`batchSize`): average batch query time
-- _C_: average processing time
-- _D_: document size
+- _D_: average document size
+- _C_: average callback processing time
 - _S_: average extra space used by the callback
 
 ### [createFastTraverser](./packages/admin/docs/API.md#createFastTraverser)
@@ -220,13 +220,13 @@ where:
 
 - _N_: number of docs in the traversable
 - _Q_(`batchSize`): average batch query time
+- _D_: average document size
 - _C_: average callback processing time
-- _D_: document size
 - _S_: average extra space used by the callback
 
 ### [createMigrator](./packages/admin/docs/API.md#createMigrator)
 
-Creates a migrator that facilitates database migrations. The migrator accepts a custom traverser to traverse the collection. Otherwise it will create a default traverser with your desired traversal config. This migrator does not use atomic writes so it is possible that when a write fails other writes go through.
+Creates a migrator that facilitates database migrations. The migrator accepts a custom traverser to traverse the collection. Otherwise it will create a default traverser with your desired traversal config. This migrator does not use atomic batch writes so it is possible that when a write fails other writes go through.
 
 #### Write properties
 
@@ -244,7 +244,7 @@ where:
 
 ### [createBatchMigrator](./packages/admin/docs/API.md#createBatchMigrator)
 
-Creates a migrator that facilitates database migrations. The migrator accepts a custom traverser to traverse the collection. Otherwise it will create a default traverser with your desired traversal config. This migrator uses batch writes so the entire operation will fail if a single write isn't successful.
+Creates a migrator that facilitates database migrations. The migrator accepts a custom traverser to traverse the collection. Otherwise it will create a default traverser with your desired traversal config. This migrator uses atomic batch writes so the entire operation will fail if a single write isn't successful.
 
 #### Write properties
 
