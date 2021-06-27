@@ -1,6 +1,6 @@
 import type { firestore } from 'firebase-admin';
 import { isTraverser } from '../utils';
-import type { BaseTraversalConfig, BatchMigrator, Traversable, Traverser } from '../api';
+import type { BatchMigrator, Traversable, TraversalConfig, Traverser } from '../api';
 import { createTraverser } from '../createTraverser';
 import { SpecificBatchMigrator } from './SpecificBatchMigrator';
 
@@ -13,10 +13,9 @@ import { SpecificBatchMigrator } from './SpecificBatchMigrator';
  * @param traverser The traverser object that this migrator will use when traversing the collection and writing to documents.
  * @returns A batch migrator object.
  */
-export function createBatchMigrator<
-  D extends firestore.DocumentData,
-  C extends BaseTraversalConfig
->(traverser: Traverser<D, C>): BatchMigrator<D, C>;
+export function createBatchMigrator<D extends firestore.DocumentData, C extends TraversalConfig>(
+  traverser: Traverser<D, C>
+): BatchMigrator<D, C>;
 
 /**
  * Creates a migrator that facilitates database migrations. The migrator creates a default (slow) traverser that
@@ -30,16 +29,13 @@ export function createBatchMigrator<
  */
 export function createBatchMigrator<D extends firestore.DocumentData>(
   traversable: Traversable<D>,
-  traversalConfig?: Partial<BaseTraversalConfig>
-): BatchMigrator<D, BaseTraversalConfig>;
+  traversalConfig?: Partial<TraversalConfig>
+): BatchMigrator<D, TraversalConfig>;
 
-export function createBatchMigrator<
-  D extends firestore.DocumentData,
-  C extends BaseTraversalConfig
->(
+export function createBatchMigrator<D extends firestore.DocumentData, C extends TraversalConfig>(
   traversableOrTraverser: Traverser<D, C> | Traversable<D>,
-  traversalConfig?: Partial<BaseTraversalConfig>
-): BatchMigrator<D, C> | BatchMigrator<D, BaseTraversalConfig> {
+  traversalConfig?: Partial<TraversalConfig>
+): BatchMigrator<D, C> | BatchMigrator<D, TraversalConfig> {
   const traverser = isTraverser(traversableOrTraverser)
     ? traversableOrTraverser
     : createTraverser(traversableOrTraverser, traversalConfig);

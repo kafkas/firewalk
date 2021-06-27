@@ -1,18 +1,18 @@
 import type { firestore } from 'firebase-admin';
-import type { BaseTraversalConfig, BatchCallbackAsync, TraversalResult, Traverser } from '../api';
+import type { BatchCallbackAsync, TraversalConfig, TraversalResult, Traverser } from '../api';
 
 /**
  * A slow traverser object that facilitates Firestore collection traversals.
  */
 export interface SlowTraverser<D extends firestore.DocumentData>
-  extends Traverser<D, BaseTraversalConfig> {
+  extends Traverser<D, TraversalConfig> {
   /**
    * Applies a the specified config values to the traverser.
    *
    * @param config Partial traversal configuration.
    * @returns A new SlowTraverser object.
    */
-  withConfig(config: Partial<BaseTraversalConfig>): SlowTraverser<D>;
+  withConfig(config: Partial<TraversalConfig>): SlowTraverser<D>;
 
   /**
    * Traverses the entire collection in batches of the size specified in traversal config. Invokes the specified

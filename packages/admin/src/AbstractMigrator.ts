@@ -1,20 +1,18 @@
 import type { firestore } from 'firebase-admin';
 import type {
-  BaseTraversalConfig,
   BatchCallback,
   MigrationResult,
   Migrator,
   SetDataGetter,
   SetOptions,
   SetPartialDataGetter,
+  TraversalConfig,
   Traverser,
   UpdateDataGetter,
 } from './api';
 
-export abstract class AbstractMigrator<
-  D extends firestore.DocumentData,
-  C extends BaseTraversalConfig
-> implements Migrator<D, C> {
+export abstract class AbstractMigrator<D extends firestore.DocumentData, C extends TraversalConfig>
+  implements Migrator<D, C> {
   protected registeredCallbacks: {
     onBeforeBatchStart?: BatchCallback<D>;
     onAfterBatchComplete?: BatchCallback<D>;

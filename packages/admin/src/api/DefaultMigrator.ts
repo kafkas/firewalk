@@ -1,7 +1,7 @@
 import type { firestore } from 'firebase-admin';
-import type { BaseTraversalConfig, MigrationPredicate, Migrator, Traverser } from '.';
+import type { MigrationPredicate, Migrator, TraversalConfig, Traverser } from '.';
 
-export interface DefaultMigrator<D extends firestore.DocumentData, C extends BaseTraversalConfig>
+export interface DefaultMigrator<D extends firestore.DocumentData, C extends TraversalConfig>
   extends Migrator<D, C> {
   /**
    * Applies a migration predicate that returns a boolean indicating whether to migrate the current document.
@@ -18,7 +18,5 @@ export interface DefaultMigrator<D extends firestore.DocumentData, C extends Bas
    * @param traverser The new traverser that the migrator will use.
    * @returns A new DefaultMigrator object.
    */
-  withTraverser<C2 extends BaseTraversalConfig>(
-    traverser: Traverser<D, C2>
-  ): DefaultMigrator<D, C2>;
+  withTraverser<C2 extends TraversalConfig>(traverser: Traverser<D, C2>): DefaultMigrator<D, C2>;
 }

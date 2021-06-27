@@ -14,7 +14,6 @@ Please note that although the Github docs for this project are work-in-progress,
 
 ## API Overview
 
-- [BaseTraversalConfig](#BaseTraversalConfig)
 - [BatchMigrator](#BatchMigrator)
 - [createBatchMigrator](#createBatchMigrator)
 - [createFastTraverser](#createFastTraverser)
@@ -27,18 +26,10 @@ Please note that although the Github docs for this project are work-in-progress,
 - [Migrator](#Migrator)
 - [SlowTraverser](#SlowTraverser)
 - [Traversable](#Traversable)
+- [TraversalConfig](#TraversalConfig)
 - [TraversalResult](#TraversalResult)
 - [TraverseEachConfig](#TraverseEachConfig)
 - [Traverser](#Traverser)
-
-## BaseTraversalConfig
-
-A plain object representing traversal configuration. The keys allowed are:
-
-- `batchSize` (number): The number of documents that will be traversed in each batch. Defaults to 250.
-- `sleepBetweenBatches` (boolean): Whether to sleep between batches. Defaults to `false`.
-- `sleepTimeBetweenBatches` (number): The amount of time (in ms) to "sleep" before moving on to the next batch. Defaults to 500.
-- `maxDocCount` (number): The maximum number of documents that will be traversed. Defaults to `Infinity`.
 
 ## BatchMigrator
 
@@ -69,13 +60,13 @@ createBatchMigrator(traverser: Traverser): BatchMigrator
 Creates a migrator that facilitates database migrations. The migrator creates a default (slow) traverser that it uses when traversing the collection and writing to documents.
 
 ```
-createBatchMigrator(traversable: Traversable, traversalConfig?: Partial<BaseTraversalConfig>): BatchMigrator
+createBatchMigrator(traversable: Traversable, traversalConfig?: Partial<TraversalConfig>): BatchMigrator
 ```
 
 #### Arguments
 
 1. `traversable` ([Traversable](#Traversable)): A collection-like traversable object.
-2. `traversalConfig` (Partial\<[BaseTraversalConfig](#BaseTraversalConfig)\>): Optional. The traversal configuration with which the migrator is created.
+2. `traversalConfig` (Partial\<[TraversalConfig](#TraversalConfig)\>): Optional. The traversal configuration with which the migrator is created.
 
 #### Returns
 
@@ -123,13 +114,13 @@ createMigrator(traverser: Traverser): DefaultMigrator
 Creates a migrator that facilitates database migrations. The migrator creates a default (slow) traverser that it uses when traversing the collection and writing to documents.
 
 ```
-createMigrator(traversable: Traversable, traversalConfig?: Partial<BaseTraversalConfig>): DefaultMigrator
+createMigrator(traversable: Traversable, traversalConfig?: Partial<TraversalConfig>): DefaultMigrator
 ```
 
 #### Arguments
 
 1. `traversable` ([Traversable](#Traversable)): A collection-like traversable object.
-2. `traversalConfig` (Partial\<[BaseTraversalConfig](#BaseTraversalConfig)\>): Optional. The traversal configuration with which the migrator is created.
+2. `traversalConfig` (Partial\<[TraversalConfig](#TraversalConfig)\>): Optional. The traversal configuration with which the migrator is created.
 
 #### Returns
 
@@ -142,13 +133,13 @@ Creates a traverser object that facilitates Firestore collection traversals. Whe
 #### Signature
 
 ```
-createTraverser(traversable: Traversable, config?: Partial<BaseTraversalConfig>): SlowTraverser
+createTraverser(traversable: Traversable, config?: Partial<TraversalConfig>): SlowTraverser
 ```
 
 #### Arguments
 
 1. `traversable` ([Traversable](#Traversable)): A collection-like traversable group of documents.
-2. `config` (Partial\<[BaseTraversalConfig](#BaseTraversalConfig)\>): Optional. The traversal configuration with which the traverser will be created.
+2. `config` (Partial\<[TraversalConfig](#TraversalConfig)\>): Optional. The traversal configuration with which the traverser will be created.
 
 #### Returns
 
@@ -162,7 +153,7 @@ Same interface as [Migrator](#Migrator).
 
 ## FastTraversalConfig
 
-A plain object representing fast traversal configuration. In addition to the keys in [BaseTraversalConfig](#BaseTraversalConfig), the following keys are accepted:
+A plain object representing fast traversal configuration. In addition to the keys in [TraversalConfig](#TraversalConfig), the following keys are accepted:
 
 - `maxConcurrentBatchCount` (number): The maximum number of batches that can be held in memory and processed concurrently. Defaults to 10.
 
@@ -322,7 +313,7 @@ Applies the specified config values to the traverser.
 
 #### Arguments
 
-1. `config` (Partial\<[BaseTraversalConfig](#BaseTraversalConfig)\>): Partial traversal configuration.
+1. `config` (Partial\<[TraversalConfig](#TraversalConfig)\>): Partial traversal configuration.
 
 #### Returns
 
@@ -370,6 +361,15 @@ Traverses the entire collection in batches of the size specified in traversal co
 ## Traversable
 
 A collection-like group of documents. Can be one of [CollectionReference](https://googleapis.dev/nodejs/firestore/latest/CollectionReference.html), [CollectionGroup](https://googleapis.dev/nodejs/firestore/latest/CollectionGroup.html) and [Query](https://googleapis.dev/nodejs/firestore/latest/Query.html).
+
+## TraversalConfig
+
+A plain object representing traversal configuration. The keys allowed are:
+
+- `batchSize` (number): The number of documents that will be traversed in each batch. Defaults to 250.
+- `sleepBetweenBatches` (boolean): Whether to sleep between batches. Defaults to `false`.
+- `sleepTimeBetweenBatches` (number): The amount of time (in ms) to "sleep" before moving on to the next batch. Defaults to 500.
+- `maxDocCount` (number): The maximum number of documents that will be traversed. Defaults to `Infinity`.
 
 ## TraversalResult
 

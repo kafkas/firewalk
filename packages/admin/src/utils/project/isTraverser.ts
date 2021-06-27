@@ -1,7 +1,7 @@
 import type { firestore } from 'firebase-admin';
-import type { BaseTraversalConfig, Traverser } from '../../api';
+import type { TraversalConfig, Traverser } from '../../api';
 
-export function isTraverser<D extends firestore.DocumentData, C extends BaseTraversalConfig>(
+export function isTraverser<D extends firestore.DocumentData, C extends TraversalConfig>(
   candidate: Traverser<D, C> | unknown
 ): candidate is Traverser<D, C> {
   const t = candidate as Traverser<D, C>;

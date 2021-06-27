@@ -1,6 +1,6 @@
 import type { firestore } from 'firebase-admin';
 import { isTraverser } from '../utils';
-import type { BaseTraversalConfig, DefaultMigrator, Traversable, Traverser } from '../api';
+import type { DefaultMigrator, Traversable, TraversalConfig, Traverser } from '../api';
 import { createTraverser } from '../createTraverser';
 import { SpecificDefaultMigrator } from './SpecificDefaultMigrator';
 
@@ -12,7 +12,7 @@ import { SpecificDefaultMigrator } from './SpecificDefaultMigrator';
  * @param traverser The traverser object that this migrator will use when traversing the collection and writing to documents.
  * @returns A default migrator object.
  */
-export function createMigrator<D extends firestore.DocumentData, C extends BaseTraversalConfig>(
+export function createMigrator<D extends firestore.DocumentData, C extends TraversalConfig>(
   traverser: Traverser<D, C>
 ): DefaultMigrator<D, C>;
 
@@ -27,13 +27,13 @@ export function createMigrator<D extends firestore.DocumentData, C extends BaseT
  */
 export function createMigrator<D extends firestore.DocumentData>(
   traversable: Traversable<D>,
-  traversalConfig?: Partial<BaseTraversalConfig>
-): DefaultMigrator<D, BaseTraversalConfig>;
+  traversalConfig?: Partial<TraversalConfig>
+): DefaultMigrator<D, TraversalConfig>;
 
-export function createMigrator<D extends firestore.DocumentData, C extends BaseTraversalConfig>(
+export function createMigrator<D extends firestore.DocumentData, C extends TraversalConfig>(
   traversableOrTraverser: Traverser<D, C> | Traversable<D>,
-  traversalConfig?: Partial<BaseTraversalConfig>
-): DefaultMigrator<D, C> | DefaultMigrator<D, BaseTraversalConfig> {
+  traversalConfig?: Partial<TraversalConfig>
+): DefaultMigrator<D, C> | DefaultMigrator<D, TraversalConfig> {
   const traverser = isTraverser(traversableOrTraverser)
     ? traversableOrTraverser
     : createTraverser(traversableOrTraverser, traversalConfig);

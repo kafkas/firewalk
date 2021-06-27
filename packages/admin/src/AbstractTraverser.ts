@@ -1,19 +1,17 @@
 import type { firestore } from 'firebase-admin';
 import { sleep, isPositiveInteger } from './utils';
 import type {
-  BaseTraversalConfig,
   BatchCallbackAsync,
   Traversable,
+  TraversalConfig,
   TraversalResult,
   TraverseEachConfig,
   Traverser,
 } from './api';
 
-export abstract class AbstractTraverser<
-  D extends firestore.DocumentData,
-  C extends BaseTraversalConfig
-> implements Traverser<D, C> {
-  protected static readonly baseConfig: BaseTraversalConfig = {
+export abstract class AbstractTraverser<D extends firestore.DocumentData, C extends TraversalConfig>
+  implements Traverser<D, C> {
+  protected static readonly baseConfig: TraversalConfig = {
     batchSize: 250,
     sleepBetweenBatches: false,
     sleepTimeBetweenBatches: 500,
@@ -29,7 +27,7 @@ export abstract class AbstractTraverser<
     this.validateBaseConfig(traversalConfig);
   }
 
-  private validateBaseConfig(config: Partial<BaseTraversalConfig> = {}): void {
+  private validateBaseConfig(config: Partial<TraversalConfig> = {}): void {
     const { batchSize, sleepTimeBetweenBatches, maxDocCount } = config;
 
     this.assertPositiveIntegerInBaseConfig(batchSize, 'batchSize');
@@ -42,7 +40,7 @@ export abstract class AbstractTraverser<
 
   private assertPositiveIntegerInBaseConfig(
     num: number | undefined,
-    field: keyof BaseTraversalConfig
+    field: keyof TraversalConfig
   ): asserts num {
     if (typeof num === 'number' && !isPositiveInteger(num)) {
       throw new Error(`The '${field}' field in traversal config must be a positive integer.`);

@@ -1,8 +1,8 @@
 import type { firestore } from 'firebase-admin';
 import type {
   BatchCallbackAsync,
-  BaseTraversalConfig,
   Traversable,
+  TraversalConfig,
   TraversalResult,
   TraverseEachConfig,
 } from '.';
@@ -10,7 +10,7 @@ import type {
 /**
  * Represents the general interface of a traverser.
  */
-export interface Traverser<D extends firestore.DocumentData, C extends BaseTraversalConfig> {
+export interface Traverser<D extends firestore.DocumentData, C extends TraversalConfig> {
   /**
    * The underlying traversable.
    */

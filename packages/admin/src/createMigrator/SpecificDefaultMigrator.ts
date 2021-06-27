@@ -1,21 +1,18 @@
 import type { firestore } from 'firebase-admin';
 import type {
-  BaseTraversalConfig,
   DefaultMigrator,
   MigrationPredicate,
   MigrationResult,
   SetDataGetter,
   SetOptions,
   SetPartialDataGetter,
+  TraversalConfig,
   Traverser,
   UpdateDataGetter,
 } from '../api';
 import { AbstractMigrator } from '../AbstractMigrator';
 
-export class SpecificDefaultMigrator<
-    D extends firestore.DocumentData,
-    C extends BaseTraversalConfig
-  >
+export class SpecificDefaultMigrator<D extends firestore.DocumentData, C extends TraversalConfig>
   extends AbstractMigrator<D, C>
   implements DefaultMigrator<D, C> {
   public constructor(
@@ -35,7 +32,7 @@ export class SpecificDefaultMigrator<
     return new SpecificDefaultMigrator(this.traverser, predicate);
   }
 
-  public withTraverser<C2 extends BaseTraversalConfig>(
+  public withTraverser<C2 extends TraversalConfig>(
     traverser: Traverser<D, C2>
   ): DefaultMigrator<D, C2> {
     return new SpecificDefaultMigrator(traverser, this.migrationPredicate);

@@ -1,19 +1,19 @@
 import type { firestore } from 'firebase-admin';
 import type { Traverser } from './Traverser';
 import type {
-  BaseTraversalConfig,
   BatchCallback,
   MigrationResult,
   SetDataGetter,
   SetOptions,
   SetPartialDataGetter,
+  TraversalConfig,
   UpdateDataGetter,
 } from '.';
 
 /**
  * Represents the general interface of a migrator.
  */
-export interface Migrator<D extends firestore.DocumentData, C extends BaseTraversalConfig> {
+export interface Migrator<D extends firestore.DocumentData, C extends TraversalConfig> {
   /**
    * The underlying traverser.
    */

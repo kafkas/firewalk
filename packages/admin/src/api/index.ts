@@ -1,4 +1,3 @@
-export type { BaseTraversalConfig } from './BaseTraversalConfig';
 export type { BatchCallback } from './BatchCallback';
 export type { BatchCallbackAsync } from './BatchCallbackAsync';
 export type { BatchMigrator } from './BatchMigrator';
@@ -13,6 +12,7 @@ export type { SetOptions } from './SetOptions';
 export type { SetPartialDataGetter } from './SetPartialDataGetter';
 export type { SlowTraverser } from './SlowTraverser';
 export type { Traversable } from './Traversable';
+export type { TraversalConfig } from './TraversalConfig';
 export type { TraversalResult } from './TraversalResult';
 export type { TraverseEachConfig } from './TraverseEachConfig';
 export type { Traverser } from './Traverser';

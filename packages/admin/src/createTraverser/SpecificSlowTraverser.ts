@@ -1,32 +1,32 @@
 import type { firestore } from 'firebase-admin';
 import { sleep } from '../utils';
 import type {
-  BaseTraversalConfig,
   BatchCallbackAsync,
   SlowTraverser,
   Traversable,
+  TraversalConfig,
   TraversalResult,
 } from '../api';
 import { AbstractTraverser } from '../AbstractTraverser';
 
 export class SpecificSlowTraverser<D extends firestore.DocumentData>
-  extends AbstractTraverser<D, BaseTraversalConfig>
+  extends AbstractTraverser<D, TraversalConfig>
   implements SlowTraverser<D> {
-  private static readonly defaultConfig: BaseTraversalConfig = {
+  private static readonly defaultConfig: TraversalConfig = {
     ...AbstractTraverser.baseConfig,
   };
 
   public constructor(
     public readonly traversable: Traversable<D>,
-    config?: Partial<BaseTraversalConfig>
+    config?: Partial<TraversalConfig>
   ) {
     super({ ...SpecificSlowTraverser.defaultConfig, ...config });
   }
 
   // eslint-disable-next-line
-  private validateConfig(config: Partial<BaseTraversalConfig> = {}): void {}
+  private validateConfig(config: Partial<TraversalConfig> = {}): void {}
 
-  public withConfig(config: Partial<BaseTraversalConfig>): SlowTraverser<D> {
+  public withConfig(config: Partial<TraversalConfig>): SlowTraverser<D> {
     return new SpecificSlowTraverser(this.traversable, { ...this.traversalConfig, ...config });
   }
 

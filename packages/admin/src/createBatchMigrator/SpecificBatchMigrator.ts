@@ -1,19 +1,19 @@
 import type { firestore } from 'firebase-admin';
 import { isPositiveInteger } from '../utils';
 import type {
-  BaseTraversalConfig,
   BatchMigrator,
   MigrationPredicate,
   MigrationResult,
   SetDataGetter,
   SetOptions,
   SetPartialDataGetter,
+  TraversalConfig,
   Traverser,
   UpdateDataGetter,
 } from '../api';
 import { AbstractMigrator } from '../AbstractMigrator';
 
-export class SpecificBatchMigrator<D extends firestore.DocumentData, C extends BaseTraversalConfig>
+export class SpecificBatchMigrator<D extends firestore.DocumentData, C extends TraversalConfig>
   extends AbstractMigrator<D, C>
   implements BatchMigrator<D, C> {
   private static readonly MAX_BATCH_WRITE_DOC_COUNT = 500;
@@ -26,7 +26,7 @@ export class SpecificBatchMigrator<D extends firestore.DocumentData, C extends B
     this.validateConfig(traverser.traversalConfig);
   }
 
-  private validateConfig(config: Partial<BaseTraversalConfig> = {}): void {
+  private validateConfig(config: Partial<TraversalConfig> = {}): void {
     const { batchSize } = config;
 
     if (
@@ -43,7 +43,7 @@ export class SpecificBatchMigrator<D extends firestore.DocumentData, C extends B
     return new SpecificBatchMigrator(this.traverser, predicate);
   }
 
-  public withTraverser<C2 extends BaseTraversalConfig>(
+  public withTraverser<C2 extends TraversalConfig>(
     traverser: Traverser<D, C2>
   ): BatchMigrator<D, C2> {
     return new SpecificBatchMigrator(traverser, this.migrationPredicate);
