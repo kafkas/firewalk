@@ -43,7 +43,7 @@ export class SLLQueue<E> {
       this.top = newNode;
       this.bottom = newNode;
     } else {
-      this.validateNode(this.top);
+      this.assertNode(this.top);
       this.top.next = newNode;
       this.top = this.top.next;
     }
@@ -56,14 +56,14 @@ export class SLLQueue<E> {
   public dequeue(): E {
     // Items are dequeued from the bottom
     this.validateNonEmptyQueue();
-    this.validateNode(this.bottom);
+    this.assertNode(this.bottom);
     const bottomItem = this.bottom.data;
     this.bottom = this.bottom.next;
     this.itemCount--;
     return bottomItem;
   }
 
-  private validateNode(node: SLLNode<E> | null): asserts node {
+  private assertNode(node: SLLNode<E> | null): asserts node {
     if (node === null) {
       throw new Error(
         'Node does not exist. This indicates an unexpected error which is likely caused by an incorrect implementation of this data structure.'
@@ -73,7 +73,7 @@ export class SLLQueue<E> {
 
   public peek(): E {
     this.validateNonEmptyQueue();
-    this.validateNode(this.bottom);
+    this.assertNode(this.bottom);
     return this.bottom.data;
   }
 
