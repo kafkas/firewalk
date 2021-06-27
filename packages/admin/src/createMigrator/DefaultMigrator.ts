@@ -10,7 +10,6 @@ import type {
   SetOptions,
   MigrationResult,
 } from '../types';
-import { validateConfig } from './validateConfig';
 
 export class DefaultMigrator<
   D extends firestore.DocumentData,
@@ -22,7 +21,12 @@ export class DefaultMigrator<
     private migrationPredicate: MigrationPredicate<D> = () => true
   ) {
     super();
-    validateConfig(traverser.traversalConfig);
+    this.validateConfig(traverser.traversalConfig);
+  }
+
+  // eslint-disable-next-line
+  private validateConfig(c: Partial<C> = {}): void {
+    // Confirm that the traverser config is compatible with this migrator
   }
 
   /**

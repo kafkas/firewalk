@@ -10,19 +10,34 @@ import type {
   SetOptions,
   MigrationResult,
 } from '../types';
-import { validateConfig } from './validateConfig';
+import { isPositiveInteger } from '../utils';
 
 export class BatchMigrator<
   D extends firestore.DocumentData,
   C extends BaseTraversalConfig,
   T extends Traverser<D, C>
 > extends Migrator<D, C> {
+  private static readonly MAX_BATCH_WRITE_DOC_COUNT = 500;
+
   public constructor(
     public readonly traverser: T,
     private migrationPredicate: MigrationPredicate<D> = () => true
   ) {
     super();
-    validateConfig(traverser.traversalConfig);
+    this.validateConfig(traverser.traversalConfig);
+  }
+
+  private validateConfig(c: Partial<BaseTraversalConfig> = {}): void {
+    const { batchSize } = c;
+
+    if (
+      typeof batchSize === 'number' &&
+      (!isPositiveInteger(batchSize) || batchSize > BatchMigrator.MAX_BATCH_WRITE_DOC_COUNT)
+    ) {
+      throw new Error(
+        `The 'batchSize' field in traversal config for a batch migrator must be a positive integer less than or equal to ${BatchMigrator.MAX_BATCH_WRITE_DOC_COUNT}. In Firestore, each transaction or write batch can write to a maximum of ${BatchMigrator.MAX_BATCH_WRITE_DOC_COUNT} documents.`
+      );
+    }
   }
 
   /**
