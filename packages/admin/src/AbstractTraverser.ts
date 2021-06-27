@@ -1,17 +1,18 @@
 import type { firestore } from 'firebase-admin';
-import type {
-  Traversable,
-  BaseTraversalConfig,
-  TraverseEachConfig,
-  TraversalResult,
-  BatchCallbackAsync,
-} from './types';
 import { sleep, isPositiveInteger } from './utils';
+import type {
+  BaseTraversalConfig,
+  BatchCallbackAsync,
+  Traversable,
+  TraversalResult,
+  TraverseEachConfig,
+  Traverser,
+} from './api';
 
-/**
- * Represents the general interface of a traverser.
- */
-export abstract class Traverser<D extends firestore.DocumentData, C extends BaseTraversalConfig> {
+export abstract class AbstractTraverser<
+  D extends firestore.DocumentData,
+  C extends BaseTraversalConfig
+> implements Traverser<D, C> {
   protected static readonly baseConfig: BaseTraversalConfig = {
     batchSize: 250,
     sleepBetweenBatches: false,
@@ -24,12 +25,7 @@ export abstract class Traverser<D extends firestore.DocumentData, C extends Base
     sleepTimeBetweenDocs: 500,
   };
 
-  protected constructor(
-    /**
-     * Existing traversal configuration.
-     */
-    public readonly traversalConfig: C
-  ) {
+  protected constructor(public readonly traversalConfig: C) {
     this.validateBaseConfig(traversalConfig);
   }
 
@@ -53,19 +49,12 @@ export abstract class Traverser<D extends firestore.DocumentData, C extends Base
     }
   }
 
-  /**
-   * Traverses the entire collection in batches of the size specified in traversal config. Invokes the specified
-   * callback sequentially for each document snapshot in each batch.
-   * @param callback An asynchronous callback function to invoke for each document snapshot in each batch.
-   * @param config The sequential traversal configuration.
-   * @returns A Promise resolving to an object representing the details of the traversal. The Promise resolves when the entire traversal ends.
-   */
   public async traverseEach(
     callback: (snapshot: firestore.QueryDocumentSnapshot<D>) => Promise<void>,
     config: Partial<TraverseEachConfig> = {}
   ): Promise<TraversalResult> {
     const { sleepBetweenDocs, sleepTimeBetweenDocs } = {
-      ...Traverser.baseTraverseEachConfig,
+      ...AbstractTraverser.baseTraverseEachConfig,
       ...config,
     };
 
@@ -81,12 +70,7 @@ export abstract class Traverser<D extends firestore.DocumentData, C extends Base
     return { batchCount, docCount };
   }
 
-  /**
-   * The underlying traversable.
-   */
   public abstract readonly traversable: Traversable<D>;
-
-  public abstract withConfig(config: Partial<C>): Traverser<D, C>;
 
   public abstract traverse(callback: BatchCallbackAsync<D>): Promise<TraversalResult>;
 }

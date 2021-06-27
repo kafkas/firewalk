@@ -1,25 +1,22 @@
 import type { firestore } from 'firebase-admin';
-import { Traverser } from '../Traverser';
-import type {
-  Traversable,
-  FastTraversalConfig,
-  TraversalResult,
-  BatchCallbackAsync,
-} from '../types';
 import { sleep, PromiseQueue, registerInterval, isPositiveInteger } from '../utils';
+import type {
+  BatchCallbackAsync,
+  FastTraversalConfig,
+  FastTraverser,
+  Traversable,
+  TraversalResult,
+} from '../api';
+import { AbstractTraverser } from '../AbstractTraverser';
 
 // TODO: This should probably be a function of traversal config
 const PROCESS_QUEUE_INTERVAL = 250;
 
-/**
- * A fast traverser object that facilitates Firestore collection traversals.
- */
-export class FastTraverser<D extends firestore.DocumentData> extends Traverser<
-  D,
-  FastTraversalConfig
-> {
+export class SpecificFastTraverser<D extends firestore.DocumentData>
+  extends AbstractTraverser<D, FastTraversalConfig>
+  implements FastTraverser<D> {
   private static readonly defaultConfig: FastTraversalConfig = {
-    ...Traverser.baseConfig,
+    ...AbstractTraverser.baseConfig,
     maxConcurrentBatchCount: 10,
   };
 
@@ -27,7 +24,7 @@ export class FastTraverser<D extends firestore.DocumentData> extends Traverser<
     public readonly traversable: Traversable<D>,
     config?: Partial<FastTraversalConfig>
   ) {
-    super({ ...FastTraverser.defaultConfig, ...config });
+    super({ ...SpecificFastTraverser.defaultConfig, ...config });
     this.validateConfig(config);
   }
 
@@ -45,42 +42,13 @@ export class FastTraverser<D extends firestore.DocumentData> extends Traverser<
     }
   }
 
-  /**
-   * Applies a the specified config values to the traverser.
-   *
-   * @param config Partial traversal configuration.
-   * @returns A new FastTraverser object.
-   */
   public withConfig(config: Partial<FastTraversalConfig>): FastTraverser<D> {
-    return new FastTraverser(this.traversable, {
+    return new SpecificFastTraverser(this.traversable, {
       ...this.traversalConfig,
       ...config,
     });
   }
 
-  /**
-   * Traverses the entire collection in batches of the size specified in traversal config. Invokes the specified async
-   * callback for each batch of document snapshots and immediately moves to the next batch. Does not wait for the callback
-   * Promise to resolve before moving to the next batch so there is no guarantee that any given batch will finish processing
-   * before a later batch.
-   *
-   * **Properties:**
-   *
-   * - Time complexity: _O_(_C_ + (_N_ / `batchSize`) * _Q_(`batchSize`))
-   * - Space complexity: _O_(`maxConcurrentBatchCount` * (`batchSize` * _D_ + _S_))
-   * - Billing: _max_(1, _N_) reads
-   *
-   * where:
-   *
-   * - _N_: number of docs in the traversable
-   * - _Q_(`batchSize`): average batch query time
-   * - _C_: average callback processing time
-   * - _D_: document size
-   * - _S_: average extra space used by the callback
-   *
-   * @param callback An asynchronous callback function to invoke for each batch of document snapshots.
-   * @returns A Promise resolving to an object representing the details of the traversal.
-   */
   public async traverse(callback: BatchCallbackAsync<D>): Promise<TraversalResult> {
     const {
       batchSize,

@@ -1,6 +1,6 @@
 import type { firestore } from 'firebase-admin';
-import type { Traversable, BaseTraversalConfig } from '../types';
-import { SlowTraverser } from './SlowTraverser';
+import type { BaseTraversalConfig, SlowTraverser, Traversable } from '../api';
+import { SpecificSlowTraverser } from './SpecificSlowTraverser';
 
 /**
  * Creates a traverser object that facilitates Firestore collection traversals. When traversing the collection,
@@ -15,7 +15,5 @@ export function createTraverser<D extends firestore.DocumentData>(
   traversable: Traversable<D>,
   config?: Partial<BaseTraversalConfig>
 ): SlowTraverser<D> {
-  return new SlowTraverser(traversable, config);
+  return new SpecificSlowTraverser(traversable, config);
 }
-
-export { SlowTraverser };

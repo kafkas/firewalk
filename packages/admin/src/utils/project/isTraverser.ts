@@ -1,6 +1,5 @@
 import type { firestore } from 'firebase-admin';
-import type { BaseTraversalConfig } from '../../types';
-import type { Traverser } from '../../Traverser';
+import type { BaseTraversalConfig, Traverser } from '../../api';
 
 export function isTraverser<D extends firestore.DocumentData, C extends BaseTraversalConfig>(
   candidate: Traverser<D, C> | unknown
@@ -8,7 +7,6 @@ export function isTraverser<D extends firestore.DocumentData, C extends BaseTrav
   const t = candidate as Traverser<D, C>;
   return (
     !!t &&
-    typeof t.withConfig === 'function' &&
     typeof t.traverse === 'function' &&
     typeof t.traverseEach === 'function' &&
     t.traversable !== null &&

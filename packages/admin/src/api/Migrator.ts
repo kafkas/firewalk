@@ -3,56 +3,33 @@ import type { Traverser } from './Traverser';
 import type {
   BaseTraversalConfig,
   BatchCallback,
-  SetOptions,
+  MigrationResult,
   SetDataGetter,
+  SetOptions,
   SetPartialDataGetter,
   UpdateDataGetter,
-  MigrationPredicate,
-  MigrationResult,
-} from './types';
+} from '.';
 
 /**
  * Represents the general interface of a migrator.
  */
-export abstract class Migrator<D extends firestore.DocumentData, C extends BaseTraversalConfig> {
-  protected registeredCallbacks: {
-    onBeforeBatchStart?: BatchCallback<D>;
-    onAfterBatchComplete?: BatchCallback<D>;
-  } = {};
+export interface Migrator<D extends firestore.DocumentData, C extends BaseTraversalConfig> {
+  /**
+   * The underlying traverser.
+   */
+  readonly traverser: Traverser<D, C>;
 
   /**
    * Registers a callback function that fires right before a batch starts processing.
    * @param callback A synchronous callback that takes batch doc snapshots and the 0-based batch index as its arguments.
    */
-  public onBeforeBatchStart(callback: BatchCallback<D>): void {
-    this.registeredCallbacks.onBeforeBatchStart = callback;
-  }
+  onBeforeBatchStart(callback: BatchCallback<D>): void;
 
   /**
    * Registers a callback function that fires after a batch is processed.
    * @param callback A synchronous callback that takes batch doc snapshots and the 0-based batch index as its arguments.
    */
-  public onAfterBatchComplete(callback: BatchCallback<D>): void {
-    this.registeredCallbacks.onAfterBatchComplete = callback;
-  }
-
-  /**
-   * The underlying traverser.
-   */
-  public abstract readonly traverser: Traverser<D, C>;
-
-  public abstract withPredicate(predicate: MigrationPredicate<D>): Migrator<D, C>;
-
-  public abstract withTraverser<C2 extends BaseTraversalConfig>(
-    traverser: Traverser<D, C2>
-  ): Migrator<D, C2>;
-
-  public abstract set(getData: SetDataGetter<D>): Promise<MigrationResult>;
-
-  public abstract set(
-    getData: SetPartialDataGetter<D>,
-    options: SetOptions
-  ): Promise<MigrationResult>;
+  onAfterBatchComplete(callback: BatchCallback<D>): void;
 
   /**
    * Sets all documents in this collection with the provided data.
@@ -75,7 +52,7 @@ export abstract class Migrator<D extends firestore.DocumentData, C extends BaseT
    * @param options - An object to configure the set behavior.
    * @returns A Promise resolving to an object representing the details of the migration.
    */
-  public abstract set(data: Partial<D>, options: SetOptions): Promise<MigrationResult>;
+  set(data: Partial<D>, options: SetOptions): Promise<MigrationResult>;
 
   /**
    * Sets all documents in this collection with the provided data.
@@ -97,7 +74,7 @@ export abstract class Migrator<D extends firestore.DocumentData, C extends BaseT
    * @param data - The data with which to set each document.
    * @returns A Promise resolving to an object representing the details of the migration.
    */
-  public abstract set(data: D): Promise<MigrationResult>;
+  set(data: D): Promise<MigrationResult>;
 
   /**
    * Sets all documents in this collection with the provided data.
@@ -120,10 +97,7 @@ export abstract class Migrator<D extends firestore.DocumentData, C extends BaseT
    * @param options - An object to configure the set behavior.
    * @returns A Promise resolving to an object representing the details of the migration.
    */
-  public abstract set(
-    getData: SetPartialDataGetter<D>,
-    options: SetOptions
-  ): Promise<MigrationResult>;
+  set(getData: SetPartialDataGetter<D>, options: SetOptions): Promise<MigrationResult>;
 
   /**
    * Sets all documents in this collection with the provided data.
@@ -145,7 +119,7 @@ export abstract class Migrator<D extends firestore.DocumentData, C extends BaseT
    * @param getData - A function that returns the data with which to set each document.
    * @returns A Promise resolving to an object representing the details of the migration.
    */
-  public abstract set(getData: SetDataGetter<D>): Promise<MigrationResult>;
+  set(getData: SetDataGetter<D>): Promise<MigrationResult>;
 
   /**
    * Updates all documents in this collection with the provided data.
@@ -167,7 +141,7 @@ export abstract class Migrator<D extends firestore.DocumentData, C extends BaseT
    * @param getData - A function that returns the data with which to update each document.
    * @returns A Promise resolving to an object representing the details of the migration.
    */
-  public abstract update(getData: UpdateDataGetter<D>): Promise<MigrationResult>;
+  update(getData: UpdateDataGetter<D>): Promise<MigrationResult>;
 
   /**
    * Updates all documents in this collection with the provided data.
@@ -189,7 +163,7 @@ export abstract class Migrator<D extends firestore.DocumentData, C extends BaseT
    * @param data - The data with which to update each document. Must be a non-empty object.
    * @returns A Promise resolving to an object representing the details of the migration.
    */
-  public abstract update(data: firestore.UpdateData): Promise<MigrationResult>;
+  update(data: firestore.UpdateData): Promise<MigrationResult>;
 
   /**
    * Updates all documents in this collection with the provided field-value pair.
@@ -212,5 +186,5 @@ export abstract class Migrator<D extends firestore.DocumentData, C extends BaseT
    * @param value - The value with which to update the specified field in each document. Must not be `undefined`.
    * @returns A Promise resolving to an object representing the details of the migration.
    */
-  public abstract update(field: string | firestore.FieldPath, value: any): Promise<MigrationResult>;
+  update(field: string | firestore.FieldPath, value: any): Promise<MigrationResult>;
 }

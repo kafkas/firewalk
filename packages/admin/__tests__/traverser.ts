@@ -21,7 +21,7 @@ slowTraverser.traverse(async (docs) => {
 
 const slowTraversable = slowTraverser.traversable;
 
-// Ideally this should have a narrow type
+// Ideally this should have a narrower type
 fastTraverser.traversable;
 
 const defaultMigrator1 = createBatchMigrator(fastTraverser);

@@ -1,9 +1,8 @@
 import type { firestore } from 'firebase-admin';
-import type { Traverser } from '../Traverser';
-import { createTraverser } from '../createTraverser';
-import type { Traversable, BaseTraversalConfig } from '../types';
 import { isTraverser } from '../utils';
-import { BatchMigrator } from './BatchMigrator';
+import type { BaseTraversalConfig, BatchMigrator, Traversable, Traverser } from '../api';
+import { createTraverser } from '../createTraverser';
+import { SpecificBatchMigrator } from './SpecificBatchMigrator';
 
 /**
  * Creates a migrator that facilitates database migrations. Accepts a custom traverser object as argument which the
@@ -44,7 +43,5 @@ export function createBatchMigrator<
   const traverser = isTraverser(traversableOrTraverser)
     ? traversableOrTraverser
     : createTraverser(traversableOrTraverser, traversalConfig);
-  return new BatchMigrator(traverser);
+  return new SpecificBatchMigrator(traverser);
 }
-
-export { BatchMigrator };

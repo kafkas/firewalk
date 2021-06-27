@@ -1,20 +1,23 @@
 import type { firestore } from 'firebase-admin';
-import type { Traverser } from '../Traverser';
-import { Migrator } from '../Migrator';
 import type {
   BaseTraversalConfig,
+  DefaultMigrator,
   MigrationPredicate,
-  UpdateDataGetter,
-  SetDataGetter,
-  SetPartialDataGetter,
-  SetOptions,
   MigrationResult,
-} from '../types';
+  SetDataGetter,
+  SetOptions,
+  SetPartialDataGetter,
+  Traverser,
+  UpdateDataGetter,
+} from '../api';
+import { AbstractMigrator } from '../AbstractMigrator';
 
-export class DefaultMigrator<
-  D extends firestore.DocumentData,
-  C extends BaseTraversalConfig
-> extends Migrator<D, C> {
+export class SpecificDefaultMigrator<
+    D extends firestore.DocumentData,
+    C extends BaseTraversalConfig
+  >
+  extends AbstractMigrator<D, C>
+  implements DefaultMigrator<D, C> {
   public constructor(
     public readonly traverser: Traverser<D, C>,
     private migrationPredicate: MigrationPredicate<D> = () => true
@@ -28,27 +31,14 @@ export class DefaultMigrator<
     // Confirm that the traverser config is compatible with this migrator
   }
 
-  /**
-   * Applies a migration predicate that returns a boolean indicating whether to migrate the current document.
-   * If this is not provided, all documents will be migrated.
-   *
-   * @param predicate A function that takes a document snapshot and returns a boolean indicating whether to migrate it.
-   * @returns A new DefaultMigrator object.
-   */
   public withPredicate(predicate: MigrationPredicate<D>): DefaultMigrator<D, C> {
-    return new DefaultMigrator(this.traverser, predicate);
+    return new SpecificDefaultMigrator(this.traverser, predicate);
   }
 
-  /**
-   * Applies a new traverser that will be used by the migrator.
-   *
-   * @param traverser The new traverser that the migrator will use.
-   * @returns A new DefaultMigrator object.
-   */
   public withTraverser<C2 extends BaseTraversalConfig>(
     traverser: Traverser<D, C2>
   ): DefaultMigrator<D, C2> {
-    return new DefaultMigrator(traverser, this.migrationPredicate);
+    return new SpecificDefaultMigrator(traverser, this.migrationPredicate);
   }
 
   public set(data: Partial<D>, options: SetOptions): Promise<MigrationResult>;

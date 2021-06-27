@@ -1,21 +1,21 @@
 import type { firestore } from 'firebase-admin';
-import type { Traverser } from '../Traverser';
-import { Migrator } from '../Migrator';
+import { isPositiveInteger } from '../utils';
 import type {
   BaseTraversalConfig,
+  BatchMigrator,
   MigrationPredicate,
-  UpdateDataGetter,
-  SetDataGetter,
-  SetPartialDataGetter,
-  SetOptions,
   MigrationResult,
-} from '../types';
-import { isPositiveInteger } from '../utils';
+  SetDataGetter,
+  SetOptions,
+  SetPartialDataGetter,
+  Traverser,
+  UpdateDataGetter,
+} from '../api';
+import { AbstractMigrator } from '../AbstractMigrator';
 
-export class BatchMigrator<
-  D extends firestore.DocumentData,
-  C extends BaseTraversalConfig
-> extends Migrator<D, C> {
+export class SpecificBatchMigrator<D extends firestore.DocumentData, C extends BaseTraversalConfig>
+  extends AbstractMigrator<D, C>
+  implements BatchMigrator<D, C> {
   private static readonly MAX_BATCH_WRITE_DOC_COUNT = 500;
 
   public constructor(
@@ -31,35 +31,22 @@ export class BatchMigrator<
 
     if (
       typeof batchSize === 'number' &&
-      (!isPositiveInteger(batchSize) || batchSize > BatchMigrator.MAX_BATCH_WRITE_DOC_COUNT)
+      (!isPositiveInteger(batchSize) || batchSize > SpecificBatchMigrator.MAX_BATCH_WRITE_DOC_COUNT)
     ) {
       throw new Error(
-        `The 'batchSize' field in traversal config for a batch migrator must be a positive integer less than or equal to ${BatchMigrator.MAX_BATCH_WRITE_DOC_COUNT}. In Firestore, each transaction or write batch can write to a maximum of ${BatchMigrator.MAX_BATCH_WRITE_DOC_COUNT} documents.`
+        `The 'batchSize' field in traversal config for a batch migrator must be a positive integer less than or equal to ${SpecificBatchMigrator.MAX_BATCH_WRITE_DOC_COUNT}. In Firestore, each transaction or write batch can write to a maximum of ${SpecificBatchMigrator.MAX_BATCH_WRITE_DOC_COUNT} documents.`
       );
     }
   }
 
-  /**
-   * Applies a migration predicate that returns a boolean indicating whether to migrate the current document.
-   * If this is not provided, all documents will be migrated.
-   *
-   * @param predicate A function that takes a document snapshot and returns a boolean indicating whether to migrate it.
-   * @returns A new BatchMigrator object.
-   */
   public withPredicate(predicate: MigrationPredicate<D>): BatchMigrator<D, C> {
-    return new BatchMigrator(this.traverser, predicate);
+    return new SpecificBatchMigrator(this.traverser, predicate);
   }
 
-  /**
-   * Applies a new traverser that will be used by the migrator.
-   *
-   * @param traverser The new traverser that the migrator will use.
-   * @returns A new BatchMigrator object.
-   */
   public withTraverser<C2 extends BaseTraversalConfig>(
     traverser: Traverser<D, C2>
   ): BatchMigrator<D, C2> {
-    return new BatchMigrator(traverser, this.migrationPredicate);
+    return new SpecificBatchMigrator(traverser, this.migrationPredicate);
   }
 
   public set(data: Partial<D>, options: SetOptions): Promise<MigrationResult>;
