@@ -26,6 +26,9 @@ export class SlowTraverser<D extends firestore.DocumentData> extends Traverser<
     super({ ...SlowTraverser.defaultConfig, ...config });
   }
 
+  // eslint-disable-next-line
+  private validateConfig(c: Partial<BaseTraversalConfig> = {}): void {}
+
   /**
    * Applies a the specified config values to the traverser.
    *

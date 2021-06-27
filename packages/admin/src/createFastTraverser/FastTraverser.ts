@@ -6,8 +6,7 @@ import type {
   TraversalResult,
   BatchCallbackAsync,
 } from '../types';
-import { sleep, PromiseQueue, registerInterval } from '../utils';
-import { validateConfig } from './validateConfig';
+import { sleep, PromiseQueue, registerInterval, isPositiveInteger } from '../utils';
 
 // TODO: This should probably be a function of traversal config
 const PROCESS_QUEUE_INTERVAL = 250;
@@ -29,7 +28,21 @@ export class FastTraverser<D extends firestore.DocumentData> extends Traverser<
     config?: Partial<FastTraversalConfig>
   ) {
     super({ ...FastTraverser.defaultConfig, ...config });
-    validateConfig(config);
+    this.validateConfig(config);
+  }
+
+  private validateConfig(c: Partial<FastTraversalConfig> = {}): void {
+    const { maxConcurrentBatchCount } = c;
+    this.assertPositiveIntegerInConfig(maxConcurrentBatchCount, 'maxConcurrentBatchCount');
+  }
+
+  private assertPositiveIntegerInConfig(
+    num: number | undefined,
+    field: keyof FastTraversalConfig
+  ): asserts num {
+    if (typeof num === 'number' && !isPositiveInteger(num)) {
+      throw new Error(`The '${field}' field in traversal config must be a positive integer.`);
+    }
   }
 
   /**
