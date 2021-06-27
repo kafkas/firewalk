@@ -8,25 +8,6 @@ import type {
 } from './types';
 import { sleep, isPositiveInteger } from './utils';
 
-function assertPositiveIntegerInConfig(
-  num: number | undefined,
-  field: keyof BaseTraversalConfig
-): asserts num {
-  if (typeof num === 'number' && !isPositiveInteger(num)) {
-    throw new Error(`The '${field}' field in traversal config must be a positive integer.`);
-  }
-}
-
-function validateTraversalConfig(c: Partial<BaseTraversalConfig> = {}): void {
-  const { batchSize, sleepTimeBetweenBatches, maxDocCount } = c;
-
-  assertPositiveIntegerInConfig(batchSize, 'batchSize');
-  assertPositiveIntegerInConfig(sleepTimeBetweenBatches, 'sleepTimeBetweenBatches');
-  if (maxDocCount !== Infinity) {
-    assertPositiveIntegerInConfig(maxDocCount, 'maxDocCount');
-  }
-}
-
 /**
  * Represents the general interface of a traverser.
  */
@@ -46,8 +27,28 @@ export abstract class Traverser<D extends firestore.DocumentData, C extends Base
   public readonly traversalConfig: C;
 
   protected constructor(c: C) {
-    validateTraversalConfig(c);
+    this.validateBaseConfig(c);
     this.traversalConfig = c;
+  }
+
+  private validateBaseConfig(c: Partial<BaseTraversalConfig> = {}): void {
+    const { batchSize, sleepTimeBetweenBatches, maxDocCount } = c;
+
+    this.assertPositiveIntegerInBaseConfig(batchSize, 'batchSize');
+    this.assertPositiveIntegerInBaseConfig(sleepTimeBetweenBatches, 'sleepTimeBetweenBatches');
+
+    if (maxDocCount !== Infinity) {
+      this.assertPositiveIntegerInBaseConfig(maxDocCount, 'maxDocCount');
+    }
+  }
+
+  private assertPositiveIntegerInBaseConfig(
+    num: number | undefined,
+    field: keyof BaseTraversalConfig
+  ): asserts num {
+    if (typeof num === 'number' && !isPositiveInteger(num)) {
+      throw new Error(`The '${field}' field in traversal config must be a positive integer.`);
+    }
   }
 
   /**
