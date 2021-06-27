@@ -26,8 +26,8 @@ export class BatchMigrator<
     this.validateConfig(traverser.traversalConfig);
   }
 
-  private validateConfig(c: Partial<BaseTraversalConfig> = {}): void {
-    const { batchSize } = c;
+  private validateConfig(config: Partial<BaseTraversalConfig> = {}): void {
+    const { batchSize } = config;
 
     if (
       typeof batchSize === 'number' &&

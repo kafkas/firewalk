@@ -24,7 +24,7 @@ export class DefaultMigrator<
   }
 
   // eslint-disable-next-line
-  private validateConfig(c: Partial<C> = {}): void {
+  private validateConfig(config: Partial<C> = {}): void {
     // Confirm that the traverser config is compatible with this migrator
   }
 

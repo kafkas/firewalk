@@ -24,15 +24,17 @@ export abstract class Traverser<D extends firestore.DocumentData, C extends Base
     sleepTimeBetweenDocs: 500,
   };
 
-  public readonly traversalConfig: C;
-
-  protected constructor(c: C) {
-    this.validateBaseConfig(c);
-    this.traversalConfig = c;
+  protected constructor(
+    /**
+     * Existing traversal configuration.
+     */
+    public readonly traversalConfig: C
+  ) {
+    this.validateBaseConfig(traversalConfig);
   }
 
-  private validateBaseConfig(c: Partial<BaseTraversalConfig> = {}): void {
-    const { batchSize, sleepTimeBetweenBatches, maxDocCount } = c;
+  private validateBaseConfig(config: Partial<BaseTraversalConfig> = {}): void {
+    const { batchSize, sleepTimeBetweenBatches, maxDocCount } = config;
 
     this.assertPositiveIntegerInBaseConfig(batchSize, 'batchSize');
     this.assertPositiveIntegerInBaseConfig(sleepTimeBetweenBatches, 'sleepTimeBetweenBatches');
@@ -60,11 +62,11 @@ export abstract class Traverser<D extends firestore.DocumentData, C extends Base
    */
   public async traverseEach(
     callback: (snapshot: firestore.QueryDocumentSnapshot<D>) => Promise<void>,
-    c: Partial<TraverseEachConfig> = {}
+    config: Partial<TraverseEachConfig> = {}
   ): Promise<TraversalResult> {
     const { sleepBetweenDocs, sleepTimeBetweenDocs } = {
       ...Traverser.baseTraverseEachConfig,
-      ...c,
+      ...config,
     };
 
     const { batchCount, docCount } = await this.traverse(async (snapshots) => {

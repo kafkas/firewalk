@@ -31,8 +31,8 @@ export class FastTraverser<D extends firestore.DocumentData> extends Traverser<
     this.validateConfig(config);
   }
 
-  private validateConfig(c: Partial<FastTraversalConfig> = {}): void {
-    const { maxConcurrentBatchCount } = c;
+  private validateConfig(config: Partial<FastTraversalConfig> = {}): void {
+    const { maxConcurrentBatchCount } = config;
     this.assertPositiveIntegerInConfig(maxConcurrentBatchCount, 'maxConcurrentBatchCount');
   }
 
@@ -51,10 +51,10 @@ export class FastTraverser<D extends firestore.DocumentData> extends Traverser<
    * @param config Partial traversal configuration.
    * @returns A new FastTraverser object.
    */
-  public withConfig(c: Partial<FastTraversalConfig>): FastTraverser<D> {
+  public withConfig(config: Partial<FastTraversalConfig>): FastTraverser<D> {
     return new FastTraverser(this.traversable, {
       ...this.traversalConfig,
-      ...c,
+      ...config,
     });
   }
 
