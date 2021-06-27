@@ -60,7 +60,7 @@ export class BatchMigrator<
   public withTraverser<C2 extends BaseTraversalConfig>(
     traverser: Traverser<D, C2>
   ): BatchMigrator<D, C2, Traverser<D, C2>> {
-    return new BatchMigrator(traverser);
+    return new BatchMigrator(traverser, this.migrationPredicate);
   }
 
   public set(data: Partial<D>, options: SetOptions): Promise<MigrationResult>;

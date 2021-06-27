@@ -49,7 +49,7 @@ export class DefaultMigrator<
   public withTraverser<C2 extends BaseTraversalConfig>(
     traverser: Traverser<D, C2>
   ): DefaultMigrator<D, C2, Traverser<D, C2>> {
-    return new DefaultMigrator(traverser);
+    return new DefaultMigrator(traverser, this.migrationPredicate);
   }
 
   public set(data: Partial<D>, options: SetOptions): Promise<MigrationResult>;
