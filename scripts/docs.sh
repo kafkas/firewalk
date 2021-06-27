@@ -21,3 +21,10 @@ version=$(jq -r .version "$package_path/package.json")
 # Step 3: Generate the docs
 
 npx typedoc --out docs/$version --entryPoints "$package_path/src/index.ts" --tsconfig "$package_path/src/tsconfig.json"
+
+# Step 4: Update docs readme
+
+ts-node scripts/updateDocsReadme.ts
+
+npx prettier -w docs/index.md
+
