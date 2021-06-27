@@ -34,7 +34,7 @@ export interface Migrator<D extends firestore.DocumentData, C extends TraversalC
   /**
    * Sets all documents in this collection with the provided data.
    *
-   * **Properties:**
+   * **Complexity:**
    *
    * - Time complexity: _TC_(`traverser`) where _C_ = _W_(`batchSize`)
    * - Space complexity: _SC_(`traverser`) where _S_ = _O_(`batchSize`)
@@ -57,7 +57,7 @@ export interface Migrator<D extends firestore.DocumentData, C extends TraversalC
   /**
    * Sets all documents in this collection with the provided data.
    *
-   * **Properties:**
+   * **Complexity:**
    *
    * - Time complexity: _TC_(`traverser`) where _C_ = _W_(`batchSize`)
    * - Space complexity: _SC_(`traverser`) where _S_ = _O_(`batchSize`)
@@ -79,7 +79,7 @@ export interface Migrator<D extends firestore.DocumentData, C extends TraversalC
   /**
    * Sets all documents in this collection with the provided data.
    *
-   * **Properties:**
+   * **Complexity:**
    *
    * - Time complexity: _TC_(`traverser`) where _C_ = _W_(`batchSize`)
    * - Space complexity: _SC_(`traverser`) where _S_ = _O_(`batchSize`)
@@ -102,7 +102,7 @@ export interface Migrator<D extends firestore.DocumentData, C extends TraversalC
   /**
    * Sets all documents in this collection with the provided data.
    *
-   * **Properties:**
+   * **Complexity:**
    *
    * - Time complexity: _TC_(`traverser`) where _C_ = _W_(`batchSize`)
    * - Space complexity: _SC_(`traverser`) where _S_ = _O_(`batchSize`)
@@ -124,7 +124,7 @@ export interface Migrator<D extends firestore.DocumentData, C extends TraversalC
   /**
    * Updates all documents in this collection with the provided data.
    *
-   * **Properties:**
+   * **Complexity:**
    *
    * - Time complexity: _TC_(`traverser`) where _C_ = _W_(`batchSize`)
    * - Space complexity: _SC_(`traverser`) where _S_ = _O_(`batchSize`)
@@ -146,7 +146,7 @@ export interface Migrator<D extends firestore.DocumentData, C extends TraversalC
   /**
    * Updates all documents in this collection with the provided data.
    *
-   * **Properties:**
+   * **Complexity:**
    *
    * - Time complexity: _TC_(`traverser`) where _C_ = _W_(`batchSize`)
    * - Space complexity: _SC_(`traverser`) where _S_ = _O_(`batchSize`)
@@ -168,7 +168,7 @@ export interface Migrator<D extends firestore.DocumentData, C extends TraversalC
   /**
    * Updates all documents in this collection with the provided field-value pair.
    *
-   * **Properties:**
+   * **Complexity:**
    *
    * - Time complexity: _TC_(`traverser`) where _C_ = _W_(`batchSize`)
    * - Space complexity: _SC_(`traverser`) where _S_ = _O_(`batchSize`)

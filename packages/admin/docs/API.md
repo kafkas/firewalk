@@ -177,7 +177,7 @@ Applies the specified config values to the traverser.
 
 Traverses the entire collection in batches of the size specified in traversal config. Invokes the specified async callback for each batch of document snapshots and immediately moves to the next batch. Does not wait for the callback Promise to resolve before moving to the next batch so there is no guarantee that any given batch will finish processing before a later batch.
 
-#### Properties
+#### Complexity:
 
 - Time complexity: _O_(_C_ + (_N_ / `batchSize`) \* _Q_(`batchSize`))
 - Space complexity: _O_(`maxConcurrentBatchCount` \* (`batchSize` \* _D_ + _S_))
@@ -224,9 +224,9 @@ A plain object representing the details of a migration. Contains the following k
 
 Represents the general interface of a migrator.
 
-#### Properties
+#### Complexity:
 
-The `set()` and `update()` methods of a migrator have the following properties:
+The complexity of `set()` and `update()` methods of a migrator is as follows:
 
 - Time complexity: _TC_(`traverser`) where _C_ = _W_(`batchSize`)
 - Space complexity: _SC_(`traverser`) where _S_ = _O_(`batchSize`)
@@ -323,7 +323,7 @@ Applies the specified config values to the traverser.
 
 Traverses the entire collection in batches of the size specified in traversal config. Invokes the specified async callback for each batch of document snapshots. Waits for the callback Promise to resolve before moving to the next batch.
 
-#### Properties
+#### Complexity:
 
 - Time complexity: _O_((_N_ / `batchSize`) \* (_Q_(`batchSize`) + _C_))
 - Space complexity: _O_(`batchSize` \* _D_ + _S_)

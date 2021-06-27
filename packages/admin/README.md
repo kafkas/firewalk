@@ -192,7 +192,7 @@ You can find the full API reference for `@firecode/admin` [here](./docs/API.md).
 
 Creates a traverser that facilitates Firestore collection traversals. When traversing the collection, this traverser invokes a specified async callback for each batch of document snapshots and waits for the callback Promise to resolve before moving to the next batch.
 
-#### Traversal properties
+#### Complexity:
 
 - Time complexity: _O_((_N_ / `batchSize`) \* (_Q_(`batchSize`) + _C_))
 - Space complexity: _O_(`batchSize` \* _D_ + _S_)
@@ -210,7 +210,7 @@ where:
 
 Creates a fast traverser that facilitates Firestore collection traversals. When traversing the collection, this traverser invokes a specified async callback for each batch of document snapshots and immediately moves to the next batch. It does not wait for the callback Promise to resolve before moving to the next batch so there is no guarantee that any given batch will finish processing before a later batch. This traverser uses more memory but is significantly faster than the default traverser.
 
-#### Traversal properties
+#### Complexity:
 
 - Time complexity: _O_(_C_ + (_N_ / `batchSize`) \* _Q_(`batchSize`))
 - Space complexity: _O_(`maxConcurrentBatchCount` \* (`batchSize` \* _D_ + _S_))
@@ -228,7 +228,7 @@ where:
 
 Creates a migrator that facilitates database migrations. The migrator accepts a custom traverser to traverse the collection. Otherwise it will create a default traverser with your desired traversal config. This migrator does not use atomic batch writes so it is possible that when a write fails other writes go through.
 
-#### Write properties
+#### Complexity:
 
 - Time complexity: _TC_(`traverser`) where _C_ = _W_(`batchSize`)
 - Space complexity: _SC_(`traverser`) where _S_ = _O_(`batchSize`)
@@ -246,7 +246,7 @@ where:
 
 Creates a migrator that facilitates database migrations. The migrator accepts a custom traverser to traverse the collection. Otherwise it will create a default traverser with your desired traversal config. This migrator uses atomic batch writes so the entire operation will fail if a single write isn't successful.
 
-#### Write properties
+#### Complexity:
 
 - Time complexity: _TC_(`traverser`) where _C_ = _W_(`batchSize`)
 - Space complexity: _SC_(`traverser`) where _S_ = _O_(`batchSize`)

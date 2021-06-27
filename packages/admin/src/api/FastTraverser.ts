@@ -20,7 +20,7 @@ export interface FastTraverser<D extends firestore.DocumentData>
    * Promise to resolve before moving to the next batch so there is no guarantee that any given batch will finish processing
    * before a later batch.
    *
-   * **Properties:**
+   * **Complexity:**
    *
    * - Time complexity: _O_(_C_ + (_N_ / `batchSize`) * _Q_(`batchSize`))
    * - Space complexity: _O_(`maxConcurrentBatchCount` * (`batchSize` * _D_ + _S_))
