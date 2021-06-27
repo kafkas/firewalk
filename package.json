@@ -17,6 +17,7 @@
   },
   "scripts": {
     "build": "npx lerna run build",
+    "docs": "cd scripts && sh docs.sh",
     "format": "prettier --write \"./packages/**/{src,test}/**/*.{ts,tsx,json}\"",
     "format-check": "prettier --check \"./packages/**/{src,test}/**/*.{ts,tsx,json}\"",
     "lint": "npx eslint packages/**/{src,__tests__} --ext .js,.ts",

@@ -1,6 +1,5 @@
 {
   "entryPoints": ["./packages/admin/src/index.ts"],
-  "out": "docs",
   "tsconfig": "./packages/admin/src/tsconfig.json",
   "includeVersion": true
 }
