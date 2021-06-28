@@ -6,7 +6,6 @@ import type {
   MigrationResult,
   SetDataGetter,
   SetOptions,
-  SetPartialDataGetter,
   TraversalConfig,
   Traverser,
   UpdateDataGetter,
@@ -57,12 +56,12 @@ export class BasicBatchMigratorImplementation<
 
   public set(data: D): Promise<MigrationResult>;
 
-  public set(getData: SetPartialDataGetter<D>, options: SetOptions): Promise<MigrationResult>;
+  public set(getData: SetDataGetter<Partial<D>>, options: SetOptions): Promise<MigrationResult>;
 
   public set(getData: SetDataGetter<D>): Promise<MigrationResult>;
 
   public async set(
-    dataOrGetData: SetDataGetter<D> | SetPartialDataGetter<D> | D | Partial<D>,
+    dataOrGetData: SetDataGetter<D> | SetDataGetter<Partial<D>> | D | Partial<D>,
     options?: SetOptions
   ): Promise<MigrationResult> {
     let migratedDocCount = 0;
@@ -96,7 +95,7 @@ export class BasicBatchMigratorImplementation<
           } else {
             if (options !== undefined) {
               // Signature 3
-              const getData = dataOrGetData as SetPartialDataGetter<D>;
+              const getData = dataOrGetData as SetDataGetter<Partial<D>>;
               const data = getData(snapshot);
               writeBatch.set(snapshot.ref, data, options);
             } else {

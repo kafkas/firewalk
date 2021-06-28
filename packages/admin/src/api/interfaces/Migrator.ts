@@ -5,7 +5,6 @@ import type {
   MigrationResult,
   SetDataGetter,
   SetOptions,
-  SetPartialDataGetter,
   TraversalConfig,
   UpdateDataGetter,
 } from '.';
@@ -97,7 +96,7 @@ export interface Migrator<D extends firestore.DocumentData, C extends TraversalC
    * @param options - An object to configure the set behavior.
    * @returns A Promise resolving to an object representing the details of the migration.
    */
-  set(getData: SetPartialDataGetter<D>, options: SetOptions): Promise<MigrationResult>;
+  set(getData: SetDataGetter<Partial<D>>, options: SetOptions): Promise<MigrationResult>;
 
   /**
    * Sets all documents in this collection with the provided data.

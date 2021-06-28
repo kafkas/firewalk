@@ -1,6 +1,9 @@
 import type { firestore } from 'firebase-admin';
 import type { MigrationPredicate, Migrator, TraversalConfig, Traverser } from '.';
 
+/**
+ * A batch migrator object that does not use atomic batch writes.
+ */
 export interface DefaultMigrator<D extends firestore.DocumentData, C extends TraversalConfig>
   extends Migrator<D, C> {
   /**

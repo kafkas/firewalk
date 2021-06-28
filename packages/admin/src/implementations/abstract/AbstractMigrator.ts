@@ -5,7 +5,6 @@ import type {
   Migrator,
   SetDataGetter,
   SetOptions,
-  SetPartialDataGetter,
   TraversalConfig,
   Traverser,
   UpdateDataGetter,
@@ -33,7 +32,7 @@ export abstract class AbstractMigrator<D extends firestore.DocumentData, C exten
   public abstract set(data: D): Promise<MigrationResult>;
 
   public abstract set(
-    getData: SetPartialDataGetter<D>,
+    getData: SetDataGetter<Partial<D>>,
     options: SetOptions
   ): Promise<MigrationResult>;
 
