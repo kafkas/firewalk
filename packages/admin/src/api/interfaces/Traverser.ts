@@ -4,6 +4,7 @@ import type {
   Traversable,
   TraversalConfig,
   TraversalResult,
+  TraverseEachCallback,
   TraverseEachConfig,
 } from '.';
 
@@ -29,7 +30,7 @@ export interface Traverser<D extends firestore.DocumentData, C extends Traversal
    * @returns A Promise resolving to an object representing the details of the traversal. The Promise resolves when the entire traversal ends.
    */
   traverseEach(
-    callback: (snapshot: firestore.QueryDocumentSnapshot<D>) => Promise<void>,
+    callback: TraverseEachCallback<D>,
     config?: Partial<TraverseEachConfig>
   ): Promise<TraversalResult>;
 

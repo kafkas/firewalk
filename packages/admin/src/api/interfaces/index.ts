@@ -13,6 +13,7 @@ export type { SlowTraverser } from './SlowTraverser';
 export type { Traversable } from './Traversable';
 export type { TraversalConfig } from './TraversalConfig';
 export type { TraversalResult } from './TraversalResult';
+export type { TraverseEachCallback } from './TraverseEachCallback';
 export type { TraverseEachConfig } from './TraverseEachConfig';
 export type { Traverser } from './Traverser';
 export type { UpdateDataGetter } from './UpdateDataGetter';

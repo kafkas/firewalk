@@ -5,6 +5,7 @@ import type {
   Traversable,
   TraversalConfig,
   TraversalResult,
+  TraverseEachCallback,
   TraverseEachConfig,
   Traverser,
 } from '../../api';
@@ -48,7 +49,7 @@ export abstract class AbstractTraverser<D extends firestore.DocumentData, C exte
   }
 
   public async traverseEach(
-    callback: (snapshot: firestore.QueryDocumentSnapshot<D>) => Promise<void>,
+    callback: TraverseEachCallback<D>,
     config: Partial<TraverseEachConfig> = {}
   ): Promise<TraversalResult> {
     const { sleepBetweenDocs, sleepTimeBetweenDocs } = {
@@ -56,9 +57,9 @@ export abstract class AbstractTraverser<D extends firestore.DocumentData, C exte
       ...config,
     };
 
-    const { batchCount, docCount } = await this.traverse(async (snapshots) => {
+    const { batchCount, docCount } = await this.traverse(async (snapshots, batchIndex) => {
       for (let i = 0; i < snapshots.length; i++) {
-        await callback(snapshots[i]);
+        await callback(snapshots[i], i, batchIndex);
         if (sleepBetweenDocs) {
           await sleep(sleepTimeBetweenDocs);
         }
