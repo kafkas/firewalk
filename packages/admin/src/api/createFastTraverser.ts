@@ -1,6 +1,6 @@
 import type { firestore } from 'firebase-admin';
-import type { FastTraversalConfig, FastTraverser, Traversable } from '../api';
-import { PromiseQueueBasedFastTraverserImplementation } from './PromiseQueueBasedFastTraverserImplementation';
+import { PromiseQueueBasedFastTraverserImplementation } from '../implementations';
+import type { FastTraversalConfig, FastTraverser, Traversable } from './interfaces';
 
 /**
  * Creates a fast traverser object that facilitates Firestore collection traversals. When traversing

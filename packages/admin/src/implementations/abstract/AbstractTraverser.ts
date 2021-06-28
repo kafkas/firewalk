@@ -1,5 +1,5 @@
 import type { firestore } from 'firebase-admin';
-import { sleep, isPositiveInteger } from './utils';
+import { sleep, isPositiveInteger } from '../../utils';
 import type {
   BatchCallbackAsync,
   Traversable,
@@ -7,7 +7,7 @@ import type {
   TraversalResult,
   TraverseEachConfig,
   Traverser,
-} from './api';
+} from '../../api';
 
 export abstract class AbstractTraverser<D extends firestore.DocumentData, C extends TraversalConfig>
   implements Traverser<D, C> {

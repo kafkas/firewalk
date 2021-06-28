@@ -7,7 +7,7 @@ import type {
   Traversable,
   TraversalResult,
 } from '../api';
-import { AbstractTraverser } from '../AbstractTraverser';
+import { AbstractTraverser } from './abstract';
 
 // TODO: This should probably be a function of traversal config
 const PROCESS_QUEUE_INTERVAL = 250;

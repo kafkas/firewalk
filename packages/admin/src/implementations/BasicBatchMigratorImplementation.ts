@@ -11,7 +11,7 @@ import type {
   Traverser,
   UpdateDataGetter,
 } from '../api';
-import { AbstractMigrator } from '../AbstractMigrator';
+import { AbstractMigrator } from './abstract';
 
 export class BasicBatchMigratorImplementation<
     D extends firestore.DocumentData,

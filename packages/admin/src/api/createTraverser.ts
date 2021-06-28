@@ -1,6 +1,6 @@
 import type { firestore } from 'firebase-admin';
-import type { SlowTraverser, Traversable, TraversalConfig } from '../api';
-import { BasicSlowTraverserImplementation } from './BasicSlowTraverserImplementation';
+import { BasicSlowTraverserImplementation } from '../implementations';
+import type { SlowTraverser, Traversable, TraversalConfig } from './interfaces';
 
 /**
  * Creates a traverser object that facilitates Firestore collection traversals. When traversing the collection,

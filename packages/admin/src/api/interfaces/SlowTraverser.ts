@@ -1,5 +1,5 @@
 import type { firestore } from 'firebase-admin';
-import type { BatchCallbackAsync, TraversalConfig, TraversalResult, Traverser } from '../api';
+import type { BatchCallbackAsync, TraversalConfig, TraversalResult, Traverser } from '.';
 
 /**
  * A slow traverser object that facilitates Firestore collection traversals.

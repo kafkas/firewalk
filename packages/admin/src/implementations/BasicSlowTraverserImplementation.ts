@@ -7,7 +7,7 @@ import type {
   TraversalConfig,
   TraversalResult,
 } from '../api';
-import { AbstractTraverser } from '../AbstractTraverser';
+import { AbstractTraverser } from './abstract';
 
 export class BasicSlowTraverserImplementation<D extends firestore.DocumentData>
   extends AbstractTraverser<D, TraversalConfig>

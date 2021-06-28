@@ -9,7 +9,7 @@ import type {
   TraversalConfig,
   Traverser,
   UpdateDataGetter,
-} from './api';
+} from '../../api';
 
 export abstract class AbstractMigrator<D extends firestore.DocumentData, C extends TraversalConfig>
   implements Migrator<D, C> {

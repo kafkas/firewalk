@@ -1,8 +1,8 @@
 import type { firestore } from 'firebase-admin';
 import { isTraverser } from '../utils';
-import type { BatchMigrator, Traversable, TraversalConfig, Traverser } from '../api';
-import { createTraverser } from '../createTraverser';
-import { BasicBatchMigratorImplementation } from './BasicBatchMigratorImplementation';
+import { BasicBatchMigratorImplementation } from '../implementations';
+import type { BatchMigrator, Traversable, TraversalConfig, Traverser } from './interfaces';
+import { createTraverser } from './createTraverser';
 
 /**
  * Creates a migrator that facilitates database migrations. Accepts a custom traverser object as argument which the
