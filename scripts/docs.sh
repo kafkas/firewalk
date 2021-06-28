@@ -24,7 +24,7 @@ npx typedoc --out docs/$version --entryPoints "$package_path/src/index.ts" --tsc
 
 # Step 4: Update docs readme
 
-ts-node scripts/updateDocsReadme.ts
+ts-node scripts/updateDocsIndexFile.ts
 
 npx prettier -w docs/index.md
 

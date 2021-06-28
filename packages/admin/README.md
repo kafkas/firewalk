@@ -1,12 +1,18 @@
-# Firecode
+<h1 align="center">
+  <a href="https://kafkas.github.io/firecode">
+    Firecode
+  </a>
+</h1>
 
-Firecode is a Node.js library that lets you efficiently traverse Firestore collections.
+<p align="center">
+  A light, fast, and memory-efficient collection traversal library for Firestore and Node.js.
+</p>
 
-When you have millions of documents in a collection, you can't just get all of them at once as your program's memory usage will explode. Firecode's configurable traverser objects let you do this in a simple, intuitive and memory-efficient way using batching.
+---
 
-Firecode is an extremely light, well-typed, zero-dependency library that is useful in a variety of scenarios. You can use it in database migration scripts (e.g. when you need to add a new field to all docs) or a scheduled Cloud Function that needs to check every doc in a collection periodically or a locally run script that retrieves some data from a collection.
-
-<p>
+<p align="center">
+    <a href="https://github.com/kafkas/firecode/blob/main/LICENSE">
+    <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="Firecode is released under the MIT license." /></a>
     <a href="https://npmjs.com/package/@firecode/admin" alt="Version">
         <img src="https://img.shields.io/npm/v/@firecode/admin" /></a>
     <a href="https://npmjs.com/package/@firecode/admin" alt="Size">
@@ -21,7 +27,19 @@ Firecode is an extremely light, well-typed, zero-dependency library that is usef
         <img src="https://img.shields.io/github/last-commit/kafkas/firecode" /></a>
     <a href="https://lerna.js.org/" alt="Framework">
         <img src="https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg" /></a>
+    <a href="https://kafkas.github.io/firecode/0.6.3/">
+    <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs welcome!" /></a>
 </p>
+
+Firecode is a Node.js library that lets you efficiently traverse Firestore collections.
+
+When you have millions of documents in a collection, you can't just get all of them at once as your program's memory usage will explode. Firecode's configurable traverser objects let you do this in a simple, intuitive and memory-efficient way using batching.
+
+Firecode is an extremely light, well-typed, zero-dependency library that is useful in a variety of scenarios. You can use it in database migration scripts (e.g. when you need to add a new field to all docs) or a scheduled Cloud Function that needs to check every doc in a collection periodically or a locally run script that retrieves some data from a collection.
+
+[**Read the introductory blog post ▸**](https://anarkafkas.medium.com/traversing-firestore-collections-efficiently-6e43cea1eefd)
+
+[**View the full documentation (docs)▸**](https://kafkas.github.io/firecode)
 
 ## Overview
 
@@ -51,7 +69,7 @@ npm install @firecode/admin
 
 There are only 2 kinds of objects you need to be familiar with when using this library:
 
-1. **Traverser**: An object that walks you through a collection of documents (or more generally a [Traversable](./docs/API.md#Traversable)).
+1. **Traverser**: An object that walks you through a collection of documents (or more generally a [Traversable](https://kafkas.github.io/firecode/0.6.3/modules.html#traversable)).
 
 2. **Migrator**: A convenience object used for database migrations. It lets you easily write to the documents within a given traversable and uses a traverser to do that. You can easily write your own migration logic in the traverser callback if you don't want to use a migrator.
 
@@ -184,11 +202,11 @@ const { migratedDocCount } = await migrator
 console.log(`Updated ${migratedDocCount} posts!`);
 ```
 
-## [API](./docs/API.md)
+## [API](https://kafkas.github.io/firecode/)
 
-You can find the full API reference for `@firecode/admin` [here](./docs/API.md). Here are some of the core functions that this library provides.
+You can find the full API reference for `@firecode/admin` [here](https://kafkas.github.io/firecode/). We maintain detailed docs for every version! Here are some of the core functions that this library provides.
 
-### [createTraverser](./docs/API.md#createTraverser)
+### [createTraverser](https://kafkas.github.io/firecode/0.6.3/modules.html#createtraverser)
 
 Creates a traverser that facilitates Firestore collection traversals. When traversing the collection, this traverser invokes a specified async callback for each batch of document snapshots and waits for the callback Promise to resolve before moving to the next batch.
 
@@ -206,7 +224,7 @@ where:
 - _C_: average callback processing time
 - _S_: average extra space used by the callback
 
-### [createFastTraverser](./docs/API.md#createFastTraverser)
+### [createFastTraverser](https://kafkas.github.io/firecode/0.6.3/modules.html#createfasttraverser)
 
 Creates a fast traverser that facilitates Firestore collection traversals. When traversing the collection, this traverser invokes a specified async callback for each batch of document snapshots and immediately moves to the next batch. It does not wait for the callback Promise to resolve before moving to the next batch so there is no guarantee that any given batch will finish processing before a later batch. This traverser uses more memory but is significantly faster than the default traverser.
 
@@ -224,7 +242,7 @@ where:
 - _C_: average callback processing time
 - _S_: average extra space used by the callback
 
-### [createMigrator](./docs/API.md#createMigrator)
+### [createMigrator](https://kafkas.github.io/firecode/0.6.3/modules.html#createmigrator)
 
 Creates a migrator that facilitates database migrations. The migrator accepts a custom traverser to traverse the collection. Otherwise it will create a default traverser with your desired traversal config. This migrator does not use atomic batch writes so it is possible that when a write fails other writes go through.
 
@@ -242,7 +260,7 @@ where:
 - _TC_(`traverser`): time complexity of the underlying traverser
 - _SC_(`traverser`): space complexity of the underlying traverser
 
-### [createBatchMigrator](./docs/API.md#createBatchMigrator)
+### [createBatchMigrator](https://kafkas.github.io/firecode/0.6.3/modules.html#createbatchmigrator)
 
 Creates a migrator that facilitates database migrations. The migrator accepts a custom traverser to traverse the collection. Otherwise it will create a default traverser with your desired traversal config. This migrator uses atomic batch writes so the entire operation will fail if a single write isn't successful.
 
