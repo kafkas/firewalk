@@ -7,8 +7,8 @@ import type { MigrationPredicate, Migrator, TraversalConfig, Traverser } from '.
 export interface BatchMigrator<D extends firestore.DocumentData, C extends TraversalConfig>
   extends Migrator<D, C> {
   /**
-   * Applies a migration predicate that returns a boolean indicating whether to migrate the current document.
-   * If this is not provided, all documents will be migrated.
+   * Applies a migration predicate that indicates whether to migrate the current document. If this is not provided,
+   * all documents will be migrated.
    *
    * @param predicate A function that takes a document snapshot and returns a boolean indicating whether to migrate it.
    * @returns A new {@link BatchMigrator} object.
