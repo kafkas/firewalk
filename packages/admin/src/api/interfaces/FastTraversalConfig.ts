@@ -17,7 +17,7 @@ export interface FastTraversalConfig extends TraversalConfig {
    *
    * @example
    *
-   * ```
+   * ```typescript
    * const projectsColRef = firestore().collection('projects');
    * const fastTraverser = createFastTraverser(projectsColRef, {
    *   batchSize: 500,
