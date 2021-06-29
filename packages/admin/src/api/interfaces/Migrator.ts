@@ -33,6 +33,8 @@ export interface Migrator<D extends firestore.DocumentData, C extends TraversalC
   /**
    * Sets all documents in this collection with the provided data.
    *
+   * @remarks
+   *
    * **Complexity:**
    *
    * - Time complexity: _TC_(`traverser`) where _C_ = _W_(`batchSize`)
@@ -56,6 +58,8 @@ export interface Migrator<D extends firestore.DocumentData, C extends TraversalC
   /**
    * Sets all documents in this collection with the provided data.
    *
+   * @remarks
+   *
    * **Complexity:**
    *
    * - Time complexity: _TC_(`traverser`) where _C_ = _W_(`batchSize`)
@@ -77,6 +81,8 @@ export interface Migrator<D extends firestore.DocumentData, C extends TraversalC
 
   /**
    * Sets all documents in this collection with the provided data.
+   *
+   * @remarks
    *
    * **Complexity:**
    *
@@ -101,6 +107,8 @@ export interface Migrator<D extends firestore.DocumentData, C extends TraversalC
   /**
    * Sets all documents in this collection with the provided data.
    *
+   * @remarks
+   *
    * **Complexity:**
    *
    * - Time complexity: _TC_(`traverser`) where _C_ = _W_(`batchSize`)
@@ -122,6 +130,8 @@ export interface Migrator<D extends firestore.DocumentData, C extends TraversalC
 
   /**
    * Updates all documents in this collection with the provided data.
+   *
+   * @remarks
    *
    * **Complexity:**
    *
@@ -145,6 +155,8 @@ export interface Migrator<D extends firestore.DocumentData, C extends TraversalC
   /**
    * Updates all documents in this collection with the provided data.
    *
+   * @remarks
+   *
    * **Complexity:**
    *
    * - Time complexity: _TC_(`traverser`) where _C_ = _W_(`batchSize`)
@@ -166,6 +178,8 @@ export interface Migrator<D extends firestore.DocumentData, C extends TraversalC
 
   /**
    * Updates all documents in this collection with the provided field-value pair.
+   *
+   * @remarks
    *
    * **Complexity:**
    *

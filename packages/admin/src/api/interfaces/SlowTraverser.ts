@@ -18,6 +18,8 @@ export interface SlowTraverser<D extends firestore.DocumentData>
    * Traverses the entire collection in batches of the size specified in traversal config. Invokes the specified
    * async callback for each batch of document snapshots. Waits for the callback Promise to resolve before moving to the next batch.
    *
+   * @remarks
+   *
    * **Complexity:**
    *
    * - Time complexity: _O_((_N_ / `batchSize`) * (_Q_(`batchSize`) + _C_))
