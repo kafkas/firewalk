@@ -5,7 +5,9 @@ import type { TraversalConfig } from '.';
  */
 export interface FastTraversalConfig extends TraversalConfig {
   /**
-   * The maximum number of batches that can be held in memory and processed concurrently. Defaults to 10.
+   * The maximum number of batches that can be held in memory and processed concurrently.
+   *
+   * @defaultValue 10
    */
   readonly maxConcurrentBatchCount: number;
 }
