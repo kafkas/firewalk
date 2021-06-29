@@ -37,7 +37,7 @@ export class BasicBatchMigratorImplementation<
         batchSize > BasicBatchMigratorImplementation.MAX_BATCH_WRITE_DOC_COUNT)
     ) {
       throw new Error(
-        `The 'batchSize' field in traversal config for a batch migrator must be a positive integer less than or equal to ${BasicBatchMigratorImplementation.MAX_BATCH_WRITE_DOC_COUNT}. In Firestore, each transaction or write batch can write to a maximum of ${BasicBatchMigratorImplementation.MAX_BATCH_WRITE_DOC_COUNT} documents.`
+        `The 'batchSize' field in the traversal config of a BatchMigrator's traverser must be a positive integer less than or equal to ${BasicBatchMigratorImplementation.MAX_BATCH_WRITE_DOC_COUNT}. In Firestore, each write batch can write to a maximum of ${BasicBatchMigratorImplementation.MAX_BATCH_WRITE_DOC_COUNT} documents.`
       );
     }
   }
