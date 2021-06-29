@@ -9,7 +9,7 @@ import type { SlowTraverser, Traversable, TraversalConfig } from './interfaces';
  *
  * @param traversable A collection-like traversable group of documents.
  * @param config Optional. The traversal configuration with which the traverser will be created.
- * @returns A default (slow) traverser object.
+ * @returns A new {@link SlowTraverser} object.
  */
 export function createTraverser<D extends firestore.DocumentData>(
   traversable: Traversable<D>,

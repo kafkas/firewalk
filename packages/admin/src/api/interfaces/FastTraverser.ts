@@ -10,7 +10,7 @@ export interface FastTraverser<D extends firestore.DocumentData>
    * Applies a the specified config values to the traverser.
    *
    * @param config Partial traversal configuration.
-   * @returns A new FastTraverser object.
+   * @returns A new {@link FastTraverser} object.
    */
   withConfig(config: Partial<FastTraversalConfig>): FastTraverser<D>;
 

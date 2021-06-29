@@ -10,7 +10,7 @@ export interface SlowTraverser<D extends firestore.DocumentData>
    * Applies a the specified config values to the traverser.
    *
    * @param config Partial traversal configuration.
-   * @returns A new SlowTraverser object.
+   * @returns A new {@link SlowTraverser} object.
    */
   withConfig(config: Partial<TraversalConfig>): SlowTraverser<D>;
 

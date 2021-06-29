@@ -11,7 +11,7 @@ import type { FastTraversalConfig, FastTraverser, Traversable } from './interfac
  *
  * @param traversable A collection-like traversable group of documents.
  * @param config Optional. The traversal configuration with which the traverser will be created.
- * @returns A fast traverser object.
+ * @returns A new {@link FastTraverser} object.
  */
 export function createFastTraverser<D extends firestore.DocumentData>(
   traversable: Traversable<D>,

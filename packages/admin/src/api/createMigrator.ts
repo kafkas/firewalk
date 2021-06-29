@@ -10,7 +10,7 @@ import { createTraverser } from './createTraverser';
  *
  * This migrator does not use atomic batch writes so it is possible that when a write fails other writes go through.
  * @param traverser The traverser object that this migrator will use when traversing the collection and writing to documents.
- * @returns A default migrator object.
+ * @returns A new {@link DefaultMigrator} object.
  */
 export function createMigrator<D extends firestore.DocumentData, C extends TraversalConfig>(
   traverser: Traverser<D, C>
@@ -23,7 +23,7 @@ export function createMigrator<D extends firestore.DocumentData, C extends Trave
  * This migrator does not use atomic batch writes so it is possible that when a write fails other writes go through.
  * @param traversable A collection-like traversable group of documents to migrate.
  * @param traversalConfig Optional. The traversal configuration with which the default traverser will be created.
- * @returns A default migrator object.
+ * @returns A new {@link DefaultMigrator} object.
  */
 export function createMigrator<D extends firestore.DocumentData>(
   traversable: Traversable<D>,

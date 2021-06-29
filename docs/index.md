@@ -37,9 +37,9 @@ When you have millions of documents in a collection, you can't just get all of t
 
 Firecode is an extremely light, well-typed, zero-dependency library that is useful in a variety of scenarios. You can use it in database migration scripts (e.g. when you need to add a new field to all docs) or a scheduled Cloud Function that needs to check every doc in a collection periodically or a locally run script that retrieves some data from a collection.
 
-## Documentation
+## API
 
-This site contains the full documentation for each version of Firecode. Please choose a version to view the docs.
+This site contains the full API reference and documentation for each version of Firecode. Please choose a version to view the docs.
 
 ### Versions
 

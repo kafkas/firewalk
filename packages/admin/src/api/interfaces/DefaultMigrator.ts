@@ -11,7 +11,7 @@ export interface DefaultMigrator<D extends firestore.DocumentData, C extends Tra
    * If this is not provided, all documents will be migrated.
    *
    * @param predicate A function that takes a document snapshot and returns a boolean indicating whether to migrate it.
-   * @returns A new DefaultMigrator object.
+   * @returns A new {@link DefaultMigrator} object.
    */
   withPredicate(predicate: MigrationPredicate<D>): DefaultMigrator<D, C>;
 
@@ -19,7 +19,7 @@ export interface DefaultMigrator<D extends firestore.DocumentData, C extends Tra
    * Applies a new traverser that will be used by the migrator.
    *
    * @param traverser The new traverser that the migrator will use.
-   * @returns A new DefaultMigrator object.
+   * @returns A new {@link DefaultMigrator} object.
    */
   withTraverser<C2 extends TraversalConfig>(traverser: Traverser<D, C2>): DefaultMigrator<D, C2>;
 }
