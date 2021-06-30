@@ -40,16 +40,15 @@ export class BasicDefaultMigratorImplementation<
     return new BasicDefaultMigratorImplementation(traverser, this.migrationPredicate);
   }
 
-  public set(data: Partial<D>, options: SetOptions): Promise<MigrationResult>;
+  public set(dataOrGetData: D | SetDataGetter<D>): Promise<MigrationResult>;
 
-  public set(data: D): Promise<MigrationResult>;
-
-  public set(getData: SetDataGetter<Partial<D>>, options: SetOptions): Promise<MigrationResult>;
-
-  public set(getData: SetDataGetter<D>): Promise<MigrationResult>;
+  public set(
+    dataOrGetData: Partial<D> | SetDataGetter<Partial<D>>,
+    options: SetOptions
+  ): Promise<MigrationResult>;
 
   public async set(
-    dataOrGetData: SetDataGetter<D> | SetDataGetter<Partial<D>> | D | Partial<D>,
+    dataOrGetData: D | SetDataGetter<D> | Partial<D> | SetDataGetter<Partial<D>>,
     options?: SetOptions
   ): Promise<MigrationResult> {
     let migratedDocCount = 0;
@@ -105,14 +104,14 @@ export class BasicDefaultMigratorImplementation<
     return { batchCount, traversedDocCount, migratedDocCount };
   }
 
-  public update(getData: UpdateDataGetter<D>): Promise<MigrationResult>;
-
-  public update(data: firestore.UpdateData): Promise<MigrationResult>;
+  public update(
+    dataOrGetData: firestore.UpdateData | UpdateDataGetter<D>
+  ): Promise<MigrationResult>;
 
   public update(field: string | firestore.FieldPath, value: any): Promise<MigrationResult>;
 
   public async update(
-    arg1: firestore.UpdateData | string | firestore.FieldPath | UpdateDataGetter<D>,
+    arg1: firestore.UpdateData | UpdateDataGetter<D> | string | firestore.FieldPath,
     arg2?: any
   ): Promise<MigrationResult> {
     const argCount = [arg1, arg2].filter((a) => a !== undefined).length;

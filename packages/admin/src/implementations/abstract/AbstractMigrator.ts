@@ -27,20 +27,16 @@ export abstract class AbstractMigrator<D extends firestore.DocumentData, C exten
 
   public abstract readonly traverser: Traverser<D, C>;
 
-  public abstract set(data: Partial<D>, options: SetOptions): Promise<MigrationResult>;
-
-  public abstract set(data: D): Promise<MigrationResult>;
+  public abstract set(dataOrGetData: D | SetDataGetter<D>): Promise<MigrationResult>;
 
   public abstract set(
-    getData: SetDataGetter<Partial<D>>,
+    dataOrGetData: Partial<D> | SetDataGetter<Partial<D>>,
     options: SetOptions
   ): Promise<MigrationResult>;
 
-  public abstract set(getData: SetDataGetter<D>): Promise<MigrationResult>;
-
-  public abstract update(getData: UpdateDataGetter<D>): Promise<MigrationResult>;
-
-  public abstract update(data: firestore.UpdateData): Promise<MigrationResult>;
+  public abstract update(
+    dataOrGetData: firestore.UpdateData | UpdateDataGetter<D>
+  ): Promise<MigrationResult>;
 
   public abstract update(field: string | firestore.FieldPath, value: any): Promise<MigrationResult>;
 }
