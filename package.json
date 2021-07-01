@@ -2,13 +2,19 @@
   "name": "root",
   "private": true,
   "devDependencies": {
+    "@babel/core": "^7.14.6",
+    "@babel/preset-env": "^7.14.7",
+    "@babel/preset-typescript": "^7.14.5",
+    "@types/jest": "^26.0.23",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
+    "babel-jest": "^27.0.6",
     "eslint": "^7.25.0",
     "eslint-config-prettier": "^6.15.0",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-prettier": "^3.1.4",
     "firebase-admin": "^9.6.0",
+    "jest": "^27.0.6",
     "lerna": "^4.0.0",
     "prettier": "2.2.1",
     "ts-node": "^10.0.0",
@@ -20,9 +26,10 @@
     "docs": "cd scripts && sh docs.sh",
     "format": "prettier --write \"./packages/**/{src,test}/**/*.{ts,tsx,json}\"",
     "format-check": "prettier --check \"./packages/**/{src,test}/**/*.{ts,tsx,json}\"",
-    "lint": "npx eslint packages/**/{src,__tests__} --ext .js,.ts",
     "lerna-publish": "npx lerna publish from-git",
-    "lerna-version": "npx lerna version"
+    "lerna-version": "npx lerna version",
+    "lint": "npx eslint packages/**/{src,__tests__} --ext .js,.ts",
+    "test": "npx jest packages/admin/__tests__ jest.config.ts"
   },
   "dependencies": {
     "@firecode/admin": "file:packages/admin"
