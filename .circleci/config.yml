@@ -1,18 +1,19 @@
 version: 2.1
 
-jobs:
+commands:
   install_deps:
-    docker:
-      - image: cimg/node:16.3.0
+    description: "Install project dependencies"
     steps:
-      - checkout
       - run: npm install
       - run: cd packages/admin && npm install
+
+jobs:
   lint_and_format_check:
     docker:
       - image: cimg/node:16.3.0
     steps:
       - checkout
+      - install_deps
       - run: npm run lint
       - run: npm run format-check
   compile:
@@ -20,6 +21,7 @@ jobs:
       - image: cimg/node:16.3.0
     steps:
       - checkout
+      - install_deps
       - run: rm -rf packages/admin/lib
       - run: npm run build
   test:
@@ -27,18 +29,14 @@ jobs:
       - image: cimg/node:16.3.0
     steps:
       - checkout
+      - install_deps
       - run: npm test
 
 workflows:
   build_and_test:
     jobs:
-      - install_deps
-      - lint_and_format_check:
-          requires:
-            - install_deps
-      - compile:
-          requires:
-            - install_deps
+      - lint_and_format_check
+      - compile
       - test: # TODO: Make sure to compile tests as well (with noEmit)
           requires:
             - compile
