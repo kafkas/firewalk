@@ -30,6 +30,9 @@ jobs:
     steps:
       - checkout
       - install_deps
+      - run: cd packages/admin/__tests__
+      - run: echo "$FB_SERVICE_ACCOUNT_KEY" | base64 --decode > service-account.json
+      - run: cd ../../..
       - run: npm test
 
 workflows:
