@@ -29,7 +29,7 @@
     "lerna-publish": "npx lerna publish from-git",
     "lerna-version": "npx lerna version",
     "lint": "npx eslint packages/**/{src,__tests__} --ext .js,.ts",
-    "test": "npx jest"
+    "test": "npx jest --verbose --runInBand"
   },
   "dependencies": {
     "@firecode/admin": "file:packages/admin"
