@@ -28,7 +28,7 @@
     "format-check": "prettier --check \"./packages/**/{src,test}/**/*.{ts,tsx,json}\"",
     "lerna-publish": "npx lerna publish from-git",
     "lerna-version": "npx lerna version",
-    "lint": "npx eslint packages/**/{src,__tests__} --ext .js,.ts",
+    "lint": "npx eslint \"packages/admin/{src,__tests__}/**/*/*.{js,ts}\"",
     "test": "npx jest --verbose --runInBand"
   },
   "dependencies": {
