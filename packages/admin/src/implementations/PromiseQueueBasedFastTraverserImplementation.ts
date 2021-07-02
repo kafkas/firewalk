@@ -100,9 +100,9 @@ export class PromiseQueueBasedFastTraverserImplementation<D extends firestore.Do
       curBatchIndex++;
     }
 
-    unregisterQueueProcessor();
+    await unregisterQueueProcessor();
 
-    // There may still be some Promises left in the queue but there won't be any new items coming in.
+    // There may still be some Promises left in the queue but there won't be any new ones coming in.
     // Wait for the existing ones to resolve and exit.
 
     await callbackPromiseQueue.process();
