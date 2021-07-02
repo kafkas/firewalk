@@ -30,8 +30,7 @@ jobs:
     steps:
       - checkout
       - install_deps
-      - run: ls
-      - run: cd __tests__
+      - run: cd packages/admin/__tests__
       - run: ls
       - run: echo "$FB_SERVICE_ACCOUNT_KEY" | base64 --decode > service-account.json
       - run: ls
