@@ -1,12 +1,26 @@
 version: 2.1
 
 jobs:
+  install_deps:
+    docker:
+      - image: cimg/node:16.3.0
+    steps:
+      - checkout
+      - run: npm install
+      - run: cd packages/admin && npm install
+  lint_and_format_check:
+    docker:
+      - image: cimg/node:16.3.0
+    steps:
+      - checkout
+      - run: npm run lint
+      - run: npm run format-check
   compile:
     docker:
       - image: cimg/node:16.3.0
     steps:
       - checkout
-      - run: node --version
+      - run: rm -rf packages/admin/lib
       - run: npm run build
   test:
     docker:
@@ -18,7 +32,10 @@ jobs:
 workflows:
   build_and_test:
     jobs:
+      - install_deps
+      - lint_and_format_check
       - compile
-      - test:
+      - test: # TODO: Make sure to compile tests as well (with noEmit)
           requires:
-          - compile
+            - compile
+            - lint_and_format_check
