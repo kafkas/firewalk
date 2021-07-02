@@ -33,8 +33,12 @@ workflows:
   build_and_test:
     jobs:
       - install_deps
-      - lint_and_format_check
-      - compile
+      - lint_and_format_check:
+          requires:
+            - install_deps
+      - compile:
+          requires:
+            - install_deps
       - test: # TODO: Make sure to compile tests as well (with noEmit)
           requires:
             - compile
