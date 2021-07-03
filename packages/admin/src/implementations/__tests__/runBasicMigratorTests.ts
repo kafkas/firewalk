@@ -34,7 +34,7 @@ export function runBasicMigratorTests<C extends TraversalConfig>(
     });
 
     test('correctly updates each document with the provided data getter', async () => {
-      await migrator.update((snap) => ({ text: snap.id }));
+      await migrator.updateWithDerivedData((snap) => ({ text: snap.id }));
       const { docs: updatedDocs } = await collectionRef.get();
       const updatedDocIds = new Set(updatedDocs.map((doc) => doc.id));
       expect(updatedDocIds).toEqual(new Set(collectionDocIds));

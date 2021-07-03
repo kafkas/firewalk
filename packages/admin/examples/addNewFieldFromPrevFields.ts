@@ -1,5 +1,5 @@
 import { firestore } from 'firebase-admin';
-import { createBatchMigrator } from '../../src';
+import { createBatchMigrator } from '../src';
 
 type UserDoc = {
   firstName: string;
@@ -7,7 +7,7 @@ type UserDoc = {
 };
 const usersColRef = firestore().collection('users') as firestore.CollectionReference<UserDoc>;
 const migrator = createBatchMigrator(usersColRef);
-const { migratedDocCount } = await migrator.update((snap) => {
+const { migratedDocCount } = await migrator.updateWithDerivedData((snap) => {
   const { firstName, lastName } = snap.data();
   return {
     fullName: `${firstName} ${lastName}`,
