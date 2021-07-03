@@ -8,8 +8,10 @@ export function runBasicTraverserTests<D extends firestore.DocumentData, C exten
   getInitialData: () => D
 ): void {
   describe('basic traverser tests', () => {
-    async function initItemsCollection(): Promise<void> {
-      await populateCollection(collectionRef, getInitialData(), 100);
+    let collectionDocIds: string[] = [];
+
+    async function initItemsCollection(): Promise<firestore.DocumentReference<D>[]> {
+      return await populateCollection(collectionRef, getInitialData(), 100);
     }
 
     async function clearItemsCollection(): Promise<void> {
@@ -18,11 +20,13 @@ export function runBasicTraverserTests<D extends firestore.DocumentData, C exten
     }
 
     beforeAll(async () => {
-      await initItemsCollection();
+      const docRefs = await initItemsCollection();
+      collectionDocIds = docRefs.map((docRef) => docRef.id);
     });
 
     afterAll(async () => {
       await clearItemsCollection();
+      collectionDocIds = [];
     });
 
     test('exits early when instructed as such', async () => {
@@ -50,18 +54,17 @@ export function runBasicTraverserTests<D extends firestore.DocumentData, C exten
     });
 
     test('processes each document exactly once w/o external interference', async () => {
-      const processCountMap: Record<string, number> = {};
+      const expectedProcessCountMap = new Map(collectionDocIds.map((id) => [id, 1]));
+      const processCountMap = new Map<string, number>();
 
       await traverser.traverse(async (snapshots) => {
         snapshots.forEach((snapshot) => {
-          const itemId = snapshot.id;
-          processCountMap[itemId] = (processCountMap[itemId] ?? 0) + 1;
+          const id = snapshot.id;
+          processCountMap.set(id, (processCountMap.get(id) ?? 0) + 1);
         });
       });
-      const isEachProcessCountEqualTo1 = Object.keys(processCountMap).every(
-        (key) => processCountMap[key] === 1
-      );
-      expect(isEachProcessCountEqualTo1).toBe(true);
+
+      expect(processCountMap).toEqual(expectedProcessCountMap);
     });
   });
 }
