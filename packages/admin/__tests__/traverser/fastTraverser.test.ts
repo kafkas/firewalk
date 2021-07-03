@@ -4,6 +4,6 @@ import { runBasicTraverserTests } from './basic';
 
 describe('FastTraverser', () => {
   const itemsColRef = app().admin.firestore().collection('items');
-  const traverser = createFastTraverser(itemsColRef, { batchSize: 5, maxDocCount: 25 });
+  const traverser = createFastTraverser(itemsColRef);
   runBasicTraverserTests(traverser, itemsColRef, () => ({ number: Math.random() }));
 });

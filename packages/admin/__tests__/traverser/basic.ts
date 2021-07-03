@@ -25,6 +25,30 @@ export function runBasicTraverserTests<D extends firestore.DocumentData, C exten
       await clearItemsCollection();
     });
 
+    test('exits early when instructed as such', async () => {
+      const t = traverser
+        .withConfig({ batchSize: 10 } as Partial<C>)
+        .withExitEarlyPredicate((_, batchIndex) => batchIndex === 5);
+
+      let processedBatchIndices: number[] = [];
+
+      await t.traverse(async (_, batchIndex) => {
+        processedBatchIndices.push(batchIndex);
+      });
+
+      expect(processedBatchIndices).toEqual([0, 1, 2, 3, 4, 5]);
+
+      processedBatchIndices = [];
+
+      await t
+        .withExitEarlyPredicate((_, batchIndex) => batchIndex === 3)
+        .traverse(async (_, batchIndex) => {
+          processedBatchIndices.push(batchIndex);
+        });
+
+      expect(processedBatchIndices).toEqual([0, 1, 2, 3]);
+    });
+
     test('processes each document exactly once w/o external interference', async () => {
       const processCountMap: Record<string, number> = {};
 
