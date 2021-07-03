@@ -2,6 +2,7 @@ import type { firestore } from 'firebase-admin';
 import { sleep } from '../utils';
 import type {
   BatchCallbackAsync,
+  ExitEarlyPredicate,
   SlowTraverser,
   Traversable,
   TraversalConfig,
@@ -18,6 +19,7 @@ export class BasicSlowTraverserImplementation<D extends firestore.DocumentData>
 
   public constructor(
     public readonly traversable: Traversable<D>,
+    private readonly exitEarlyPredicate: ExitEarlyPredicate<D> = () => false,
     config?: Partial<TraversalConfig>
   ) {
     super({ ...BasicSlowTraverserImplementation.defaultConfig, ...config });
@@ -27,10 +29,14 @@ export class BasicSlowTraverserImplementation<D extends firestore.DocumentData>
   private validateConfig(config: Partial<TraversalConfig> = {}): void {}
 
   public withConfig(config: Partial<TraversalConfig>): SlowTraverser<D> {
-    return new BasicSlowTraverserImplementation(this.traversable, {
+    return new BasicSlowTraverserImplementation(this.traversable, this.exitEarlyPredicate, {
       ...this.traversalConfig,
       ...config,
     });
+  }
+
+  public withExitEarlyPredicate(predicate: ExitEarlyPredicate<D>): SlowTraverser<D> {
+    return new BasicSlowTraverserImplementation(this.traversable, predicate, this.traversalConfig);
   }
 
   public async traverse(callback: BatchCallbackAsync<D>): Promise<TraversalResult> {
@@ -41,7 +47,7 @@ export class BasicSlowTraverserImplementation<D extends firestore.DocumentData>
       maxDocCount,
     } = this.traversalConfig;
 
-    let batchIndex = 0;
+    let curBatchIndex = 0;
     let docCount = 0;
     let query = this.traversable.limit(Math.min(batchSize, maxDocCount));
 
@@ -57,20 +63,22 @@ export class BasicSlowTraverserImplementation<D extends firestore.DocumentData>
 
       docCount += batchDocCount;
 
-      await callback(batchDocSnapshots, batchIndex);
+      await callback(batchDocSnapshots, curBatchIndex);
 
-      if (docCount === maxDocCount) {
+      const shouldExitEarly = this.exitEarlyPredicate(batchDocSnapshots, curBatchIndex);
+
+      if (shouldExitEarly || docCount === maxDocCount) {
         break;
       }
 
       query = query.startAfter(lastDocInBatch).limit(Math.min(batchSize, maxDocCount - docCount));
-      batchIndex++;
+      curBatchIndex++;
 
       if (sleepBetweenBatches) {
         await sleep(sleepTimeBetweenBatches);
       }
     }
 
-    return { batchCount: batchIndex, docCount };
+    return { batchCount: curBatchIndex, docCount };
   }
 }
