@@ -1,6 +1,7 @@
 import type { firestore } from 'firebase-admin';
 import type {
   BatchCallback,
+  MigrationPredicate,
   MigrationResult,
   Migrator,
   SetDataGetter,
@@ -26,6 +27,12 @@ export abstract class AbstractMigrator<D extends firestore.DocumentData, C exten
   }
 
   public abstract readonly traverser: Traverser<D, C>;
+
+  public abstract withPredicate(predicate: MigrationPredicate<D>): Migrator<D, C>;
+
+  public abstract withTraverser<C2 extends TraversalConfig>(
+    traverser: Traverser<D, C2>
+  ): Migrator<D, C2>;
 
   public abstract set(dataOrGetData: D | SetDataGetter<D>): Promise<MigrationResult>;
 

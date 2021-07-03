@@ -2,6 +2,7 @@ import type { firestore } from 'firebase-admin';
 import type { Traverser } from './Traverser';
 import type {
   BatchCallback,
+  MigrationPredicate,
   MigrationResult,
   SetDataGetter,
   SetOptions,
@@ -17,6 +18,23 @@ export interface Migrator<D extends firestore.DocumentData, C extends TraversalC
    * The underlying traverser.
    */
   readonly traverser: Traverser<D, C>;
+
+  /**
+   * Applies a migration predicate that indicates whether to migrate the current document. If this is not provided,
+   * all documents will be migrated.
+   *
+   * @param predicate A function that takes a document snapshot and returns a boolean indicating whether to migrate it.
+   * @returns A new {@link Migrator} object.
+   */
+  withPredicate(predicate: MigrationPredicate<D>): Migrator<D, C>;
+
+  /**
+   * Applies a new traverser that will be used by the migrator.
+   *
+   * @param traverser The new traverser that the migrator will use.
+   * @returns A new {@link Migrator} object.
+   */
+  withTraverser<C2 extends TraversalConfig>(traverser: Traverser<D, C2>): Migrator<D, C2>;
 
   /**
    * Registers a callback function that fires right before a batch starts processing.
