@@ -31,16 +31,18 @@ export class PromiseQueue<T> {
     return ++this.lastPromiseId;
   }
 
-  public async process(): Promise<void> {
+  public async process(): Promise<T[]> {
     this._isProcessing = true;
     const promiseIds = this.queue.extractToArray();
-    await Promise.all(
+    const results = await Promise.all(
       promiseIds.map(async (id) => {
-        const promise = this.map.get(id) ?? Promise.resolve();
-        await promise;
+        const promise = this.map.get(id)!;
+        const result = await promise;
         this.map.delete(id);
+        return result;
       })
     );
     this._isProcessing = false;
+    return results;
   }
 }
