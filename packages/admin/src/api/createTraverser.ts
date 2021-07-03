@@ -15,5 +15,5 @@ export function createTraverser<D extends firestore.DocumentData>(
   traversable: Traversable<D>,
   config?: Partial<TraversalConfig>
 ): SlowTraverser<D> {
-  return new BasicSlowTraverserImplementation(traversable, config);
+  return new BasicSlowTraverserImplementation(traversable, undefined, config);
 }

@@ -1,5 +1,11 @@
 import type { firestore } from 'firebase-admin';
-import type { BatchCallbackAsync, FastTraversalConfig, TraversalResult, Traverser } from '.';
+import type {
+  BatchCallbackAsync,
+  ExitEarlyPredicate,
+  FastTraversalConfig,
+  TraversalResult,
+  Traverser,
+} from '.';
 
 /**
  * A fast traverser object that facilitates Firestore collection traversals.
@@ -13,6 +19,16 @@ export interface FastTraverser<D extends firestore.DocumentData>
    * @returns A new {@link FastTraverser} object.
    */
   withConfig(config: Partial<FastTraversalConfig>): FastTraverser<D>;
+
+  /**
+   * Applies the specified exit-early predicate to the traverser. After retrieving each batch, the traverser will evaluate the
+   * predicate with the current batch doc snapshots and batch index and decide whether to continue the traversal or exit early.
+   *
+   * @param predicate A synchronous function that takes batch doc snapshots and the 0-based batch index and returns a boolean
+   * indicating whether to exit traversal early.
+   * @returns A new {@link FastTraverser} object.
+   */
+  withExitEarlyPredicate(predicate: ExitEarlyPredicate<D>): FastTraverser<D>;
 
   /**
    * Traverses the entire collection in batches of the size specified in traversal config. Invokes the specified async

@@ -17,5 +17,5 @@ export function createFastTraverser<D extends firestore.DocumentData>(
   traversable: Traversable<D>,
   config?: Partial<FastTraversalConfig>
 ): FastTraverser<D> {
-  return new PromiseQueueBasedFastTraverserImplementation(traversable, config);
+  return new PromiseQueueBasedFastTraverserImplementation(traversable, undefined, config);
 }

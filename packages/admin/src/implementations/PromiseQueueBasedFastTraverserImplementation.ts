@@ -2,6 +2,7 @@ import type { firestore } from 'firebase-admin';
 import { sleep, PromiseQueue, registerInterval, isPositiveInteger } from '../utils';
 import type {
   BatchCallbackAsync,
+  ExitEarlyPredicate,
   FastTraversalConfig,
   FastTraverser,
   Traversable,
@@ -22,6 +23,7 @@ export class PromiseQueueBasedFastTraverserImplementation<D extends firestore.Do
 
   public constructor(
     public readonly traversable: Traversable<D>,
+    private readonly exitEarlyPredicate: ExitEarlyPredicate<D> = () => false,
     config?: Partial<FastTraversalConfig>
   ) {
     super({ ...PromiseQueueBasedFastTraverserImplementation.defaultConfig, ...config });
@@ -43,10 +45,22 @@ export class PromiseQueueBasedFastTraverserImplementation<D extends firestore.Do
   }
 
   public withConfig(config: Partial<FastTraversalConfig>): FastTraverser<D> {
-    return new PromiseQueueBasedFastTraverserImplementation(this.traversable, {
-      ...this.traversalConfig,
-      ...config,
-    });
+    return new PromiseQueueBasedFastTraverserImplementation(
+      this.traversable,
+      this.exitEarlyPredicate,
+      {
+        ...this.traversalConfig,
+        ...config,
+      }
+    );
+  }
+
+  public withExitEarlyPredicate(predicate: ExitEarlyPredicate<D>): FastTraverser<D> {
+    return new PromiseQueueBasedFastTraverserImplementation(
+      this.traversable,
+      predicate,
+      this.traversalConfig
+    );
   }
 
   public async traverse(callback: BatchCallbackAsync<D>): Promise<TraversalResult> {
@@ -84,7 +98,9 @@ export class PromiseQueueBasedFastTraverserImplementation<D extends firestore.Do
 
       callbackPromiseQueue.enqueue(callback(batchDocSnapshots, curBatchIndex));
 
-      if (docCount === maxDocCount) {
+      const shouldExitEarly = this.exitEarlyPredicate(batchDocSnapshots, curBatchIndex);
+
+      if (shouldExitEarly || docCount === maxDocCount) {
         break;
       }
 

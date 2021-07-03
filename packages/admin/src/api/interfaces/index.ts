@@ -2,6 +2,7 @@ export type { BatchCallback } from './BatchCallback';
 export type { BatchCallbackAsync } from './BatchCallbackAsync';
 export type { BatchMigrator } from './BatchMigrator';
 export type { DefaultMigrator } from './DefaultMigrator';
+export type { ExitEarlyPredicate } from './ExitEarlyPredicate';
 export type { FastTraversalConfig } from './FastTraversalConfig';
 export type { FastTraverser } from './FastTraverser';
 export type { MigrationPredicate } from './MigrationPredicate';
