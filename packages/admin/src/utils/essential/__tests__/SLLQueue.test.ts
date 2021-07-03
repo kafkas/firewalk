@@ -47,4 +47,33 @@ describe('SLLQueue', () => {
     const q = new SLLQueue<string>();
     expect(() => q.dequeue()).toThrow();
   });
+
+  test('mutates the queue while extracting to array', () => {
+    const q = new SLLQueue<number>();
+
+    q.enqueue(1);
+    q.enqueue(2);
+    q.enqueue(3);
+
+    q.extractToArray();
+
+    expect(q.isEmpty()).toBe(true);
+  });
+
+  test('extracts to array in FIFO order', () => {
+    const q = new SLLQueue<number>();
+
+    expect(q.extractToArray()).toEqual([]);
+
+    q.enqueue(1);
+    q.enqueue(2);
+    q.enqueue(3);
+
+    expect(q.extractToArray()).toEqual([1, 2, 3]);
+
+    q.enqueue(2);
+    q.enqueue(1);
+
+    expect(q.extractToArray()).toEqual([2, 1]);
+  });
 });
