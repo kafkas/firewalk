@@ -29,6 +29,8 @@
     "lerna-publish": "npx lerna publish from-git",
     "lerna-version": "npx lerna version",
     "lint": "npx eslint \"packages/admin/{src,__tests__}/**/*/*.{js,ts}\"",
+    "prebuild": "rm -rf packages/admin/lib",
+    "prelerna-publish": "npm run build",
     "test": "npx jest --verbose --runInBand"
   },
   "dependencies": {
