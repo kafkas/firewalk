@@ -33,17 +33,29 @@ export function runBasicMigratorTests<C extends TraversalConfig>(
       collectionDocIds = [];
     });
 
+    test('correctly updates each document with the provided data getter', async () => {
+      await migrator.update((snap) => ({ text: snap.id }));
+      const { docs: updatedDocs } = await collectionRef.get();
+      const updatedDocIds = new Set(updatedDocs.map((doc) => doc.id));
+      expect(updatedDocIds).toEqual(new Set(collectionDocIds));
+      updatedDocs.forEach((snap) => {
+        const data = snap.data();
+        expect(data.number).toBe(0);
+        expect(data.text).toBe(snap.id);
+      });
+    }, 15_000);
+
     test('correctly updates each document with the provided data', async () => {
-      const updateData: Partial<TestItemDoc> = { number: 2 };
+      const updateData = { number: 2 };
       await migrator.update(updateData);
       const { docs: updatedDocs } = await collectionRef.get();
       const updatedDocIds = new Set(updatedDocs.map((doc) => doc.id));
       expect(updatedDocIds).toEqual(new Set(collectionDocIds));
       updatedDocs.forEach((snap) => {
         const data = snap.data();
-        expect(data.number).toBe(2);
-        expect(data.text).toBe('abc');
+        expect(data.number).toBe(updateData.number);
+        expect(data.text).toBe(snap.id);
       });
-    });
+    }, 15_000);
   });
 }
