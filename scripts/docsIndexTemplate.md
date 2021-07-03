@@ -27,7 +27,7 @@
         <img src="https://img.shields.io/github/last-commit/kafkas/firecode" /></a>
     <a href="https://lerna.js.org/" alt="Framework">
         <img src="https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg" /></a>
-    <a href="https://kafkas.github.io/firecode/0.7.0/">
+    <a href="https://kafkas.github.io/firecode/0.7.2/">
     <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs welcome!" /></a>
 </p>
 
