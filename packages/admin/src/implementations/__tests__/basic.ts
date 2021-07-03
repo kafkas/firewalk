@@ -1,6 +1,6 @@
 import type { firestore } from 'firebase-admin';
-import type { Traverser, TraversalConfig } from '../../src';
-import { populateCollection } from '../utils';
+import type { Traverser, TraversalConfig } from '../../../src';
+import { populateCollection } from '../../../__tests__/utils';
 
 export function runBasicTraverserTests<D extends firestore.DocumentData, C extends TraversalConfig>(
   traverser: Traverser<D, C>,
