@@ -7,7 +7,7 @@ import type { BatchCallbackAsync, TraversalConfig, TraversalResult, Traverser } 
 export interface SlowTraverser<D extends firestore.DocumentData>
   extends Traverser<D, TraversalConfig> {
   /**
-   * Applies a the specified config values to the traverser.
+   * Applies the specified config values to the traverser.
    *
    * @param config Partial traversal configuration.
    * @returns A new {@link SlowTraverser} object.
