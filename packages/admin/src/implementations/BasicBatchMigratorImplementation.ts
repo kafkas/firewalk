@@ -171,8 +171,7 @@ export class BasicBatchMigratorImplementation<C extends TraversalConfig, D>
       let migratedDocCount = 0;
       const writeBatch = this.traverser.traversable.firestore.batch();
       snapshots.forEach((snapshot) => {
-        const shouldMigrate = this.shouldMigrateDoc(snapshot);
-        if (shouldMigrate) {
+        if (this.shouldMigrateDoc(snapshot)) {
           migrateDoc(writeBatch, snapshot);
           migratedDocCount++;
         }

@@ -157,8 +157,7 @@ export class BasicDefaultMigratorImplementation<C extends TraversalConfig, D>
     return this.migrateWithTraverser(async (snapshots) => {
       let migratedDocCount = 0;
       const promises = snapshots.map(async (snapshot) => {
-        const shouldMigrate = this.shouldMigrateDoc(snapshot);
-        if (shouldMigrate) {
+        if (this.shouldMigrateDoc(snapshot)) {
           await migrateDoc(snapshot);
           migratedDocCount++;
         }
