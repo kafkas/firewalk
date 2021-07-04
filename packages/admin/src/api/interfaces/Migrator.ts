@@ -50,6 +50,34 @@ export interface Migrator<D extends firestore.DocumentData, C extends TraversalC
   onAfterBatchComplete(callback: BatchCallback<D>): void;
 
   /**
+   * Renames the specified field in all documents in this collection.
+   *
+   * @remarks
+   *
+   * **Complexity:**
+   *
+   * - Time complexity: _TC_(`traverser`) where _C_ = _W_(`batchSize`)
+   * - Space complexity: _SC_(`traverser`) where _S_ = _O_(`batchSize`)
+   * - Billing: _max_(1, _N_) reads, _K_ writes
+   *
+   * where:
+   *
+   * - _N_: number of docs in the traversable
+   * - _K_: number of docs that passed the migration predicate (_K_<=_N_)
+   * - _W_(`batchSize`): average batch write time
+   * - _TC_(`traverser`): time complexity of the underlying traverser
+   * - _SC_(`traverser`): space complexity of the underlying traverser
+   *
+   * @param oldField - The old field.
+   * @param newField - The new field.
+   * @returns A Promise resolving to an object representing the details of the migration.
+   */
+  renameField(
+    oldField: string | firestore.FieldPath,
+    newField: string | firestore.FieldPath
+  ): Promise<MigrationResult>;
+
+  /**
    * Sets all documents in this collection with the provided data.
    *
    * @remarks

@@ -1,4 +1,4 @@
-import type { firestore } from 'firebase-admin';
+import { firestore } from 'firebase-admin';
 import type {
   BatchCallback,
   MigrationPredicate,
@@ -25,6 +25,16 @@ export abstract class AbstractMigrator<D extends firestore.DocumentData, C exten
 
   public onAfterBatchComplete(callback: BatchCallback<D>): void {
     this.registeredCallbacks.onAfterBatchComplete = callback;
+  }
+
+  public renameField(
+    oldField: string | firestore.FieldPath,
+    newField: string | firestore.FieldPath
+  ): Promise<MigrationResult> {
+    return this.updateWithDerivedData((snap) => {
+      const value = snap.get(oldField);
+      return [oldField, firestore.FieldValue.delete(), newField, value];
+    });
   }
 
   protected async migrateWithTraverser(
