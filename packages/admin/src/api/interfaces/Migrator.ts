@@ -55,13 +55,17 @@ export interface Migrator<C extends TraversalConfig = TraversalConfig, D = fires
   withTraverser<C2 extends TraversalConfig>(traverser: Traverser<C2, D>): Migrator<C2, D>;
 
   /**
-   * Registers a callback function that fires right before a batch starts processing.
+   * Registers a callback function that fires right before a batch starts processing. You can register at most 1
+   * callback. If you call this function multiple times, only the last callback will be registered.
+   *
    * @param callback - A synchronous callback that takes batch doc snapshots and the 0-based batch index as its arguments.
    */
   onBeforeBatchStart(callback: BatchCallback<D>): void;
 
   /**
-   * Registers a callback function that fires after a batch is processed.
+   * Registers a callback function that fires after a batch is processed. You can register at most 1 callback. If you call
+   * this function multiple times, only the last callback will be registered.
+   *
    * @param callback - A synchronous callback that takes batch doc snapshots and the 0-based batch index as its arguments.
    */
   onAfterBatchComplete(callback: BatchCallback<D>): void;
