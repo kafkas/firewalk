@@ -1,4 +1,3 @@
-import type { firestore } from 'firebase-admin';
 import { sleep } from '../utils';
 import type {
   BatchCallbackAsync,
@@ -19,10 +18,10 @@ export class BasicSlowTraverserImplementation<D>
 
   public constructor(
     public readonly traversable: Traversable<D>,
-    private readonly exitEarlyPredicates: ExitEarlyPredicate<D>[],
+    exitEarlyPredicates: ExitEarlyPredicate<D>[],
     config?: Partial<TraversalConfig>
   ) {
-    super({ ...BasicSlowTraverserImplementation.defaultConfig, ...config });
+    super({ ...BasicSlowTraverserImplementation.defaultConfig, ...config }, exitEarlyPredicates);
   }
 
   // eslint-disable-next-line
@@ -82,12 +81,5 @@ export class BasicSlowTraverserImplementation<D>
     }
 
     return { batchCount: curBatchIndex, docCount };
-  }
-
-  private shouldExitEarly(
-    batchDocs: firestore.QueryDocumentSnapshot<D>[],
-    batchIndex: number
-  ): boolean {
-    return this.exitEarlyPredicates.some((predicate) => predicate(batchDocs, batchIndex));
   }
 }

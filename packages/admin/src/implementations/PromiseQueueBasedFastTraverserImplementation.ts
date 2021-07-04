@@ -1,4 +1,3 @@
-import type { firestore } from 'firebase-admin';
 import { sleep, PromiseQueue, registerInterval, isPositiveInteger } from '../utils';
 import type {
   BatchCallbackAsync,
@@ -23,10 +22,13 @@ export class PromiseQueueBasedFastTraverserImplementation<D>
 
   public constructor(
     public readonly traversable: Traversable<D>,
-    private readonly exitEarlyPredicates: ExitEarlyPredicate<D>[],
+    exitEarlyPredicates: ExitEarlyPredicate<D>[],
     config?: Partial<FastTraversalConfig>
   ) {
-    super({ ...PromiseQueueBasedFastTraverserImplementation.defaultConfig, ...config });
+    super(
+      { ...PromiseQueueBasedFastTraverserImplementation.defaultConfig, ...config },
+      exitEarlyPredicates
+    );
     this.validateConfig(config);
   }
 
@@ -122,12 +124,5 @@ export class PromiseQueueBasedFastTraverserImplementation<D>
     await callbackPromiseQueue.process();
 
     return { batchCount: curBatchIndex, docCount };
-  }
-
-  private shouldExitEarly(
-    batchDocs: firestore.QueryDocumentSnapshot<D>[],
-    batchIndex: number
-  ): boolean {
-    return this.exitEarlyPredicates.some((predicate) => predicate(batchDocs, batchIndex));
   }
 }

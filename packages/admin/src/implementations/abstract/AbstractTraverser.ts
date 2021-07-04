@@ -1,3 +1,4 @@
+import type { firestore } from 'firebase-admin';
 import { sleep, isPositiveInteger } from '../../utils';
 import type {
   BatchCallbackAsync,
@@ -23,7 +24,10 @@ export abstract class AbstractTraverser<C extends TraversalConfig, D> implements
     sleepTimeBetweenDocs: 500,
   };
 
-  protected constructor(public readonly traversalConfig: C) {
+  protected constructor(
+    public readonly traversalConfig: C,
+    protected readonly exitEarlyPredicates: ExitEarlyPredicate<D>[]
+  ) {
     this.validateBaseConfig(traversalConfig);
   }
 
@@ -66,6 +70,13 @@ export abstract class AbstractTraverser<C extends TraversalConfig, D> implements
     });
 
     return { batchCount, docCount };
+  }
+
+  protected shouldExitEarly(
+    batchDocs: firestore.QueryDocumentSnapshot<D>[],
+    batchIndex: number
+  ): boolean {
+    return this.exitEarlyPredicates.some((predicate) => predicate(batchDocs, batchIndex));
   }
 
   public abstract readonly traversable: Traversable<D>;
