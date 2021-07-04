@@ -15,7 +15,7 @@ import { createTraverser } from './createTraverser';
  * because in Firestore, each write batch can write to a maximum of 500 documents. This function will throw an error if
  * you pass an incompatible traverser.
  *
- * @param traverser The traverser object that this migrator will use when traversing the collection and writing to documents.
+ * @param traverser - The traverser object that this migrator will use when traversing the collection and writing to documents.
  * @returns A new {@link BatchMigrator} object.
  */
 export function createBatchMigrator<D extends firestore.DocumentData, C extends TraversalConfig>(
@@ -33,8 +33,8 @@ export function createBatchMigrator<D extends firestore.DocumentData, C extends 
  * because in Firestore, each write batch can write to a maximum of 500 documents. This function will throw an error if
  * you pass a traversal config that is incompatible with {@link BatchMigrator}.
  *
- * @param traversable A collection-like traversable group of documents.
- * @param traversalConfig Optional. The traversal configuration with which the default traverser will be created.
+ * @param traversable - A collection-like traversable group of documents.
+ * @param traversalConfig - Optional. The traversal configuration with which the default traverser will be created.
  * @returns A new {@link BatchMigrator} object.
  */
 export function createBatchMigrator<D extends firestore.DocumentData>(

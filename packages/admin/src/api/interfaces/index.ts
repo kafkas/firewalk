@@ -18,3 +18,4 @@ export type { TraverseEachCallback } from './TraverseEachCallback';
 export type { TraverseEachConfig } from './TraverseEachConfig';
 export type { Traverser } from './Traverser';
 export type { UpdateDataGetter } from './UpdateDataGetter';
+export type { UpdateFieldValueGetter } from './UpdateFieldValueGetter';

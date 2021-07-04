@@ -1,5 +1,5 @@
 import { firestore } from 'firebase-admin';
-import { createBatchMigrator } from '../../src';
+import { createBatchMigrator } from '../src';
 
 const projectsColRef = firestore().collection('projects');
 const migrator = createBatchMigrator(projectsColRef);

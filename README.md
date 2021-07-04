@@ -142,7 +142,7 @@ type UserDoc = {
 };
 const usersColRef = firestore().collection('users') as firestore.CollectionReference<UserDoc>;
 const migrator = createBatchMigrator(usersColRef);
-const { migratedDocCount } = await migrator.update((snap) => {
+const { migratedDocCount } = await migrator.updateWithDerivedData((snap) => {
   const { firstName, lastName } = snap.data();
   return {
     fullName: `${firstName} ${lastName}`,
@@ -192,7 +192,7 @@ const { migratedDocCount } = await migrator
     // Ignore if it doesn't have a `postedAt` field
     (snap) => snap.data().postedAt !== undefined
   )
-  .update((snap) => {
+  .updateWithDerivedData((snap) => {
     const { postedAt } = snap.data();
     return {
       publishedAt: postedAt!, // Safe to assert now

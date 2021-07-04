@@ -1,5 +1,5 @@
 import { firestore } from 'firebase-admin';
-import { createBatchMigrator } from '../../src';
+import { createBatchMigrator } from '../src';
 
 type PostDoc = {
   text: string;
@@ -12,7 +12,7 @@ const { migratedDocCount } = await migrator
     // Ignore if it doesn't have a `postedAt` field
     (snap) => snap.data().postedAt !== undefined
   )
-  .update((snap) => {
+  .updateWithDerivedData((snap) => {
     const { postedAt } = snap.data();
     return {
       publishedAt: postedAt!, // Safe to assert now
