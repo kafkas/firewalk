@@ -9,8 +9,25 @@ export interface DefaultMigrator<
   D = firestore.DocumentData
 > extends Migrator<C, D> {
   /**
-   * Applies a migration predicate that indicates whether to migrate the current document. If this is not provided,
-   * all documents will be migrated.
+   * Applies a migration predicate that indicates whether to migrate the current document or not. By default, all
+   * documents are migrated.
+   *
+   * @remarks
+   *
+   * If you have already applied other migration predicates to this migrator, this and all the other predicates will be
+   * evaluated and the resulting booleans will be AND'd to get the boolean that indicates whether to migrate the document
+   * or not. This is consistent with the intuitive default behavior that all documents are migrated.
+   *
+   * @example
+   *
+   * ```ts
+   * const newMigrator = migrator
+   *   .withPredicate((doc) => doc.get('name') !== undefined)
+   *   .withPredicate((doc) => doc.ref.path.startsWith('users/'));
+   * ```
+   *
+   * In the above case `newMigrator` will migrate only the documents whose `name` field is not missing AND whose path
+   * start with `"users/"`.
    *
    * @param predicate - A function that takes a document snapshot and returns a boolean indicating whether to migrate it.
    * @returns A new {@link DefaultMigrator} object.
