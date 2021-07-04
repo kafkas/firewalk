@@ -71,7 +71,8 @@ export interface Migrator<C extends TraversalConfig = TraversalConfig, D = fires
   onAfterBatchComplete(callback: BatchCallback<D>): void;
 
   /**
-   * Renames the specified field in all documents in this collection.
+   * Renames the specified field in all documents in this collection. The documents where the field is missing
+   * will be ignored.
    *
    * @remarks
    *
