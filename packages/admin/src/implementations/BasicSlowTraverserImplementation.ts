@@ -1,3 +1,4 @@
+import type { firestore } from 'firebase-admin';
 import { sleep } from '../utils';
 import type {
   BatchCallbackAsync,
@@ -18,7 +19,7 @@ export class BasicSlowTraverserImplementation<D>
 
   public constructor(
     public readonly traversable: Traversable<D>,
-    private readonly exitEarlyPredicate: ExitEarlyPredicate<D> = () => false,
+    private readonly exitEarlyPredicates: ExitEarlyPredicate<D>[],
     config?: Partial<TraversalConfig>
   ) {
     super({ ...BasicSlowTraverserImplementation.defaultConfig, ...config });
@@ -28,14 +29,18 @@ export class BasicSlowTraverserImplementation<D>
   private validateConfig(config: Partial<TraversalConfig> = {}): void {}
 
   public withConfig(config: Partial<TraversalConfig>): SlowTraverser<D> {
-    return new BasicSlowTraverserImplementation(this.traversable, this.exitEarlyPredicate, {
+    return new BasicSlowTraverserImplementation(this.traversable, this.exitEarlyPredicates, {
       ...this.traversalConfig,
       ...config,
     });
   }
 
   public withExitEarlyPredicate(predicate: ExitEarlyPredicate<D>): SlowTraverser<D> {
-    return new BasicSlowTraverserImplementation(this.traversable, predicate, this.traversalConfig);
+    return new BasicSlowTraverserImplementation(
+      this.traversable,
+      [...this.exitEarlyPredicates, predicate],
+      this.traversalConfig
+    );
   }
 
   public async traverse(callback: BatchCallbackAsync<D>): Promise<TraversalResult> {
@@ -64,9 +69,7 @@ export class BasicSlowTraverserImplementation<D>
 
       await callback(batchDocSnapshots, curBatchIndex);
 
-      const shouldExitEarly = this.exitEarlyPredicate(batchDocSnapshots, curBatchIndex);
-
-      if (shouldExitEarly || docCount === maxDocCount) {
+      if (this.shouldExitEarly(batchDocSnapshots, curBatchIndex) || docCount === maxDocCount) {
         break;
       }
 
@@ -79,5 +82,12 @@ export class BasicSlowTraverserImplementation<D>
     }
 
     return { batchCount: curBatchIndex, docCount };
+  }
+
+  private shouldExitEarly(
+    batchDocs: firestore.QueryDocumentSnapshot<D>[],
+    batchIndex: number
+  ): boolean {
+    return this.exitEarlyPredicates.some((predicate) => predicate(batchDocs, batchIndex));
   }
 }
