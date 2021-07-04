@@ -1,8 +1,8 @@
 import { firestore } from 'firebase-admin';
-import { createBatchMigrator } from '../src';
+import { createMigrator } from '../src';
 
 const walletsWithNegativeBalance = firestore().collection('wallets').where('money', '<', 0);
-const migrator = createBatchMigrator(walletsWithNegativeBalance, {
+const migrator = createMigrator(walletsWithNegativeBalance, {
   // We want each batch to have 500 docs. The size of the very last batch may be less than 500
   batchSize: 500,
   // We want to wait before moving to the next batch

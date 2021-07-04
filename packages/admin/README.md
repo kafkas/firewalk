@@ -27,7 +27,7 @@
         <img src="https://img.shields.io/github/last-commit/kafkas/firecode" /></a>
     <a href="https://lerna.js.org/" alt="Framework">
         <img src="https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg" /></a>
-    <a href="https://kafkas.github.io/firecode/0.7.2/">
+    <a href="https://kafkas.github.io/firecode/0.8.0/">
     <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs welcome!" /></a>
 </p>
 
@@ -69,7 +69,7 @@ npm install @firecode/admin
 
 There are only 2 kinds of objects you need to be familiar with when using this library:
 
-1. **Traverser**: An object that walks you through a collection of documents (or more generally a [Traversable](https://kafkas.github.io/firecode/0.7.2/modules.html#traversable)).
+1. **Traverser**: An object that walks you through a collection of documents (or more generally a [Traversable](https://kafkas.github.io/firecode/0.8.0/modules.html#traversable)).
 
 2. **Migrator**: A convenience object used for database migrations. It lets you easily write to the documents within a given traversable and uses a traverser to do that. You can easily write your own migration logic in the traverser callback if you don't want to use a migrator.
 
@@ -128,7 +128,7 @@ console.log(`Traversed ${docCount} projects super-fast!`);
 
 ```ts
 const projectsColRef = firestore().collection('projects');
-const migrator = createBatchMigrator(projectsColRef);
+const migrator = createMigrator(projectsColRef);
 const { migratedDocCount } = await migrator.update('isCompleted', false);
 console.log(`Updated ${migratedDocCount} projects!`);
 ```
@@ -141,7 +141,7 @@ type UserDoc = {
   lastName: string;
 };
 const usersColRef = firestore().collection('users') as firestore.CollectionReference<UserDoc>;
-const migrator = createBatchMigrator(usersColRef);
+const migrator = createMigrator(usersColRef);
 const { migratedDocCount } = await migrator.updateWithDerivedData((snap) => {
   const { firstName, lastName } = snap.data();
   return {
@@ -156,7 +156,7 @@ console.log(`Updated ${migratedDocCount} users!`);
 ```ts
 const projectsColRef = firestore().collection('projects');
 const fastTraverser = createFastTraverser(projectsColRef, { maxConcurrentBatchCount: 25 });
-const fastMigrator = createBatchMigrator(fastTraverser);
+const fastMigrator = createMigrator(fastTraverser);
 const { migratedDocCount } = await fastMigrator.update('isCompleted', false);
 console.log(`Updated ${migratedDocCount} projects super-fast!`);
 ```
@@ -165,7 +165,7 @@ console.log(`Updated ${migratedDocCount} projects super-fast!`);
 
 ```ts
 const walletsWithNegativeBalance = firestore().collection('wallets').where('money', '<', 0);
-const migrator = createBatchMigrator(walletsWithNegativeBalance, {
+const migrator = createMigrator(walletsWithNegativeBalance, {
   // We want each batch to have 500 docs. The size of the very last batch may be less than 500
   batchSize: 500,
   // We want to wait before moving to the next batch
@@ -178,27 +178,12 @@ const { migratedDocCount } = await migrator.set({ money: 0 });
 console.log(`Updated ${migratedDocCount} wallets!`);
 ```
 
-### Rename an optional field
+### Rename a field
 
 ```ts
-type PostDoc = {
-  text: string;
-  postedAt?: firestore.Timestamp;
-};
-const postsColGroup = firestore().collectionGroup('posts') as firestore.CollectionGroup<PostDoc>;
-const migrator = createBatchMigrator(postsColGroup);
-const { migratedDocCount } = await migrator
-  .withPredicate(
-    // Ignore if it doesn't have a `postedAt` field
-    (snap) => snap.data().postedAt !== undefined
-  )
-  .updateWithDerivedData((snap) => {
-    const { postedAt } = snap.data();
-    return {
-      publishedAt: postedAt!, // Safe to assert now
-      postedAt: firestore.FieldValue.delete(),
-    };
-  });
+const postsColGroup = firestore().collectionGroup('posts');
+const migrator = createMigrator(postsColGroup);
+const { migratedDocCount } = await migrator.renameField('postedAt', 'publishedAt');
 console.log(`Updated ${migratedDocCount} posts!`);
 ```
 
@@ -206,7 +191,7 @@ console.log(`Updated ${migratedDocCount} posts!`);
 
 You can find the full API reference for `@firecode/admin` [here](https://kafkas.github.io/firecode/). We maintain detailed docs for every version! Here are some of the core functions that this library provides.
 
-### [createTraverser](https://kafkas.github.io/firecode/0.7.2/modules.html#createtraverser)
+### [createTraverser](https://kafkas.github.io/firecode/0.8.0/modules.html#createtraverser)
 
 Creates a traverser that facilitates Firestore collection traversals. When traversing the collection, this traverser invokes a specified async callback for each batch of document snapshots and waits for the callback Promise to resolve before moving to the next batch.
 
@@ -224,7 +209,7 @@ where:
 - _C_: average callback processing time
 - _S_: average extra space used by the callback
 
-### [createFastTraverser](https://kafkas.github.io/firecode/0.7.2/modules.html#createfasttraverser)
+### [createFastTraverser](https://kafkas.github.io/firecode/0.8.0/modules.html#createfasttraverser)
 
 Creates a fast traverser that facilitates Firestore collection traversals. When traversing the collection, this traverser invokes a specified async callback for each batch of document snapshots and immediately moves to the next batch. It does not wait for the callback Promise to resolve before moving to the next batch so there is no guarantee that any given batch will finish processing before a later batch. This traverser uses more memory but is significantly faster than the default traverser.
 
@@ -242,7 +227,7 @@ where:
 - _C_: average callback processing time
 - _S_: average extra space used by the callback
 
-### [createMigrator](https://kafkas.github.io/firecode/0.7.2/modules.html#createmigrator)
+### [createMigrator](https://kafkas.github.io/firecode/0.8.0/modules.html#createmigrator)
 
 Creates a migrator that facilitates database migrations. The migrator accepts a custom traverser to traverse the collection. Otherwise it will create a default traverser with your desired traversal config. This migrator does not use atomic batch writes so it is possible that when a write fails other writes go through.
 
@@ -260,7 +245,7 @@ where:
 - _TC_(`traverser`): time complexity of the underlying traverser
 - _SC_(`traverser`): space complexity of the underlying traverser
 
-### [createBatchMigrator](https://kafkas.github.io/firecode/0.7.2/modules.html#createbatchmigrator)
+### [createBatchMigrator](https://kafkas.github.io/firecode/0.8.0/modules.html#createbatchmigrator)
 
 Creates a migrator that facilitates database migrations. The migrator accepts a custom traverser to traverse the collection. Otherwise it will create a default traverser with your desired traversal config. This migrator uses atomic batch writes so the entire operation will fail if a single write isn't successful.
 
