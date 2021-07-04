@@ -1,6 +1,7 @@
 import type { firestore } from 'firebase-admin';
 import { sleep, isPositiveInteger } from '../../utils';
 import type {
+  BatchCallback,
   BatchCallbackAsync,
   ExitEarlyPredicate,
   Traversable,
@@ -10,6 +11,12 @@ import type {
   TraverseEachConfig,
   Traverser,
 } from '../../api';
+
+export type PauseAndResume = () => void | Promise<void>;
+
+export type BatchProcessor<D> = (
+  ...args: Parameters<BatchCallback<D>>
+) => void | Promise<void> | PauseAndResume | Promise<PauseAndResume>;
 
 export abstract class AbstractTraverser<C extends TraversalConfig, D> implements Traverser<C, D> {
   protected static readonly baseConfig: TraversalConfig = {
@@ -70,6 +77,49 @@ export abstract class AbstractTraverser<C extends TraversalConfig, D> implements
     });
 
     return { batchCount, docCount };
+  }
+
+  protected async runTraversal(processBatch: BatchProcessor<D>): Promise<TraversalResult> {
+    const {
+      batchSize,
+      sleepBetweenBatches,
+      sleepTimeBetweenBatches,
+      maxDocCount,
+    } = this.traversalConfig;
+
+    let curBatchIndex = 0;
+    let docCount = 0;
+    let query = this.traversable.limit(Math.min(batchSize, maxDocCount));
+
+    while (true) {
+      const { docs: batchDocs } = await query.get();
+      const batchDocCount = batchDocs.length;
+
+      if (batchDocCount === 0) {
+        break;
+      }
+
+      const lastDocInBatch = batchDocs[batchDocCount - 1];
+
+      docCount += batchDocCount;
+
+      const pauseAndResume = await processBatch(batchDocs, curBatchIndex);
+
+      if (this.shouldExitEarly(batchDocs, curBatchIndex) || docCount === maxDocCount) {
+        break;
+      }
+
+      await pauseAndResume?.();
+
+      if (sleepBetweenBatches) {
+        await sleep(sleepTimeBetweenBatches);
+      }
+
+      query = query.startAfter(lastDocInBatch).limit(Math.min(batchSize, maxDocCount - docCount));
+      curBatchIndex++;
+    }
+
+    return { batchCount: curBatchIndex, docCount };
   }
 
   protected shouldExitEarly(

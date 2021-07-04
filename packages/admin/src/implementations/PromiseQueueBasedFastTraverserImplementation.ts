@@ -66,17 +66,7 @@ export class PromiseQueueBasedFastTraverserImplementation<D>
   }
 
   public async traverse(callback: BatchCallbackAsync<D>): Promise<TraversalResult> {
-    const {
-      batchSize,
-      sleepBetweenBatches,
-      sleepTimeBetweenBatches,
-      maxDocCount,
-      maxConcurrentBatchCount,
-    } = this.traversalConfig;
-
-    let curBatchIndex = 0;
-    let docCount = 0;
-    let query = this.traversable.limit(Math.min(batchSize, maxDocCount));
+    const { maxConcurrentBatchCount } = this.traversalConfig;
 
     const callbackPromiseQueue = new PromiseQueue<void>();
 
@@ -86,43 +76,21 @@ export class PromiseQueueBasedFastTraverserImplementation<D>
       }
     }, PROCESS_QUEUE_INTERVAL);
 
-    while (true) {
-      const { docs: batchDocs } = await query.get();
-      const batchDocCount = batchDocs.length;
-
-      if (batchDocCount === 0) {
-        break;
-      }
-
-      const lastDocInBatch = batchDocs[batchDocCount - 1];
-
-      docCount += batchDocCount;
-
-      callbackPromiseQueue.enqueue(callback(batchDocs, curBatchIndex));
-
-      if (this.shouldExitEarly(batchDocs, curBatchIndex) || docCount === maxDocCount) {
-        break;
-      }
-
-      while (callbackPromiseQueue.size >= maxConcurrentBatchCount) {
-        await sleep(PROCESS_QUEUE_INTERVAL);
-      }
-
-      if (sleepBetweenBatches) {
-        await sleep(sleepTimeBetweenBatches);
-      }
-
-      query = query.startAfter(lastDocInBatch).limit(Math.min(batchSize, maxDocCount - docCount));
-      curBatchIndex++;
-    }
+    const traversalResult = await this.runTraversal((batchDocs, batchIndex) => {
+      callbackPromiseQueue.enqueue(callback(batchDocs, batchIndex));
+      return async () => {
+        while (callbackPromiseQueue.size >= maxConcurrentBatchCount) {
+          await sleep(PROCESS_QUEUE_INTERVAL);
+        }
+      };
+    });
 
     await unregisterQueueProcessor();
 
     // There may still be some Promises left in the queue but there won't be any new ones coming in.
     // Wait for the existing ones to resolve and exit.
-
     await callbackPromiseQueue.process();
 
-    return { batchCount: curBatchIndex, docCount };
+    return traversalResult;
   }
 }

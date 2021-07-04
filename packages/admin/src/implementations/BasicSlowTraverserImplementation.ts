@@ -1,4 +1,3 @@
-import { sleep } from '../utils';
 import type {
   BatchCallbackAsync,
   ExitEarlyPredicate,
@@ -42,44 +41,9 @@ export class BasicSlowTraverserImplementation<D>
     );
   }
 
-  public async traverse(callback: BatchCallbackAsync<D>): Promise<TraversalResult> {
-    const {
-      batchSize,
-      sleepBetweenBatches,
-      sleepTimeBetweenBatches,
-      maxDocCount,
-    } = this.traversalConfig;
-
-    let curBatchIndex = 0;
-    let docCount = 0;
-    let query = this.traversable.limit(Math.min(batchSize, maxDocCount));
-
-    while (true) {
-      const { docs: batchDocs } = await query.get();
-      const batchDocCount = batchDocs.length;
-
-      if (batchDocCount === 0) {
-        break;
-      }
-
-      const lastDocInBatch = batchDocs[batchDocCount - 1];
-
-      docCount += batchDocCount;
-
-      await callback(batchDocs, curBatchIndex);
-
-      if (this.shouldExitEarly(batchDocs, curBatchIndex) || docCount === maxDocCount) {
-        break;
-      }
-
-      query = query.startAfter(lastDocInBatch).limit(Math.min(batchSize, maxDocCount - docCount));
-      curBatchIndex++;
-
-      if (sleepBetweenBatches) {
-        await sleep(sleepTimeBetweenBatches);
-      }
-    }
-
-    return { batchCount: curBatchIndex, docCount };
+  public traverse(callback: BatchCallbackAsync<D>): Promise<TraversalResult> {
+    return this.runTraversal(async (batchDocs, batchIndex) => {
+      await callback(batchDocs, batchIndex);
+    });
   }
 }
