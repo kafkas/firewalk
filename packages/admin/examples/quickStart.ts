@@ -1,5 +1,5 @@
 import { firestore } from 'firebase-admin';
-import { createTraverser } from '../src';
+import { createTraverser } from '@firecode/admin';
 
 const usersCollection = firestore().collection('users');
 const traverser = createTraverser(usersCollection);

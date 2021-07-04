@@ -1,5 +1,5 @@
 import { firestore } from 'firebase-admin';
-import { createMigrator } from '../src';
+import { createMigrator } from '@firecode/admin';
 
 const projectsColRef = firestore().collection('projects');
 const migrator = createMigrator(projectsColRef);

@@ -1,5 +1,5 @@
 import { firestore } from 'firebase-admin';
-import { createMigrator } from '../src';
+import { createMigrator } from '@firecode/admin';
 
 const walletsWithNegativeBalance = firestore().collection('wallets').where('money', '<', 0);
 const migrator = createMigrator(walletsWithNegativeBalance, {

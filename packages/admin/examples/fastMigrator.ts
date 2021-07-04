@@ -1,5 +1,5 @@
 import { firestore } from 'firebase-admin';
-import { createMigrator, createFastTraverser } from '../src';
+import { createMigrator, createFastTraverser } from '@firecode/admin';
 
 const projectsColRef = firestore().collection('projects');
 const fastTraverser = createFastTraverser(projectsColRef, { maxConcurrentBatchCount: 25 });

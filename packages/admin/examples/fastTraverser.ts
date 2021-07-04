@@ -1,5 +1,5 @@
 import { firestore } from 'firebase-admin';
-import { createFastTraverser } from '../src';
+import { createFastTraverser } from '@firecode/admin';
 
 const projectsColRef = firestore().collection('projects');
 const traverser = createFastTraverser(projectsColRef, {
