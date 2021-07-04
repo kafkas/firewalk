@@ -47,39 +47,37 @@ export class BasicDefaultMigratorImplementation<
   public async set(data: D | Partial<D>, options?: SetOptions): Promise<MigrationResult> {
     let migratedDocCount = 0;
 
-    const { batchCount, docCount: traversedDocCount } = await this.traverser.traverse(
-      async (snapshots, batchIndex) => {
-        this.registeredCallbacks.onBeforeBatchStart?.(snapshots, batchIndex);
+    const traversalResult = await this.traverser.traverse(async (snapshots, batchIndex) => {
+      this.registeredCallbacks.onBeforeBatchStart?.(snapshots, batchIndex);
 
-        let migratableDocCount = 0;
+      let migratableDocCount = 0;
 
-        const promises = snapshots.map(async (snapshot) => {
-          const shouldMigrate = this.migrationPredicate(snapshot);
+      const promises = snapshots.map(async (snapshot) => {
+        const shouldMigrate = this.migrationPredicate(snapshot);
 
-          if (!shouldMigrate) {
-            return;
-          }
+        if (!shouldMigrate) {
+          return;
+        }
 
-          migratableDocCount++;
+        migratableDocCount++;
 
-          if (options === undefined) {
-            // Signature 1
-            await snapshot.ref.set(data as D);
-          } else {
-            // Signature 2
-            await snapshot.ref.set(data as Partial<D>, options);
-          }
-        });
+        if (options === undefined) {
+          // Signature 1
+          await snapshot.ref.set(data as D);
+        } else {
+          // Signature 2
+          await snapshot.ref.set(data as Partial<D>, options);
+        }
+      });
 
-        await Promise.all(promises);
+      await Promise.all(promises);
 
-        migratedDocCount += migratableDocCount;
+      migratedDocCount += migratableDocCount;
 
-        this.registeredCallbacks.onAfterBatchComplete?.(snapshots, batchIndex);
-      }
-    );
+      this.registeredCallbacks.onAfterBatchComplete?.(snapshots, batchIndex);
+    });
 
-    return { batchCount, traversedDocCount, migratedDocCount };
+    return { traversalResult, migratedDocCount };
   }
 
   public setWithDerivedData(getData: SetDataGetter<D>): Promise<MigrationResult>;
@@ -95,41 +93,39 @@ export class BasicDefaultMigratorImplementation<
   ): Promise<MigrationResult> {
     let migratedDocCount = 0;
 
-    const { batchCount, docCount: traversedDocCount } = await this.traverser.traverse(
-      async (snapshots, batchIndex) => {
-        this.registeredCallbacks.onBeforeBatchStart?.(snapshots, batchIndex);
+    const traversalResult = await this.traverser.traverse(async (snapshots, batchIndex) => {
+      this.registeredCallbacks.onBeforeBatchStart?.(snapshots, batchIndex);
 
-        let migratableDocCount = 0;
+      let migratableDocCount = 0;
 
-        const promises = snapshots.map((snapshot) => {
-          const shouldMigrate = this.migrationPredicate(snapshot);
+      const promises = snapshots.map((snapshot) => {
+        const shouldMigrate = this.migrationPredicate(snapshot);
 
-          if (!shouldMigrate) {
-            return;
-          }
+        if (!shouldMigrate) {
+          return;
+        }
 
-          migratableDocCount++;
+        migratableDocCount++;
 
-          if (options === undefined) {
-            // Signature 1
-            const data = (getData as SetDataGetter<D>)(snapshot);
-            snapshot.ref.set(data);
-          } else {
-            // Signature 2
-            const data = (getData as SetDataGetter<Partial<D>>)(snapshot);
-            snapshot.ref.set(data, options);
-          }
-        });
+        if (options === undefined) {
+          // Signature 1
+          const data = (getData as SetDataGetter<D>)(snapshot);
+          snapshot.ref.set(data);
+        } else {
+          // Signature 2
+          const data = (getData as SetDataGetter<Partial<D>>)(snapshot);
+          snapshot.ref.set(data, options);
+        }
+      });
 
-        await Promise.all(promises);
+      await Promise.all(promises);
 
-        migratedDocCount += migratableDocCount;
+      migratedDocCount += migratableDocCount;
 
-        this.registeredCallbacks.onAfterBatchComplete?.(snapshots, batchIndex);
-      }
-    );
+      this.registeredCallbacks.onAfterBatchComplete?.(snapshots, batchIndex);
+    });
 
-    return { batchCount, traversedDocCount, migratedDocCount };
+    return { traversalResult, migratedDocCount };
   }
 
   public update(data: firestore.UpdateData): Promise<MigrationResult>;
@@ -143,68 +139,64 @@ export class BasicDefaultMigratorImplementation<
     const argCount = [dataOrField, value].filter((a) => a !== undefined).length;
     let migratedDocCount = 0;
 
-    const { batchCount, docCount: traversedDocCount } = await this.traverser.traverse(
-      async (snapshots, batchIndex) => {
-        this.registeredCallbacks.onBeforeBatchStart?.(snapshots, batchIndex);
+    const traversalResult = await this.traverser.traverse(async (snapshots, batchIndex) => {
+      this.registeredCallbacks.onBeforeBatchStart?.(snapshots, batchIndex);
 
-        let migratableDocCount = 0;
+      let migratableDocCount = 0;
 
-        const promises = snapshots.map(async (snapshot) => {
-          if (argCount === 1) {
-            // Signature 1
-            const data = dataOrField as firestore.UpdateData;
-            const shouldMigrate = this.migrationPredicate(snapshot);
-            if (shouldMigrate) {
-              migratableDocCount++;
-              await snapshot.ref.update(data);
-            }
-          } else {
-            // Signature 2
-            const field = dataOrField as string | firestore.FieldPath;
-            const shouldMigrate = this.migrationPredicate(snapshot);
-            if (shouldMigrate) {
-              migratableDocCount++;
-              await snapshot.ref.update(field, value);
-            }
+      const promises = snapshots.map(async (snapshot) => {
+        if (argCount === 1) {
+          // Signature 1
+          const data = dataOrField as firestore.UpdateData;
+          const shouldMigrate = this.migrationPredicate(snapshot);
+          if (shouldMigrate) {
+            migratableDocCount++;
+            await snapshot.ref.update(data);
           }
-        });
+        } else {
+          // Signature 2
+          const field = dataOrField as string | firestore.FieldPath;
+          const shouldMigrate = this.migrationPredicate(snapshot);
+          if (shouldMigrate) {
+            migratableDocCount++;
+            await snapshot.ref.update(field, value);
+          }
+        }
+      });
 
-        await Promise.all(promises);
+      await Promise.all(promises);
 
-        migratedDocCount += migratableDocCount;
+      migratedDocCount += migratableDocCount;
 
-        this.registeredCallbacks.onAfterBatchComplete?.(snapshots, batchIndex);
-      }
-    );
+      this.registeredCallbacks.onAfterBatchComplete?.(snapshots, batchIndex);
+    });
 
-    return { batchCount, traversedDocCount, migratedDocCount };
+    return { traversalResult, migratedDocCount };
   }
 
   public async updateWithDerivedData(getData: UpdateDataGetter<D>): Promise<MigrationResult> {
     let migratedDocCount = 0;
 
-    const { batchCount, docCount: traversedDocCount } = await this.traverser.traverse(
-      async (snapshots, batchIndex) => {
-        this.registeredCallbacks.onBeforeBatchStart?.(snapshots, batchIndex);
+    const traversalResult = await this.traverser.traverse(async (snapshots, batchIndex) => {
+      this.registeredCallbacks.onBeforeBatchStart?.(snapshots, batchIndex);
 
-        let migratableDocCount = 0;
+      let migratableDocCount = 0;
 
-        const promises = snapshots.map(async (snapshot) => {
-          const shouldMigrate = this.migrationPredicate(snapshot);
-          if (shouldMigrate) {
-            migratableDocCount++;
-            await snapshot.ref.update(getData(snapshot));
-          }
-        });
+      const promises = snapshots.map(async (snapshot) => {
+        const shouldMigrate = this.migrationPredicate(snapshot);
+        if (shouldMigrate) {
+          migratableDocCount++;
+          await snapshot.ref.update(getData(snapshot));
+        }
+      });
 
-        await Promise.all(promises);
+      await Promise.all(promises);
 
-        migratedDocCount += migratableDocCount;
+      migratedDocCount += migratableDocCount;
 
-        this.registeredCallbacks.onAfterBatchComplete?.(snapshots, batchIndex);
-      }
-    );
+      this.registeredCallbacks.onAfterBatchComplete?.(snapshots, batchIndex);
+    });
 
-    return { batchCount, traversedDocCount, migratedDocCount };
+    return { traversalResult, migratedDocCount };
   }
 }
