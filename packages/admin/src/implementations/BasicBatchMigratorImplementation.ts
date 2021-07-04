@@ -172,14 +172,18 @@ export class BasicBatchMigratorImplementation<
 
           if (typeof dataOrField === 'string' || dataOrField instanceof firestore.FieldPath) {
             // Signature 2
-            const field = dataOrField as string | firestore.FieldPath;
+            const field = dataOrField;
             const value = preconditionOrValue;
             writeBatch.update(snapshot.ref, field, value, ...moreFieldsOrPrecondition);
           } else {
             // Signature 1
-            const data = dataOrField as firestore.UpdateData;
+            const data = dataOrField;
             const precondition = preconditionOrValue as firestore.Precondition | undefined;
-            writeBatch.update(snapshot.ref, data, precondition);
+            if (precondition === undefined) {
+              writeBatch.update(snapshot.ref, data);
+            } else {
+              writeBatch.update(snapshot.ref, data, precondition);
+            }
           }
         }
       });
@@ -208,8 +212,13 @@ export class BasicBatchMigratorImplementation<
       snapshots.forEach((snapshot) => {
         const shouldMigrate = this.migrationPredicate(snapshot);
         if (shouldMigrate) {
-          writeBatch.update(snapshot.ref, getData(snapshot), precondition);
           migratableDocCount++;
+          const data = getData(snapshot);
+          if (precondition === undefined) {
+            writeBatch.update(snapshot.ref, data);
+          } else {
+            writeBatch.update(snapshot.ref, data, precondition);
+          }
         }
       });
 

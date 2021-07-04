@@ -166,7 +166,11 @@ export class BasicDefaultMigratorImplementation<
             // Signature 1
             const data = dataOrField;
             const precondition = preconditionOrValue as firestore.Precondition | undefined;
-            await snapshot.ref.update(data, precondition);
+            if (precondition === undefined) {
+              await snapshot.ref.update(data);
+            } else {
+              await snapshot.ref.update(data, precondition);
+            }
           }
         }
       });
@@ -196,7 +200,12 @@ export class BasicDefaultMigratorImplementation<
         const shouldMigrate = this.migrationPredicate(snapshot);
         if (shouldMigrate) {
           migratableDocCount++;
-          await snapshot.ref.update(getData(snapshot), precondition);
+          const data = getData(snapshot);
+          if (precondition === undefined) {
+            await snapshot.ref.update(data);
+          } else {
+            await snapshot.ref.update(data, precondition);
+          }
         }
       });
 
