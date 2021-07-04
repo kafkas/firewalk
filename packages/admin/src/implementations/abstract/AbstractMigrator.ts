@@ -13,7 +13,7 @@ import type {
 
 export abstract class AbstractMigrator<D extends firestore.DocumentData, C extends TraversalConfig>
   implements Migrator<D, C> {
-  protected registeredCallbacks: {
+  private registeredCallbacks: {
     onBeforeBatchStart?: BatchCallback<D>;
     onAfterBatchComplete?: BatchCallback<D>;
   } = {};
@@ -24,6 +24,19 @@ export abstract class AbstractMigrator<D extends firestore.DocumentData, C exten
 
   public onAfterBatchComplete(callback: BatchCallback<D>): void {
     this.registeredCallbacks.onAfterBatchComplete = callback;
+  }
+
+  protected async migrateWithTraverser(
+    migrateBatch: (snapshots: firestore.QueryDocumentSnapshot<D>[]) => Promise<number>
+  ): Promise<MigrationResult> {
+    let migratedDocCount = 0;
+    const traversalResult = await this.traverser.traverse(async (snapshots, batchIndex) => {
+      this.registeredCallbacks.onBeforeBatchStart?.(snapshots, batchIndex);
+      const migratedBatchDocCount = await migrateBatch(snapshots);
+      migratedDocCount += migratedBatchDocCount;
+      this.registeredCallbacks.onAfterBatchComplete?.(snapshots, batchIndex);
+    });
+    return { traversalResult, migratedDocCount };
   }
 
   public abstract readonly traverser: Traverser<D, C>;

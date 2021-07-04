@@ -30,7 +30,6 @@ export class BasicBatchMigratorImplementation<
 
   private validateConfig(config: Partial<TraversalConfig> = {}): void {
     const { batchSize } = config;
-
     if (
       typeof batchSize === 'number' &&
       (!isPositiveInteger(batchSize) ||
@@ -57,7 +56,7 @@ export class BasicBatchMigratorImplementation<
   public set(data: Partial<D>, options: SetOptions): Promise<MigrationResult>;
 
   public async set(data: D | Partial<D>, options?: SetOptions): Promise<MigrationResult> {
-    return this.traverseAndMigrate((writeBatch, snapshot) => {
+    return this.migrate((writeBatch, snapshot) => {
       if (options === undefined) {
         // Signature 1
         writeBatch.set(snapshot.ref, data as D);
@@ -79,7 +78,7 @@ export class BasicBatchMigratorImplementation<
     getData: SetDataGetter<D> | SetDataGetter<Partial<D>>,
     options?: SetOptions
   ): Promise<MigrationResult> {
-    return this.traverseAndMigrate((writeBatch, snapshot) => {
+    return this.migrate((writeBatch, snapshot) => {
       if (options === undefined) {
         // Signature 1
         const data = (getData as SetDataGetter<D>)(snapshot);
@@ -108,7 +107,7 @@ export class BasicBatchMigratorImplementation<
     preconditionOrValue?: any,
     ...moreFieldsOrPrecondition: any[]
   ): Promise<MigrationResult> {
-    return this.traverseAndMigrate((writeBatch, snapshot) => {
+    return this.migrate((writeBatch, snapshot) => {
       if (typeof dataOrField === 'string' || dataOrField instanceof firestore.FieldPath) {
         // Signature 2
         const field = dataOrField;
@@ -131,7 +130,7 @@ export class BasicBatchMigratorImplementation<
     getData: UpdateDataGetter<D>,
     precondition?: firestore.Precondition
   ): Promise<MigrationResult> {
-    return this.traverseAndMigrate((writeBatch, snapshot) => {
+    return this.migrate((writeBatch, snapshot) => {
       const data = getData(snapshot);
       if (precondition === undefined) {
         writeBatch.update(snapshot.ref, data);
@@ -141,34 +140,24 @@ export class BasicBatchMigratorImplementation<
     });
   }
 
-  private async traverseAndMigrate(
+  private async migrate(
     migrateDoc: (
       writeBatch: firestore.WriteBatch,
       snapshot: firestore.QueryDocumentSnapshot<D>
     ) => void
   ): Promise<MigrationResult> {
-    let migratedDocCount = 0;
-
-    const traversalResult = await this.traverser.traverse(async (snapshots, batchIndex) => {
-      this.registeredCallbacks.onBeforeBatchStart?.(snapshots, batchIndex);
-
-      let migratableDocCount = 0;
+    return this.migrateWithTraverser(async (snapshots) => {
+      let migratedDocCount = 0;
       const writeBatch = this.traverser.traversable.firestore.batch();
-
-      snapshots.forEach(async (snapshot) => {
+      snapshots.forEach((snapshot) => {
         const shouldMigrate = this.migrationPredicate(snapshot);
         if (shouldMigrate) {
-          migratableDocCount++;
           migrateDoc(writeBatch, snapshot);
+          migratedDocCount++;
         }
       });
-
       await writeBatch.commit();
-      migratedDocCount += migratableDocCount;
-
-      this.registeredCallbacks.onAfterBatchComplete?.(snapshots, batchIndex);
+      return migratedDocCount;
     });
-
-    return { traversalResult, migratedDocCount };
   }
 }
