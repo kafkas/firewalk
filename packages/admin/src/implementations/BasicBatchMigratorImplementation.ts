@@ -13,16 +13,13 @@ import type {
 } from '../api';
 import { AbstractMigrator } from './abstract';
 
-export class BasicBatchMigratorImplementation<
-    D extends firestore.DocumentData,
-    C extends TraversalConfig
-  >
-  extends AbstractMigrator<D, C>
-  implements BatchMigrator<D, C> {
+export class BasicBatchMigratorImplementation<C extends TraversalConfig, D>
+  extends AbstractMigrator<C, D>
+  implements BatchMigrator<C, D> {
   private static readonly MAX_BATCH_WRITE_DOC_COUNT = 500;
 
   public constructor(
-    public readonly traverser: Traverser<D, C>,
+    public readonly traverser: Traverser<C, D>,
     private migrationPredicate: MigrationPredicate<D> = () => true
   ) {
     super();
@@ -42,13 +39,13 @@ export class BasicBatchMigratorImplementation<
     }
   }
 
-  public withPredicate(predicate: MigrationPredicate<D>): BatchMigrator<D, C> {
+  public withPredicate(predicate: MigrationPredicate<D>): BatchMigrator<C, D> {
     return new BasicBatchMigratorImplementation(this.traverser, predicate);
   }
 
   public withTraverser<C2 extends TraversalConfig>(
-    traverser: Traverser<D, C2>
-  ): BatchMigrator<D, C2> {
+    traverser: Traverser<C2, D>
+  ): BatchMigrator<C2, D> {
     return new BasicBatchMigratorImplementation(traverser, this.migrationPredicate);
   }
 

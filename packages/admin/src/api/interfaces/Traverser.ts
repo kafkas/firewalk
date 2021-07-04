@@ -12,7 +12,10 @@ import type {
 /**
  * Represents the general interface of a traverser.
  */
-export interface Traverser<D extends firestore.DocumentData, C extends TraversalConfig> {
+export interface Traverser<
+  C extends TraversalConfig = TraversalConfig,
+  D = firestore.DocumentData
+> {
   /**
    * The underlying traversable.
    */
@@ -29,7 +32,7 @@ export interface Traverser<D extends firestore.DocumentData, C extends Traversal
    * @param config - Partial traversal configuration.
    * @returns A new {@link Traverser} object.
    */
-  withConfig(config: Partial<C>): Traverser<D, C>;
+  withConfig(config: Partial<C>): Traverser<C, D>;
 
   /**
    * Applies the specified exit-early predicate to the traverser. After retrieving each batch, the traverser will evaluate the
@@ -39,7 +42,7 @@ export interface Traverser<D extends firestore.DocumentData, C extends Traversal
    * indicating whether to exit traversal early.
    * @returns A new {@link Traverser} object.
    */
-  withExitEarlyPredicate(predicate: ExitEarlyPredicate<D>): Traverser<D, C>;
+  withExitEarlyPredicate(predicate: ExitEarlyPredicate<D>): Traverser<C, D>;
 
   /**
    * Traverses the entire collection in batches of the size specified in traversal config. Invokes the specified

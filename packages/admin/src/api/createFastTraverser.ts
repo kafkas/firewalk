@@ -13,7 +13,7 @@ import type { FastTraversalConfig, FastTraverser, Traversable } from './interfac
  * @param config - Optional. The traversal configuration with which the traverser will be created.
  * @returns A new {@link FastTraverser} object.
  */
-export function createFastTraverser<D extends firestore.DocumentData>(
+export function createFastTraverser<D = firestore.DocumentData>(
   traversable: Traversable<D>,
   config?: Partial<FastTraversalConfig>
 ): FastTraverser<D> {

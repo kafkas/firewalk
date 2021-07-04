@@ -5,6 +5,6 @@ import type { firestore } from 'firebase-admin';
  * values to update within that document, optionally followed by a Precondition to enforce on
  * the update.
  */
-export type UpdateFieldValueGetter<D> = (
+export type UpdateFieldValueGetter<D = firestore.DocumentData> = (
   snapshot: firestore.QueryDocumentSnapshot<D>
 ) => [string | firestore.FieldPath, any, ...any[]];

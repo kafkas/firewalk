@@ -12,14 +12,11 @@ import type {
 } from '../api';
 import { AbstractMigrator } from './abstract';
 
-export class BasicDefaultMigratorImplementation<
-    D extends firestore.DocumentData,
-    C extends TraversalConfig
-  >
-  extends AbstractMigrator<D, C>
-  implements DefaultMigrator<D, C> {
+export class BasicDefaultMigratorImplementation<C extends TraversalConfig, D>
+  extends AbstractMigrator<C, D>
+  implements DefaultMigrator<C, D> {
   public constructor(
-    public readonly traverser: Traverser<D, C>,
+    public readonly traverser: Traverser<C, D>,
     private migrationPredicate: MigrationPredicate<D> = () => true
   ) {
     super();
@@ -31,13 +28,13 @@ export class BasicDefaultMigratorImplementation<
     // Confirm that the traverser config is compatible with this migrator
   }
 
-  public withPredicate(predicate: MigrationPredicate<D>): DefaultMigrator<D, C> {
+  public withPredicate(predicate: MigrationPredicate<D>): DefaultMigrator<C, D> {
     return new BasicDefaultMigratorImplementation(this.traverser, predicate);
   }
 
   public withTraverser<C2 extends TraversalConfig>(
-    traverser: Traverser<D, C2>
-  ): DefaultMigrator<D, C2> {
+    traverser: Traverser<C2, D>
+  ): DefaultMigrator<C2, D> {
     return new BasicDefaultMigratorImplementation(traverser, this.migrationPredicate);
   }
 

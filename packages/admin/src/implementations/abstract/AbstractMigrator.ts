@@ -12,8 +12,7 @@ import type {
   UpdateFieldValueGetter,
 } from '../../api';
 
-export abstract class AbstractMigrator<D extends firestore.DocumentData, C extends TraversalConfig>
-  implements Migrator<D, C> {
+export abstract class AbstractMigrator<C extends TraversalConfig, D> implements Migrator<C, D> {
   private registeredCallbacks: {
     onBeforeBatchStart?: BatchCallback<D>;
     onAfterBatchComplete?: BatchCallback<D>;
@@ -50,13 +49,13 @@ export abstract class AbstractMigrator<D extends firestore.DocumentData, C exten
     return { traversalResult, migratedDocCount };
   }
 
-  public abstract readonly traverser: Traverser<D, C>;
+  public abstract readonly traverser: Traverser<C, D>;
 
-  public abstract withPredicate(predicate: MigrationPredicate<D>): Migrator<D, C>;
+  public abstract withPredicate(predicate: MigrationPredicate<D>): Migrator<C, D>;
 
   public abstract withTraverser<C2 extends TraversalConfig>(
-    traverser: Traverser<D, C2>
-  ): Migrator<D, C2>;
+    traverser: Traverser<C2, D>
+  ): Migrator<C2, D>;
 
   public abstract set(data: D): Promise<MigrationResult>;
 

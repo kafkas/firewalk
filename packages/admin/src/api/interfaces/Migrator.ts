@@ -14,11 +14,11 @@ import type {
 /**
  * Represents the general interface of a migrator.
  */
-export interface Migrator<D extends firestore.DocumentData, C extends TraversalConfig> {
+export interface Migrator<C extends TraversalConfig = TraversalConfig, D = firestore.DocumentData> {
   /**
    * The underlying traverser.
    */
-  readonly traverser: Traverser<D, C>;
+  readonly traverser: Traverser<C, D>;
 
   /**
    * Applies a migration predicate that indicates whether to migrate the current document. If this is not provided,
@@ -27,7 +27,7 @@ export interface Migrator<D extends firestore.DocumentData, C extends TraversalC
    * @param predicate - A function that takes a document snapshot and returns a boolean indicating whether to migrate it.
    * @returns A new {@link Migrator} object.
    */
-  withPredicate(predicate: MigrationPredicate<D>): Migrator<D, C>;
+  withPredicate(predicate: MigrationPredicate<D>): Migrator<C, D>;
 
   /**
    * Applies a new traverser that will be used by the migrator.
@@ -35,7 +35,7 @@ export interface Migrator<D extends firestore.DocumentData, C extends TraversalC
    * @param traverser - The new traverser that the migrator will use.
    * @returns A new {@link Migrator} object.
    */
-  withTraverser<C2 extends TraversalConfig>(traverser: Traverser<D, C2>): Migrator<D, C2>;
+  withTraverser<C2 extends TraversalConfig>(traverser: Traverser<C2, D>): Migrator<C2, D>;
 
   /**
    * Registers a callback function that fires right before a batch starts processing.

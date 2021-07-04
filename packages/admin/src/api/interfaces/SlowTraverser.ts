@@ -10,8 +10,7 @@ import type {
 /**
  * A slow traverser object that facilitates Firestore collection traversals.
  */
-export interface SlowTraverser<D extends firestore.DocumentData>
-  extends Traverser<D, TraversalConfig> {
+export interface SlowTraverser<D = firestore.DocumentData> extends Traverser<TraversalConfig, D> {
   /**
    * Applies the specified config values to the traverser.
    *

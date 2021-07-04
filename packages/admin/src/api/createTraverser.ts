@@ -11,7 +11,7 @@ import type { SlowTraverser, Traversable, TraversalConfig } from './interfaces';
  * @param config - Optional. The traversal configuration with which the traverser will be created.
  * @returns A new {@link SlowTraverser} object.
  */
-export function createTraverser<D extends firestore.DocumentData>(
+export function createTraverser<D = firestore.DocumentData>(
   traversable: Traversable<D>,
   config?: Partial<TraversalConfig>
 ): SlowTraverser<D> {

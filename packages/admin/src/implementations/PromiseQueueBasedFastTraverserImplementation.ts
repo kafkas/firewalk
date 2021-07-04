@@ -1,4 +1,3 @@
-import type { firestore } from 'firebase-admin';
 import { sleep, PromiseQueue, registerInterval, isPositiveInteger } from '../utils';
 import type {
   BatchCallbackAsync,
@@ -13,8 +12,8 @@ import { AbstractTraverser } from './abstract';
 // TODO: This should probably be a function of traversal config
 const PROCESS_QUEUE_INTERVAL = 250;
 
-export class PromiseQueueBasedFastTraverserImplementation<D extends firestore.DocumentData>
-  extends AbstractTraverser<D, FastTraversalConfig>
+export class PromiseQueueBasedFastTraverserImplementation<D>
+  extends AbstractTraverser<FastTraversalConfig, D>
   implements FastTraverser<D> {
   private static readonly defaultConfig: FastTraversalConfig = {
     ...AbstractTraverser.baseConfig,

@@ -18,9 +18,10 @@ import { createTraverser } from './createTraverser';
  * @param traverser - The traverser object that this migrator will use when traversing the collection and writing to documents.
  * @returns A new {@link BatchMigrator} object.
  */
-export function createBatchMigrator<D extends firestore.DocumentData, C extends TraversalConfig>(
-  traverser: Traverser<D, C>
-): BatchMigrator<D, C>;
+export function createBatchMigrator<
+  C extends TraversalConfig = TraversalConfig,
+  D = firestore.DocumentData
+>(traverser: Traverser<C, D>): BatchMigrator<C, D>;
 
 /**
  * Creates a migrator that facilitates database migrations. The migrator creates a default (slow) traverser that
@@ -37,15 +38,18 @@ export function createBatchMigrator<D extends firestore.DocumentData, C extends 
  * @param traversalConfig - Optional. The traversal configuration with which the default traverser will be created.
  * @returns A new {@link BatchMigrator} object.
  */
-export function createBatchMigrator<D extends firestore.DocumentData>(
+export function createBatchMigrator<D = firestore.DocumentData>(
   traversable: Traversable<D>,
   traversalConfig?: Partial<TraversalConfig>
-): BatchMigrator<D, TraversalConfig>;
+): BatchMigrator<TraversalConfig, D>;
 
-export function createBatchMigrator<D extends firestore.DocumentData, C extends TraversalConfig>(
-  traversableOrTraverser: Traverser<D, C> | Traversable<D>,
+export function createBatchMigrator<
+  C extends TraversalConfig = TraversalConfig,
+  D = firestore.DocumentData
+>(
+  traversableOrTraverser: Traverser<C, D> | Traversable<D>,
   traversalConfig?: Partial<TraversalConfig>
-): BatchMigrator<D, C> | BatchMigrator<D, TraversalConfig> {
+): BatchMigrator<C, D> | BatchMigrator<TraversalConfig, D> {
   const traverser = isTraverser(traversableOrTraverser)
     ? traversableOrTraverser
     : createTraverser(traversableOrTraverser, traversalConfig);

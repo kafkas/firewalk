@@ -1,4 +1,3 @@
-import type { firestore } from 'firebase-admin';
 import { sleep } from '../utils';
 import type {
   BatchCallbackAsync,
@@ -10,8 +9,8 @@ import type {
 } from '../api';
 import { AbstractTraverser } from './abstract';
 
-export class BasicSlowTraverserImplementation<D extends firestore.DocumentData>
-  extends AbstractTraverser<D, TraversalConfig>
+export class BasicSlowTraverserImplementation<D>
+  extends AbstractTraverser<TraversalConfig, D>
   implements SlowTraverser<D> {
   private static readonly defaultConfig: TraversalConfig = {
     ...AbstractTraverser.baseConfig,

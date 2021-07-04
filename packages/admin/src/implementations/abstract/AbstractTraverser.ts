@@ -1,4 +1,3 @@
-import type { firestore } from 'firebase-admin';
 import { sleep, isPositiveInteger } from '../../utils';
 import type {
   BatchCallbackAsync,
@@ -11,8 +10,7 @@ import type {
   Traverser,
 } from '../../api';
 
-export abstract class AbstractTraverser<D extends firestore.DocumentData, C extends TraversalConfig>
-  implements Traverser<D, C> {
+export abstract class AbstractTraverser<C extends TraversalConfig, D> implements Traverser<C, D> {
   protected static readonly baseConfig: TraversalConfig = {
     batchSize: 250,
     sleepBetweenBatches: false,
@@ -72,9 +70,9 @@ export abstract class AbstractTraverser<D extends firestore.DocumentData, C exte
 
   public abstract readonly traversable: Traversable<D>;
 
-  public abstract withConfig(config: Partial<C>): Traverser<D, C>;
+  public abstract withConfig(config: Partial<C>): Traverser<C, D>;
 
-  public abstract withExitEarlyPredicate(predicate: ExitEarlyPredicate<D>): Traverser<D, C>;
+  public abstract withExitEarlyPredicate(predicate: ExitEarlyPredicate<D>): Traverser<C, D>;
 
   public abstract traverse(callback: BatchCallbackAsync<D>): Promise<TraversalResult>;
 }

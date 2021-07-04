@@ -8,7 +8,7 @@ export interface TestItemDoc {
 }
 
 export function runBasicMigratorTests<C extends TraversalConfig>(
-  migrator: Migrator<TestItemDoc, C>,
+  migrator: Migrator<C, TestItemDoc>,
   collectionRef: firestore.CollectionReference<TestItemDoc>
 ): void {
   describe('basic migrator tests', () => {
