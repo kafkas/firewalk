@@ -40,17 +40,11 @@ export class BasicDefaultMigratorImplementation<
     return new BasicDefaultMigratorImplementation(traverser, this.migrationPredicate);
   }
 
-  public set(dataOrGetData: D | SetDataGetter<D>): Promise<MigrationResult>;
+  public set(data: D): Promise<MigrationResult>;
 
-  public set(
-    dataOrGetData: Partial<D> | SetDataGetter<Partial<D>>,
-    options: SetOptions
-  ): Promise<MigrationResult>;
+  public set(data: Partial<D>, options: SetOptions): Promise<MigrationResult>;
 
-  public async set(
-    dataOrGetData: D | SetDataGetter<D> | Partial<D> | SetDataGetter<Partial<D>>,
-    options?: SetOptions
-  ): Promise<MigrationResult> {
+  public async set(data: D | Partial<D>, options?: SetOptions): Promise<MigrationResult> {
     let migratedDocCount = 0;
 
     const { batchCount, docCount: traversedDocCount } = await this.traverser.traverse(
@@ -68,28 +62,62 @@ export class BasicDefaultMigratorImplementation<
 
           migratableDocCount++;
 
-          if (typeof dataOrGetData !== 'function') {
-            if (options !== undefined) {
-              // Signature 1
-              const data = dataOrGetData as Partial<D>;
-              await snapshot.ref.set(data, options);
-            } else {
-              // Signature 2
-              const data = dataOrGetData as D;
-              await snapshot.ref.set(data);
-            }
+          if (options === undefined) {
+            // Signature 1
+            await snapshot.ref.set(data as D);
           } else {
-            if (options !== undefined) {
-              // Signature 3
-              const getData = dataOrGetData as SetDataGetter<Partial<D>>;
-              const data = getData(snapshot);
-              await snapshot.ref.set(data, options);
-            } else {
-              // Signature 4
-              const getData = dataOrGetData as SetDataGetter<D>;
-              const data = getData(snapshot);
-              await snapshot.ref.set(data);
-            }
+            // Signature 2
+            await snapshot.ref.set(data as Partial<D>, options);
+          }
+        });
+
+        await Promise.all(promises);
+
+        migratedDocCount += migratableDocCount;
+
+        this.registeredCallbacks.onAfterBatchComplete?.(snapshots, batchIndex);
+      }
+    );
+
+    return { batchCount, traversedDocCount, migratedDocCount };
+  }
+
+  public setWithDerivedData(getData: SetDataGetter<D>): Promise<MigrationResult>;
+
+  public setWithDerivedData(
+    getData: SetDataGetter<Partial<D>>,
+    options: SetOptions
+  ): Promise<MigrationResult>;
+
+  public async setWithDerivedData(
+    getData: SetDataGetter<D> | SetDataGetter<Partial<D>>,
+    options?: SetOptions
+  ): Promise<MigrationResult> {
+    let migratedDocCount = 0;
+
+    const { batchCount, docCount: traversedDocCount } = await this.traverser.traverse(
+      async (snapshots, batchIndex) => {
+        this.registeredCallbacks.onBeforeBatchStart?.(snapshots, batchIndex);
+
+        let migratableDocCount = 0;
+
+        const promises = snapshots.map((snapshot) => {
+          const shouldMigrate = this.migrationPredicate(snapshot);
+
+          if (!shouldMigrate) {
+            return;
+          }
+
+          migratableDocCount++;
+
+          if (options === undefined) {
+            // Signature 1
+            const data = (getData as SetDataGetter<D>)(snapshot);
+            snapshot.ref.set(data);
+          } else {
+            // Signature 2
+            const data = (getData as SetDataGetter<Partial<D>>)(snapshot);
+            snapshot.ref.set(data, options);
           }
         });
 

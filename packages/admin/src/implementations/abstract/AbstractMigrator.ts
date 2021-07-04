@@ -34,10 +34,14 @@ export abstract class AbstractMigrator<D extends firestore.DocumentData, C exten
     traverser: Traverser<D, C2>
   ): Migrator<D, C2>;
 
-  public abstract set(dataOrGetData: D | SetDataGetter<D>): Promise<MigrationResult>;
+  public abstract set(data: D): Promise<MigrationResult>;
 
-  public abstract set(
-    dataOrGetData: Partial<D> | SetDataGetter<Partial<D>>,
+  public abstract set(data: Partial<D>, options: SetOptions): Promise<MigrationResult>;
+
+  public abstract setWithDerivedData(getData: SetDataGetter<D>): Promise<MigrationResult>;
+
+  public abstract setWithDerivedData(
+    getData: SetDataGetter<Partial<D>>,
     options: SetOptions
   ): Promise<MigrationResult>;
 
