@@ -45,9 +45,19 @@ export abstract class AbstractMigrator<D extends firestore.DocumentData, C exten
     options: SetOptions
   ): Promise<MigrationResult>;
 
-  public abstract update(data: firestore.UpdateData): Promise<MigrationResult>;
+  public abstract update(
+    data: firestore.UpdateData,
+    precondition?: firestore.Precondition
+  ): Promise<MigrationResult>;
 
-  public abstract update(field: string | firestore.FieldPath, value: any): Promise<MigrationResult>;
+  public abstract update(
+    field: string | firestore.FieldPath,
+    value: any,
+    ...moreFieldsOrPrecondition: any[]
+  ): Promise<MigrationResult>;
 
-  public abstract updateWithDerivedData(getData: UpdateDataGetter<D>): Promise<MigrationResult>;
+  public abstract updateWithDerivedData(
+    getData: UpdateDataGetter<D>,
+    precondition?: firestore.Precondition
+  ): Promise<MigrationResult>;
 }

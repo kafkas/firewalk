@@ -171,9 +171,13 @@ export interface Migrator<D extends firestore.DocumentData, C extends TraversalC
    * - _SC_(`traverser`): space complexity of the underlying traverser
    *
    * @param data A non-empty data object with which to update each document.
+   * @param precondition A Precondition to enforce on this update.
    * @returns A Promise resolving to an object representing the details of the migration.
    */
-  update(data: firestore.UpdateData): Promise<MigrationResult>;
+  update(
+    data: firestore.UpdateData,
+    precondition?: firestore.Precondition
+  ): Promise<MigrationResult>;
 
   /**
    * Updates all documents in this collection with the provided field-value pair.
@@ -196,9 +200,15 @@ export interface Migrator<D extends firestore.DocumentData, C extends TraversalC
    *
    * @param field The field to update in each document.
    * @param value The value with which to update the specified field in each document. Must not be `undefined`.
+   * @param moreFieldsOrPrecondition An alternating list of field paths and values to update, optionally followed by a Precondition to enforce on this update.
+   *
    * @returns A Promise resolving to an object representing the details of the migration.
    */
-  update(field: string | firestore.FieldPath, value: any): Promise<MigrationResult>;
+  update(
+    field: string | firestore.FieldPath,
+    value: any,
+    ...moreFieldsOrPrecondition: any[]
+  ): Promise<MigrationResult>;
 
   /**
    * Updates all documents in this collection with the provided data.
@@ -223,5 +233,8 @@ export interface Migrator<D extends firestore.DocumentData, C extends TraversalC
    * which to update each document.
    * @returns A Promise resolving to an object representing the details of the migration.
    */
-  updateWithDerivedData(getData: UpdateDataGetter<D>): Promise<MigrationResult>;
+  updateWithDerivedData(
+    getData: UpdateDataGetter<D>,
+    precondition?: firestore.Precondition
+  ): Promise<MigrationResult>;
 }

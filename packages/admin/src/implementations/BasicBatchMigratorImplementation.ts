@@ -1,4 +1,4 @@
-import type { firestore } from 'firebase-admin';
+import { firestore } from 'firebase-admin';
 import { isPositiveInteger } from '../utils';
 import type {
   BatchMigrator,
@@ -140,15 +140,22 @@ export class BasicBatchMigratorImplementation<
     return { traversalResult, migratedDocCount };
   }
 
-  public update(data: firestore.UpdateData): Promise<MigrationResult>;
+  public update(
+    data: firestore.UpdateData,
+    precondition?: firestore.Precondition
+  ): Promise<MigrationResult>;
 
-  public update(field: string | firestore.FieldPath, value: any): Promise<MigrationResult>;
+  public update(
+    field: string | firestore.FieldPath,
+    value: any,
+    ...moreFieldsOrPrecondition: any[]
+  ): Promise<MigrationResult>;
 
   public async update(
     dataOrField: firestore.UpdateData | string | firestore.FieldPath,
-    value?: any
+    preconditionOrValue?: any,
+    ...moreFieldsOrPrecondition: any[]
   ): Promise<MigrationResult> {
-    const argCount = [dataOrField, value].filter((a) => a !== undefined).length;
     let migratedDocCount = 0;
 
     const traversalResult = await this.traverser.traverse(async (snapshots, batchIndex) => {
@@ -158,21 +165,21 @@ export class BasicBatchMigratorImplementation<
       let migratableDocCount = 0;
 
       snapshots.forEach((snapshot) => {
-        if (argCount === 1) {
-          // Signature 1
-          const data = dataOrField as firestore.UpdateData;
-          const shouldMigrate = this.migrationPredicate(snapshot);
-          if (shouldMigrate) {
-            writeBatch.update(snapshot.ref, data);
-            migratableDocCount++;
-          }
-        } else {
-          // Signature 2
-          const field = dataOrField as string | firestore.FieldPath;
-          const shouldMigrate = this.migrationPredicate(snapshot);
-          if (shouldMigrate) {
-            writeBatch.update(snapshot.ref, field, value);
-            migratableDocCount++;
+        const shouldMigrate = this.migrationPredicate(snapshot);
+
+        if (shouldMigrate) {
+          migratableDocCount++;
+
+          if (typeof dataOrField === 'string' || dataOrField instanceof firestore.FieldPath) {
+            // Signature 2
+            const field = dataOrField as string | firestore.FieldPath;
+            const value = preconditionOrValue;
+            writeBatch.update(snapshot.ref, field, value, ...moreFieldsOrPrecondition);
+          } else {
+            // Signature 1
+            const data = dataOrField as firestore.UpdateData;
+            const precondition = preconditionOrValue as firestore.Precondition | undefined;
+            writeBatch.update(snapshot.ref, data, precondition);
           }
         }
       });
@@ -186,7 +193,10 @@ export class BasicBatchMigratorImplementation<
     return { traversalResult, migratedDocCount };
   }
 
-  public async updateWithDerivedData(getData: UpdateDataGetter<D>): Promise<MigrationResult> {
+  public async updateWithDerivedData(
+    getData: UpdateDataGetter<D>,
+    precondition?: firestore.Precondition
+  ): Promise<MigrationResult> {
     let migratedDocCount = 0;
 
     const traversalResult = await this.traverser.traverse(async (snapshots, batchIndex) => {
@@ -198,7 +208,7 @@ export class BasicBatchMigratorImplementation<
       snapshots.forEach((snapshot) => {
         const shouldMigrate = this.migrationPredicate(snapshot);
         if (shouldMigrate) {
-          writeBatch.update(snapshot.ref, getData(snapshot));
+          writeBatch.update(snapshot.ref, getData(snapshot), precondition);
           migratableDocCount++;
         }
       });
