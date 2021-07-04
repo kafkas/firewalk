@@ -9,6 +9,7 @@ import type {
   TraversalConfig,
   Traverser,
   UpdateDataGetter,
+  UpdateFieldValueGetter,
 } from '../api';
 import { AbstractMigrator } from './abstract';
 
@@ -129,13 +130,28 @@ export class BasicBatchMigratorImplementation<
   public updateWithDerivedData(
     getData: UpdateDataGetter<D>,
     precondition?: firestore.Precondition
+  ): Promise<MigrationResult>;
+
+  public updateWithDerivedData(getData: UpdateFieldValueGetter<D>): Promise<MigrationResult>;
+
+  public updateWithDerivedData(
+    getData: (
+      snapshot: firestore.QueryDocumentSnapshot<D>
+    ) => ReturnType<UpdateDataGetter<D>> | ReturnType<UpdateFieldValueGetter<D>>,
+    precondition?: firestore.Precondition
   ): Promise<MigrationResult> {
     return this.migrate((writeBatch, snapshot) => {
       const data = getData(snapshot);
-      if (precondition === undefined) {
-        writeBatch.update(snapshot.ref, data);
+      if (Array.isArray(data)) {
+        // Signature 2
+        writeBatch.update(snapshot.ref, ...data);
       } else {
-        writeBatch.update(snapshot.ref, data, precondition);
+        // Signature 1
+        if (precondition === undefined) {
+          writeBatch.update(snapshot.ref, data);
+        } else {
+          writeBatch.update(snapshot.ref, data, precondition);
+        }
       }
     });
   }

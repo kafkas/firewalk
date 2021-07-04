@@ -9,6 +9,7 @@ import type {
   TraversalConfig,
   Traverser,
   UpdateDataGetter,
+  UpdateFieldValueGetter,
 } from '../../api';
 
 export abstract class AbstractMigrator<D extends firestore.DocumentData, C extends TraversalConfig>
@@ -72,5 +73,9 @@ export abstract class AbstractMigrator<D extends firestore.DocumentData, C exten
   public abstract updateWithDerivedData(
     getData: UpdateDataGetter<D>,
     precondition?: firestore.Precondition
+  ): Promise<MigrationResult>;
+
+  public abstract updateWithDerivedData(
+    getData: UpdateFieldValueGetter<D>
   ): Promise<MigrationResult>;
 }
