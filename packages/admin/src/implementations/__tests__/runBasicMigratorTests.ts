@@ -57,5 +57,17 @@ export function runBasicMigratorTests<C extends TraversalConfig>(
         expect(data.text).toBe(snap.id);
       });
     }, 15_000);
+
+    test('correctly renames a field', async () => {
+      const { migratedDocCount } = await migrator.renameField('text', 'documentId');
+      const { docs } = await collectionRef.get();
+      expect(migratedDocCount).toEqual(docs.length);
+      docs.forEach((snap) => {
+        const data = snap.data();
+        expect(data.number).toBe(2);
+        expect(data.text).toBeUndefined();
+        expect((data as any).documentId).toBe(snap.id);
+      });
+    }, 15_000);
   });
 }
