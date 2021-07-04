@@ -87,20 +87,20 @@ export class PromiseQueueBasedFastTraverserImplementation<D>
     }, PROCESS_QUEUE_INTERVAL);
 
     while (true) {
-      const { docs: batchDocSnapshots } = await query.get();
-      const batchDocCount = batchDocSnapshots.length;
+      const { docs: batchDocs } = await query.get();
+      const batchDocCount = batchDocs.length;
 
       if (batchDocCount === 0) {
         break;
       }
 
-      const lastDocInBatch = batchDocSnapshots[batchDocCount - 1];
+      const lastDocInBatch = batchDocs[batchDocCount - 1];
 
       docCount += batchDocCount;
 
-      callbackPromiseQueue.enqueue(callback(batchDocSnapshots, curBatchIndex));
+      callbackPromiseQueue.enqueue(callback(batchDocs, curBatchIndex));
 
-      if (this.shouldExitEarly(batchDocSnapshots, curBatchIndex) || docCount === maxDocCount) {
+      if (this.shouldExitEarly(batchDocs, curBatchIndex) || docCount === maxDocCount) {
         break;
       }
 

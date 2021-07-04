@@ -60,9 +60,9 @@ export abstract class AbstractTraverser<C extends TraversalConfig, D> implements
       ...config,
     };
 
-    const { batchCount, docCount } = await this.traverse(async (snapshots, batchIndex) => {
-      for (let i = 0; i < snapshots.length; i++) {
-        await callback(snapshots[i], i, batchIndex);
+    const { batchCount, docCount } = await this.traverse(async (batchDocs, batchIndex) => {
+      for (let i = 0; i < batchDocs.length; i++) {
+        await callback(batchDocs[i], i, batchIndex);
         if (sleepBetweenDocs) {
           await sleep(sleepTimeBetweenDocs);
         }

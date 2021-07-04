@@ -44,14 +44,14 @@ export abstract class AbstractMigrator<C extends TraversalConfig, D> implements 
   }
 
   protected async migrateWithTraverser(
-    migrateBatch: (snapshots: firestore.QueryDocumentSnapshot<D>[]) => Promise<number>
+    migrateBatch: (batchDocs: firestore.QueryDocumentSnapshot<D>[]) => Promise<number>
   ): Promise<MigrationResult> {
     let migratedDocCount = 0;
-    const traversalResult = await this.traverser.traverse(async (snapshots, batchIndex) => {
-      this.registeredCallbacks.onBeforeBatchStart?.(snapshots, batchIndex);
-      const migratedBatchDocCount = await migrateBatch(snapshots);
+    const traversalResult = await this.traverser.traverse(async (batchDocs, batchIndex) => {
+      this.registeredCallbacks.onBeforeBatchStart?.(batchDocs, batchIndex);
+      const migratedBatchDocCount = await migrateBatch(batchDocs);
       migratedDocCount += migratedBatchDocCount;
-      this.registeredCallbacks.onAfterBatchComplete?.(snapshots, batchIndex);
+      this.registeredCallbacks.onAfterBatchComplete?.(batchDocs, batchIndex);
     });
     return { traversalResult, migratedDocCount };
   }

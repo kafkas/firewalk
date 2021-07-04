@@ -51,13 +51,13 @@ export class BasicDefaultMigratorImplementation<C extends TraversalConfig, D>
   public set(data: Partial<D>, options: SetOptions): Promise<MigrationResult>;
 
   public async set(data: D | Partial<D>, options?: SetOptions): Promise<MigrationResult> {
-    return this.migrate(async (snapshot) => {
+    return this.migrate(async (doc) => {
       if (options === undefined) {
         // Signature 1
-        await snapshot.ref.set(data as D);
+        await doc.ref.set(data as D);
       } else {
         // Signature 2
-        await snapshot.ref.set(data as Partial<D>, options);
+        await doc.ref.set(data as Partial<D>, options);
       }
     });
   }
@@ -73,15 +73,15 @@ export class BasicDefaultMigratorImplementation<C extends TraversalConfig, D>
     getData: SetDataGetter<D> | SetDataGetter<Partial<D>>,
     options?: SetOptions
   ): Promise<MigrationResult> {
-    return this.migrate(async (snapshot) => {
+    return this.migrate(async (doc) => {
       if (options === undefined) {
         // Signature 1
-        const data = (getData as SetDataGetter<D>)(snapshot);
-        await snapshot.ref.set(data);
+        const data = (getData as SetDataGetter<D>)(doc);
+        await doc.ref.set(data);
       } else {
         // Signature 2
-        const data = (getData as SetDataGetter<Partial<D>>)(snapshot);
-        await snapshot.ref.set(data, options);
+        const data = (getData as SetDataGetter<Partial<D>>)(doc);
+        await doc.ref.set(data, options);
       }
     });
   }
@@ -102,20 +102,20 @@ export class BasicDefaultMigratorImplementation<C extends TraversalConfig, D>
     preconditionOrValue?: any,
     ...moreFieldsOrPrecondition: any[]
   ): Promise<MigrationResult> {
-    return this.migrate(async (snapshot) => {
+    return this.migrate(async (doc) => {
       if (typeof dataOrField === 'string' || dataOrField instanceof firestore.FieldPath) {
         // Signature 2
         const field = dataOrField;
         const value = preconditionOrValue;
-        await snapshot.ref.update(field, value, ...moreFieldsOrPrecondition);
+        await doc.ref.update(field, value, ...moreFieldsOrPrecondition);
       } else {
         // Signature 1
         const data = dataOrField;
         const precondition = preconditionOrValue as firestore.Precondition | undefined;
         if (precondition === undefined) {
-          await snapshot.ref.update(data);
+          await doc.ref.update(data);
         } else {
-          await snapshot.ref.update(data, precondition);
+          await doc.ref.update(data, precondition);
         }
       }
     });
@@ -130,35 +130,35 @@ export class BasicDefaultMigratorImplementation<C extends TraversalConfig, D>
 
   public updateWithDerivedData(
     getData: (
-      snapshot: firestore.QueryDocumentSnapshot<D>
+      doc: firestore.QueryDocumentSnapshot<D>
     ) => ReturnType<UpdateDataGetter<D>> | ReturnType<UpdateFieldValueGetter<D>>,
     precondition?: firestore.Precondition
   ): Promise<MigrationResult> {
-    return this.migrate(async (snapshot) => {
-      const data = getData(snapshot);
+    return this.migrate(async (doc) => {
+      const data = getData(doc);
 
       if (Array.isArray(data)) {
         // Signature 2
-        await snapshot.ref.update(...data);
+        await doc.ref.update(...data);
       } else {
         // Signature 1
         if (precondition === undefined) {
-          await snapshot.ref.update(data);
+          await doc.ref.update(data);
         } else {
-          await snapshot.ref.update(data, precondition);
+          await doc.ref.update(data, precondition);
         }
       }
     });
   }
 
   private async migrate(
-    migrateDoc: (snapshot: firestore.QueryDocumentSnapshot<D>) => Promise<void>
+    migrateDoc: (doc: firestore.QueryDocumentSnapshot<D>) => Promise<void>
   ): Promise<MigrationResult> {
-    return this.migrateWithTraverser(async (snapshots) => {
+    return this.migrateWithTraverser(async (batchDocs) => {
       let migratedDocCount = 0;
-      const promises = snapshots.map(async (snapshot) => {
-        if (this.shouldMigrateDoc(snapshot)) {
-          await migrateDoc(snapshot);
+      const promises = batchDocs.map(async (doc) => {
+        if (this.shouldMigrateDoc(doc)) {
+          await migrateDoc(doc);
           migratedDocCount++;
         }
       });

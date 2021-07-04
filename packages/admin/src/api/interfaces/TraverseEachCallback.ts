@@ -5,7 +5,7 @@ import type { firestore } from 'firebase-admin';
  * the 0-based index of the batch as arguments.
  */
 export type TraverseEachCallback<D = firestore.DocumentData> = (
-  docSnapshot: firestore.QueryDocumentSnapshot<D>,
+  doc: firestore.QueryDocumentSnapshot<D>,
   docIndex: number,
   batchIndex: number
 ) => Promise<void>;

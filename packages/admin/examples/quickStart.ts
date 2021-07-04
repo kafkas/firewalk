@@ -7,8 +7,8 @@ const traverser = createTraverser(usersCollection);
 const { batchCount, docCount } = await traverser.traverse(async (batchDocs, batchIndex) => {
   const batchSize = batchDocs.length;
   await Promise.all(
-    batchDocs.map(async (snapshot) => {
-      const { email, firstName } = snapshot.data();
+    batchDocs.map(async (doc) => {
+      const { email, firstName } = doc.data();
       await sendEmail({ to: email, content: `Hello ${firstName}!` });
     })
   );

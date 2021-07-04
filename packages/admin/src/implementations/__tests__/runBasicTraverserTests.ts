@@ -57,9 +57,9 @@ export function runBasicTraverserTests<C extends TraversalConfig, D>(
       const expectedProcessCountMap = new Map(collectionDocIds.map((id) => [id, 1]));
       const processCountMap = new Map<string, number>();
 
-      await traverser.traverse(async (snapshots) => {
-        snapshots.forEach((snapshot) => {
-          const id = snapshot.id;
+      await traverser.traverse(async (batchDocs) => {
+        batchDocs.forEach((doc) => {
+          const id = doc.id;
           processCountMap.set(id, (processCountMap.get(id) ?? 0) + 1);
         });
       });
