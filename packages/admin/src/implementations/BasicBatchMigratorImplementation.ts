@@ -11,7 +11,7 @@ import type {
   UpdateDataGetter,
   UpdateFieldValueGetter,
 } from '../api';
-import { AbstractMigrator } from './abstract';
+import { AbstractMigrator, RegisteredCallbacks } from './abstract';
 
 export class BasicBatchMigratorImplementation<C extends TraversalConfig, D>
   extends AbstractMigrator<C, D>
@@ -20,9 +20,10 @@ export class BasicBatchMigratorImplementation<C extends TraversalConfig, D>
 
   public constructor(
     public readonly traverser: Traverser<C, D>,
-    private migrationPredicate: MigrationPredicate<D> = () => true
+    registeredCallbacks?: RegisteredCallbacks<D>,
+    migrationPredicates?: MigrationPredicate<D>[]
   ) {
-    super();
+    super(registeredCallbacks, migrationPredicates);
     this.validateConfig(traverser.traversalConfig);
   }
 
@@ -40,13 +41,20 @@ export class BasicBatchMigratorImplementation<C extends TraversalConfig, D>
   }
 
   public withPredicate(predicate: MigrationPredicate<D>): BatchMigrator<C, D> {
-    return new BasicBatchMigratorImplementation(this.traverser, predicate);
+    return new BasicBatchMigratorImplementation(this.traverser, this.registeredCallbacks, [
+      ...this.migrationPredicates,
+      predicate,
+    ]);
   }
 
   public withTraverser<C2 extends TraversalConfig>(
     traverser: Traverser<C2, D>
   ): BatchMigrator<C2, D> {
-    return new BasicBatchMigratorImplementation(traverser, this.migrationPredicate);
+    return new BasicBatchMigratorImplementation(
+      traverser,
+      this.registeredCallbacks,
+      this.migrationPredicates
+    );
   }
 
   public set(data: D): Promise<MigrationResult>;
@@ -163,7 +171,7 @@ export class BasicBatchMigratorImplementation<C extends TraversalConfig, D>
       let migratedDocCount = 0;
       const writeBatch = this.traverser.traversable.firestore.batch();
       snapshots.forEach((snapshot) => {
-        const shouldMigrate = this.migrationPredicate(snapshot);
+        const shouldMigrate = this.shouldMigrateDoc(snapshot);
         if (shouldMigrate) {
           migrateDoc(writeBatch, snapshot);
           migratedDocCount++;

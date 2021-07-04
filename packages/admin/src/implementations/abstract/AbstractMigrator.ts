@@ -12,11 +12,16 @@ import type {
   UpdateFieldValueGetter,
 } from '../../api';
 
+export type RegisteredCallbacks<D> = {
+  onBeforeBatchStart?: BatchCallback<D>;
+  onAfterBatchComplete?: BatchCallback<D>;
+};
+
 export abstract class AbstractMigrator<C extends TraversalConfig, D> implements Migrator<C, D> {
-  private registeredCallbacks: {
-    onBeforeBatchStart?: BatchCallback<D>;
-    onAfterBatchComplete?: BatchCallback<D>;
-  } = {};
+  protected constructor(
+    protected readonly registeredCallbacks: RegisteredCallbacks<D> = {},
+    protected readonly migrationPredicates: MigrationPredicate<D>[] = []
+  ) {}
 
   public onBeforeBatchStart(callback: BatchCallback<D>): void {
     this.registeredCallbacks.onBeforeBatchStart = callback;
@@ -47,6 +52,10 @@ export abstract class AbstractMigrator<C extends TraversalConfig, D> implements 
       this.registeredCallbacks.onAfterBatchComplete?.(snapshots, batchIndex);
     });
     return { traversalResult, migratedDocCount };
+  }
+
+  protected shouldMigrateDoc(doc: firestore.QueryDocumentSnapshot<D>): boolean {
+    return this.migrationPredicates.every((predicate) => predicate(doc));
   }
 
   public abstract readonly traverser: Traverser<C, D>;

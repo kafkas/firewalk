@@ -10,16 +10,17 @@ import type {
   UpdateDataGetter,
   UpdateFieldValueGetter,
 } from '../api';
-import { AbstractMigrator } from './abstract';
+import { AbstractMigrator, RegisteredCallbacks } from './abstract';
 
 export class BasicDefaultMigratorImplementation<C extends TraversalConfig, D>
   extends AbstractMigrator<C, D>
   implements DefaultMigrator<C, D> {
   public constructor(
     public readonly traverser: Traverser<C, D>,
-    private migrationPredicate: MigrationPredicate<D> = () => true
+    registeredCallbacks?: RegisteredCallbacks<D>,
+    migrationPredicates?: MigrationPredicate<D>[]
   ) {
-    super();
+    super(registeredCallbacks, migrationPredicates);
     this.validateConfig(traverser.traversalConfig);
   }
 
@@ -29,13 +30,20 @@ export class BasicDefaultMigratorImplementation<C extends TraversalConfig, D>
   }
 
   public withPredicate(predicate: MigrationPredicate<D>): DefaultMigrator<C, D> {
-    return new BasicDefaultMigratorImplementation(this.traverser, predicate);
+    return new BasicDefaultMigratorImplementation(this.traverser, this.registeredCallbacks, [
+      ...this.migrationPredicates,
+      predicate,
+    ]);
   }
 
   public withTraverser<C2 extends TraversalConfig>(
     traverser: Traverser<C2, D>
   ): DefaultMigrator<C2, D> {
-    return new BasicDefaultMigratorImplementation(traverser, this.migrationPredicate);
+    return new BasicDefaultMigratorImplementation(
+      traverser,
+      this.registeredCallbacks,
+      this.migrationPredicates
+    );
   }
 
   public set(data: D): Promise<MigrationResult>;
@@ -149,7 +157,7 @@ export class BasicDefaultMigratorImplementation<C extends TraversalConfig, D>
     return this.migrateWithTraverser(async (snapshots) => {
       let migratedDocCount = 0;
       const promises = snapshots.map(async (snapshot) => {
-        const shouldMigrate = this.migrationPredicate(snapshot);
+        const shouldMigrate = this.shouldMigrateDoc(snapshot);
         if (shouldMigrate) {
           await migrateDoc(snapshot);
           migratedDocCount++;
