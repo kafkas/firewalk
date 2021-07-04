@@ -45,39 +45,15 @@ export class BasicDefaultMigratorImplementation<
   public set(data: Partial<D>, options: SetOptions): Promise<MigrationResult>;
 
   public async set(data: D | Partial<D>, options?: SetOptions): Promise<MigrationResult> {
-    let migratedDocCount = 0;
-
-    const traversalResult = await this.traverser.traverse(async (snapshots, batchIndex) => {
-      this.registeredCallbacks.onBeforeBatchStart?.(snapshots, batchIndex);
-
-      let migratableDocCount = 0;
-
-      const promises = snapshots.map(async (snapshot) => {
-        const shouldMigrate = this.migrationPredicate(snapshot);
-
-        if (!shouldMigrate) {
-          return;
-        }
-
-        migratableDocCount++;
-
-        if (options === undefined) {
-          // Signature 1
-          await snapshot.ref.set(data as D);
-        } else {
-          // Signature 2
-          await snapshot.ref.set(data as Partial<D>, options);
-        }
-      });
-
-      await Promise.all(promises);
-
-      migratedDocCount += migratableDocCount;
-
-      this.registeredCallbacks.onAfterBatchComplete?.(snapshots, batchIndex);
+    return this.traverseAndMigrate(async (snapshot) => {
+      if (options === undefined) {
+        // Signature 1
+        await snapshot.ref.set(data as D);
+      } else {
+        // Signature 2
+        await snapshot.ref.set(data as Partial<D>, options);
+      }
     });
-
-    return { traversalResult, migratedDocCount };
   }
 
   public setWithDerivedData(getData: SetDataGetter<D>): Promise<MigrationResult>;
@@ -91,41 +67,17 @@ export class BasicDefaultMigratorImplementation<
     getData: SetDataGetter<D> | SetDataGetter<Partial<D>>,
     options?: SetOptions
   ): Promise<MigrationResult> {
-    let migratedDocCount = 0;
-
-    const traversalResult = await this.traverser.traverse(async (snapshots, batchIndex) => {
-      this.registeredCallbacks.onBeforeBatchStart?.(snapshots, batchIndex);
-
-      let migratableDocCount = 0;
-
-      const promises = snapshots.map((snapshot) => {
-        const shouldMigrate = this.migrationPredicate(snapshot);
-
-        if (!shouldMigrate) {
-          return;
-        }
-
-        migratableDocCount++;
-
-        if (options === undefined) {
-          // Signature 1
-          const data = (getData as SetDataGetter<D>)(snapshot);
-          snapshot.ref.set(data);
-        } else {
-          // Signature 2
-          const data = (getData as SetDataGetter<Partial<D>>)(snapshot);
-          snapshot.ref.set(data, options);
-        }
-      });
-
-      await Promise.all(promises);
-
-      migratedDocCount += migratableDocCount;
-
-      this.registeredCallbacks.onAfterBatchComplete?.(snapshots, batchIndex);
+    return this.traverseAndMigrate(async (snapshot) => {
+      if (options === undefined) {
+        // Signature 1
+        const data = (getData as SetDataGetter<D>)(snapshot);
+        await snapshot.ref.set(data);
+      } else {
+        // Signature 2
+        const data = (getData as SetDataGetter<Partial<D>>)(snapshot);
+        await snapshot.ref.set(data, options);
+      }
     });
-
-    return { traversalResult, migratedDocCount };
   }
 
   public update(
@@ -139,55 +91,46 @@ export class BasicDefaultMigratorImplementation<
     ...moreFieldsOrPrecondition: any[]
   ): Promise<MigrationResult>;
 
-  public async update(
+  public update(
     dataOrField: firestore.UpdateData | string | firestore.FieldPath,
     preconditionOrValue?: any,
     ...moreFieldsOrPrecondition: any[]
   ): Promise<MigrationResult> {
-    let migratedDocCount = 0;
-
-    const traversalResult = await this.traverser.traverse(async (snapshots, batchIndex) => {
-      this.registeredCallbacks.onBeforeBatchStart?.(snapshots, batchIndex);
-
-      let migratableDocCount = 0;
-
-      const promises = snapshots.map(async (snapshot) => {
-        const shouldMigrate = this.migrationPredicate(snapshot);
-
-        if (shouldMigrate) {
-          migratableDocCount++;
-
-          if (typeof dataOrField === 'string' || dataOrField instanceof firestore.FieldPath) {
-            // Signature 2
-            const field = dataOrField;
-            const value = preconditionOrValue;
-            await snapshot.ref.update(field, value, ...moreFieldsOrPrecondition);
-          } else {
-            // Signature 1
-            const data = dataOrField;
-            const precondition = preconditionOrValue as firestore.Precondition | undefined;
-            if (precondition === undefined) {
-              await snapshot.ref.update(data);
-            } else {
-              await snapshot.ref.update(data, precondition);
-            }
-          }
+    return this.traverseAndMigrate(async (snapshot) => {
+      if (typeof dataOrField === 'string' || dataOrField instanceof firestore.FieldPath) {
+        // Signature 2
+        const field = dataOrField;
+        const value = preconditionOrValue;
+        await snapshot.ref.update(field, value, ...moreFieldsOrPrecondition);
+      } else {
+        // Signature 1
+        const data = dataOrField;
+        const precondition = preconditionOrValue as firestore.Precondition | undefined;
+        if (precondition === undefined) {
+          await snapshot.ref.update(data);
+        } else {
+          await snapshot.ref.update(data, precondition);
         }
-      });
-
-      await Promise.all(promises);
-
-      migratedDocCount += migratableDocCount;
-
-      this.registeredCallbacks.onAfterBatchComplete?.(snapshots, batchIndex);
+      }
     });
-
-    return { traversalResult, migratedDocCount };
   }
 
-  public async updateWithDerivedData(
+  public updateWithDerivedData(
     getData: UpdateDataGetter<D>,
     precondition?: firestore.Precondition
+  ): Promise<MigrationResult> {
+    return this.traverseAndMigrate(async (snapshot) => {
+      const data = getData(snapshot);
+      if (precondition === undefined) {
+        await snapshot.ref.update(data);
+      } else {
+        await snapshot.ref.update(data, precondition);
+      }
+    });
+  }
+
+  private async traverseAndMigrate(
+    migrateDoc: (snapshot: firestore.QueryDocumentSnapshot<D>) => Promise<void>
   ): Promise<MigrationResult> {
     let migratedDocCount = 0;
 
@@ -200,12 +143,7 @@ export class BasicDefaultMigratorImplementation<
         const shouldMigrate = this.migrationPredicate(snapshot);
         if (shouldMigrate) {
           migratableDocCount++;
-          const data = getData(snapshot);
-          if (precondition === undefined) {
-            await snapshot.ref.update(data);
-          } else {
-            await snapshot.ref.update(data, precondition);
-          }
+          await migrateDoc(snapshot);
         }
       });
 
