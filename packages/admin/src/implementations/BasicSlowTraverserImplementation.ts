@@ -18,7 +18,7 @@ export class BasicSlowTraverserImplementation<D>
 
   public constructor(
     public readonly traversable: Traversable<D>,
-    exitEarlyPredicates: ExitEarlyPredicate<D>[],
+    exitEarlyPredicates: ExitEarlyPredicate<D>[] = [],
     config?: Partial<TraversalConfig>
   ) {
     super({ ...BasicSlowTraverserImplementation.defaultConfig, ...config }, exitEarlyPredicates);

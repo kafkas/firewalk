@@ -22,7 +22,7 @@ export class PromiseQueueBasedFastTraverserImplementation<D>
 
   public constructor(
     public readonly traversable: Traversable<D>,
-    exitEarlyPredicates: ExitEarlyPredicate<D>[],
+    exitEarlyPredicates: ExitEarlyPredicate<D>[] = [],
     config?: Partial<FastTraversalConfig>
   ) {
     super(
