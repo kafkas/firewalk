@@ -19,7 +19,7 @@
   "homepage": "https://github.com/kafkas/firecode#readme",
   "license": "MIT",
   "main": "lib/index.js",
-  "typings": "lib/index.d.ts",
+  "types": "lib/index.d.ts",
   "directories": {
     "lib": "lib",
     "test": "__tests__"
@@ -34,7 +34,8 @@
   "scripts": {
     "build": "tsc -p src",
     "build:tests": "tsc -p __tests__",
-    "test": "echo \"Error: run tests from root\" && exit 1"
+    "test": "npm run test:types",
+    "test:types": "npx tsd"
   },
   "bugs": {
     "url": "https://github.com/kafkas/firecode/issues"
