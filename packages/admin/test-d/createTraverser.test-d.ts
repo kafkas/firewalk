@@ -1,17 +1,7 @@
-import { firestore } from 'firebase-admin';
 import { expectType } from 'tsd';
-import { app } from '../__tests__/app';
 import { createTraverser, SlowTraverser } from '../src';
+import { collectionRef, D } from './_helpers';
 
-type D = {
-  text: string;
-  num: number;
-};
-
-const projectsColRef = app()
-  .admin.firestore()
-  .collection('projects') as firestore.CollectionReference<D>;
-
-const slowTraverser = createTraverser(projectsColRef, { maxDocCount: 0 });
+const slowTraverser = createTraverser(collectionRef, { maxDocCount: 0 });
 
 expectType<SlowTraverser<D>>(slowTraverser);

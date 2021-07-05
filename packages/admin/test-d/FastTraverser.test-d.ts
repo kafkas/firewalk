@@ -1,6 +1,5 @@
-import { firestore } from 'firebase-admin';
+import type { firestore } from 'firebase-admin';
 import { expectType } from 'tsd';
-import { app } from '../__tests__/app';
 import {
   createFastTraverser,
   FastTraversalConfig,
@@ -8,19 +7,12 @@ import {
   Traversable,
   TraversalResult,
 } from '../src';
+import { collectionRef, D } from './_helpers';
 
-type D = {
-  text: string;
-  num: number;
-};
+const fastTraverser = createFastTraverser(collectionRef, { maxDocCount: 0 });
 
-const projectsColRef = app()
-  .admin.firestore()
-  .collection('projects') as firestore.CollectionReference<D>;
-
-const fastTraverser = createFastTraverser(projectsColRef, { maxDocCount: 0 });
-
-// TODO: Ideally we want to expect a firestore.CollectionReference<D> here
+// TODO: Ideally we want to expect a firestore.CollectionReference<D> here because
+// we initialized the traverser with a collection reference.
 expectType<Traversable<D>>(fastTraverser.traversable);
 
 expectType<FastTraversalConfig>(fastTraverser.traversalConfig);
@@ -29,10 +21,10 @@ expectType<FastTraversalConfig>(fastTraverser.traversalConfig);
   // TODO: See if there is a better way to check inferred parameters
   const modifiedTraverser = fastTraverser.withConfig({
     batchSize: 0,
-    maxDocCount: 0,
     sleepBetweenBatches: false,
     sleepTimeBetweenBatches: 0,
-    maxConcurrentBatchCount: 5,
+    maxDocCount: 0,
+    maxConcurrentBatchCount: 0,
   });
   expectType<FastTraverser<D>>(modifiedTraverser);
 })();
