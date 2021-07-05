@@ -6,7 +6,7 @@ import {
   Traversable,
   TraversalConfig,
   TraversalResult,
-} from '../src';
+} from '../../src';
 import { collectionRef, D } from './_helpers';
 
 const slowTraverser = createTraverser(collectionRef, { maxDocCount: 0 });

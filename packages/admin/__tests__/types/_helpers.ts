@@ -1,5 +1,4 @@
 import { firestore } from 'firebase-admin';
-// import { app } from '../__tests__/app';
 
 export type D = {
   text: string;

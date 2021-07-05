@@ -1,5 +1,5 @@
 import { expectType } from 'tsd';
-import { createFastTraverser, FastTraverser } from '../src';
+import { createFastTraverser, FastTraverser } from '../../src';
 import { collectionRef, D } from './_helpers';
 
 const fastTraverser = createFastTraverser(collectionRef, {
