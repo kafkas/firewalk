@@ -32,10 +32,7 @@
     "url": "git+https://github.com/kafkas/firecode.git"
   },
   "scripts": {
-    "build": "tsc -p src",
-    "build:tests": "tsc -p __tests__",
-    "test": "npm run test:types",
-    "test:types": "npx tsd"
+    "build": "tsc -p src"
   },
   "bugs": {
     "url": "https://github.com/kafkas/firecode/issues"
