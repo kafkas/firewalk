@@ -9,7 +9,7 @@ import {
 } from '../../src';
 import { collectionRef, D } from './_helpers';
 
-const fastTraverser = createFastTraverser(collectionRef, { maxDocCount: 0 });
+const fastTraverser = createFastTraverser(collectionRef);
 
 // TODO: Ideally we want to expect a firestore.CollectionReference<D> here because
 // we initialized the traverser with a collection reference.
