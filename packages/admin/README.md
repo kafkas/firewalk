@@ -37,6 +37,8 @@ When you have millions of documents in a collection, you can't just get all of t
 
 Firecode is an extremely light, well-typed, zero-dependency library that is useful in a variety of scenarios. You can use it in database migration scripts (e.g. when you need to add a new field to all docs) or a scheduled Cloud Function that needs to check every doc in a collection periodically or a locally run script that retrieves some data from a collection.
 
+[**Firecode on Google Dev Library▸**](https://devlibrary.withgoogle.com/products/firebase/repos/kafkas-firecode)
+
 [**Read the introductory blog post ▸**](https://anarkafkas.medium.com/traversing-firestore-collections-efficiently-6e43cea1eefd)
 
 [**View the full documentation (docs)▸**](https://kafkas.github.io/firecode)
