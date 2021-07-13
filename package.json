@@ -32,6 +32,7 @@
     "lint": "npx eslint \"packages/admin/{src,__tests__}/**/*/*.{js,ts}\"",
     "prebuild": "rm -rf packages/admin/lib",
     "prelerna-publish": "npm run build",
+    "pretest": "npm run build",
     "test": "npm run test:types && npx jest --verbose --runInBand",
     "test:types": "cd packages/admin && npx tsd"
   },
