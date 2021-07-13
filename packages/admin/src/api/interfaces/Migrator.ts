@@ -39,7 +39,7 @@ export interface Migrator<C extends TraversalConfig = TraversalConfig, D = fires
    * ```
    *
    * In the above case `newMigrator` will migrate only the documents whose `name` field is not missing AND whose path
-   * start with `"users/"`.
+   * starts with `"users/"`.
    *
    * @param predicate - A function that takes a document snapshot and returns a boolean indicating whether to migrate it.
    * @returns A new {@link Migrator} object.
