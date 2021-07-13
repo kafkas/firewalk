@@ -43,6 +43,7 @@ This site contains the full API reference and documentation for each version of 
 
 ### Versions
 
+- [0.8.2](./0.8.2)
 - [0.8.1](./0.8.1)
 - [0.8.0](./0.8.0)
 - [0.7.2](./0.7.2)
