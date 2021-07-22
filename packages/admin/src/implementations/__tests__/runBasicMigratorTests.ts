@@ -26,12 +26,12 @@ export function runBasicMigratorTests<C extends TraversalConfig>(
     beforeAll(async () => {
       const docRefs = await initItemsCollection();
       collectionDocIds = docRefs.map((docRef) => docRef.id);
-    });
+    }, 15_000);
 
     afterAll(async () => {
       await clearItemsCollection();
       collectionDocIds = [];
-    });
+    }, 15_000);
 
     test('correctly updates each document with the provided data getter', async () => {
       await migrator.updateWithDerivedData((snap) => ({ text: snap.id }));

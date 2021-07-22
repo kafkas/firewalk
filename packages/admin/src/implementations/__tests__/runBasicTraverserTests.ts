@@ -22,12 +22,12 @@ export function runBasicTraverserTests<C extends TraversalConfig, D>(
     beforeAll(async () => {
       const docRefs = await initItemsCollection();
       collectionDocIds = docRefs.map((docRef) => docRef.id);
-    });
+    }, 15_000);
 
     afterAll(async () => {
       await clearItemsCollection();
       collectionDocIds = [];
-    });
+    }, 15_000);
 
     test('exits early when instructed as such', async () => {
       const t = traverser
