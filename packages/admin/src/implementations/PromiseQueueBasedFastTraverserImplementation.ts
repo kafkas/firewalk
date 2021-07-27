@@ -9,8 +9,10 @@ import type {
 } from '../api';
 import { AbstractTraverser } from './abstract';
 
-// TODO: This should probably be a function of traversal config
-const PROCESS_QUEUE_INTERVAL = 250;
+function getProcessQueueInterval(traversalConfig: FastTraversalConfig): number {
+  // TODO: Implement
+  return 250;
+}
 
 export class PromiseQueueBasedFastTraverserImplementation<D>
   extends AbstractTraverser<FastTraversalConfig, D>
@@ -70,17 +72,19 @@ export class PromiseQueueBasedFastTraverserImplementation<D>
 
     const callbackPromiseQueue = new PromiseQueue<void>();
 
+    const processQueueInterval = getProcessQueueInterval(this.traversalConfig);
+
     const unregisterQueueProcessor = registerInterval(async () => {
       if (!callbackPromiseQueue.isProcessing()) {
         await callbackPromiseQueue.process();
       }
-    }, PROCESS_QUEUE_INTERVAL);
+    }, processQueueInterval);
 
     const traversalResult = await this.runTraversal((batchDocs, batchIndex) => {
       callbackPromiseQueue.enqueue(callback(batchDocs, batchIndex));
       return async () => {
         while (callbackPromiseQueue.size >= maxConcurrentBatchCount) {
-          await sleep(PROCESS_QUEUE_INTERVAL);
+          await sleep(processQueueInterval);
         }
       };
     });
