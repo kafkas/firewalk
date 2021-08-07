@@ -12,11 +12,11 @@ import type {
   Traverser,
 } from '../../api';
 
-export type PauseAndResume = () => void | Promise<void>;
+export type OnAfterBatchProcess = () => void | Promise<void>;
 
 export type BatchProcessor<D> = (
   ...args: Parameters<BatchCallback<D>>
-) => void | Promise<void> | PauseAndResume | Promise<PauseAndResume>;
+) => void | Promise<void> | OnAfterBatchProcess | Promise<OnAfterBatchProcess>;
 
 export abstract class AbstractTraverser<C extends TraversalConfig, D> implements Traverser<C, D> {
   protected static readonly baseConfig: TraversalConfig = {
@@ -103,13 +103,13 @@ export abstract class AbstractTraverser<C extends TraversalConfig, D> implements
 
       docCount += batchDocCount;
 
-      const pauseAndResume = await processBatch(batchDocs, curBatchIndex);
+      const onAfterBatchProcess = await processBatch(batchDocs, curBatchIndex);
 
       if (this.shouldExitEarly(batchDocs, curBatchIndex) || docCount === maxDocCount) {
         break;
       }
 
-      await pauseAndResume?.();
+      await onAfterBatchProcess?.();
 
       if (sleepBetweenBatches) {
         await sleep(sleepTimeBetweenBatches);
