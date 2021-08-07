@@ -1,23 +1,6 @@
 import { SLLQueue } from '../SLLQueue';
 
 describe('SLLQueue', () => {
-  test('respects FIFO order when dequeued', () => {
-    const q = new SLLQueue<number | string>();
-    q.enqueue(1);
-    q.enqueue(2);
-    q.enqueue('3');
-
-    expect(q.dequeue()).toStrictEqual(1);
-    expect(q.dequeue()).toStrictEqual(2);
-
-    q.enqueue(4);
-    q.enqueue(5);
-
-    expect(q.dequeue()).toStrictEqual('3');
-    expect(q.dequeue()).toStrictEqual(4);
-    expect(q.dequeue()).toStrictEqual(5);
-  });
-
   test('always shows correct size', () => {
     const q = new SLLQueue<string>();
 
@@ -48,32 +31,49 @@ describe('SLLQueue', () => {
     expect(() => q.dequeue()).toThrow();
   });
 
-  test('mutates the queue while extracting to array', () => {
+  test('respects FIFO order when dequeued', () => {
+    const q = new SLLQueue<number | string>();
+    q.enqueue(1);
+    q.enqueue(2);
+    q.enqueue('3');
+
+    expect(q.dequeue()).toStrictEqual(1);
+    expect(q.dequeue()).toStrictEqual(2);
+
+    q.enqueue(4);
+    q.enqueue(5);
+
+    expect(q.dequeue()).toStrictEqual('3');
+    expect(q.dequeue()).toStrictEqual(4);
+    expect(q.dequeue()).toStrictEqual(5);
+  });
+
+  test('dequeues all correctly', () => {
     const q = new SLLQueue<number>();
 
     q.enqueue(1);
     q.enqueue(2);
     q.enqueue(3);
 
-    q.extractToArray();
+    q.dequeueAll();
 
     expect(q.isEmpty()).toBe(true);
   });
 
-  test('extracts to array in FIFO order', () => {
+  test('dequeues all to array in FIFO order', () => {
     const q = new SLLQueue<number>();
 
-    expect(q.extractToArray()).toEqual([]);
+    expect(q.dequeueAll()).toEqual([]);
 
     q.enqueue(1);
     q.enqueue(2);
     q.enqueue(3);
 
-    expect(q.extractToArray()).toEqual([1, 2, 3]);
+    expect(q.dequeueAll()).toEqual([1, 2, 3]);
 
     q.enqueue(2);
     q.enqueue(1);
 
-    expect(q.extractToArray()).toEqual([2, 1]);
+    expect(q.dequeueAll()).toEqual([2, 1]);
   });
 });
