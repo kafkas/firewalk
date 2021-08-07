@@ -48,19 +48,44 @@ describe('SLLQueue', () => {
     expect(q.dequeue()).toStrictEqual(5);
   });
 
-  test('dequeues all correctly', () => {
+  test('dequeues first `n` items correctly', () => {
     const q = new SLLQueue<number>();
 
     q.enqueue(1);
     q.enqueue(2);
     q.enqueue(3);
+    q.enqueue(4);
+    q.enqueue(5);
 
-    q.dequeueAll();
-
-    expect(q.isEmpty()).toBe(true);
+    expect(q.dequeueFirst(0)).toEqual([]);
+    expect(q.dequeueFirst(1)).toEqual([1]);
+    expect(q.size).toBe(4);
+    expect(q.dequeueFirst(2)).toEqual([2, 3]);
+    expect(q.size).toBe(2);
+    expect(q.dequeueFirst(2)).toEqual([4, 5]);
+    expect(q.size).toBe(0);
+    expect(q.dequeueFirst(0)).toEqual([]);
   });
 
-  test('dequeues all to array in FIFO order', () => {
+  test('throws if dequeued `itemCount` argument is invalid', () => {
+    const q = new SLLQueue<number>();
+    q.enqueue(1);
+    q.enqueue(2);
+    q.enqueue(3);
+
+    expect(() => q.dequeueFirst(-2)).toThrow();
+    expect(() => q.dequeueFirst(-1)).toThrow();
+    expect(() => q.dequeueFirst(1.01)).toThrow();
+    expect(() => q.dequeueFirst(2.5)).toThrow();
+    expect(() => q.dequeueFirst(4)).toThrow();
+    expect(() => q.dequeueFirst(5)).toThrow();
+
+    expect(() => q.dequeueFirst(0)).not.toThrow();
+    expect(() => q.dequeueFirst(1)).not.toThrow();
+    expect(() => q.dequeueFirst(2)).not.toThrow();
+  });
+
+  test('dequeues all items correctly', () => {
     const q = new SLLQueue<number>();
 
     expect(q.dequeueAll()).toEqual([]);
@@ -70,10 +95,12 @@ describe('SLLQueue', () => {
     q.enqueue(3);
 
     expect(q.dequeueAll()).toEqual([1, 2, 3]);
+    expect(q.isEmpty()).toBe(true);
 
     q.enqueue(2);
     q.enqueue(1);
 
     expect(q.dequeueAll()).toEqual([2, 1]);
+    expect(q.isEmpty()).toBe(true);
   });
 });
