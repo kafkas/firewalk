@@ -33,7 +33,7 @@ export class PromiseQueue<T> {
 
   public async process(): Promise<T[]> {
     this._isProcessing = true;
-    const promiseIds = this.queue.extractToArray();
+    const promiseIds = this.queue.dequeueAll();
     const results = await Promise.all(
       promiseIds.map(async (id) => {
         const promise = this.map.get(id)!;
