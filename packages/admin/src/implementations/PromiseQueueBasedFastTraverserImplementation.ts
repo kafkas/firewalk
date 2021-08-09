@@ -76,7 +76,7 @@ export class PromiseQueueBasedFastTraverserImplementation<D>
 
     const unregisterQueueProcessor = registerInterval(async () => {
       if (!callbackPromiseQueue.isProcessing()) {
-        await callbackPromiseQueue.process();
+        await callbackPromiseQueue.processAll();
       }
     }, processQueueInterval);
 
@@ -93,7 +93,7 @@ export class PromiseQueueBasedFastTraverserImplementation<D>
 
     // There may still be some Promises left in the queue but there won't be any new ones coming in.
     // Wait for the existing ones to resolve and exit.
-    await callbackPromiseQueue.process();
+    await callbackPromiseQueue.processAll();
 
     return traversalResult;
   }

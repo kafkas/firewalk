@@ -31,9 +31,19 @@ export class PromiseQueue<T> {
     return ++this.lastPromiseId;
   }
 
-  public async process(): Promise<T[]> {
+  /**
+   * Processes all Promises in the queue.
+   */
+  public async processAll(): Promise<T[]> {
+    return this.processFirst(this.queue.size);
+  }
+
+  /**
+   * Processes the first `promiseCount` Promises in the queue.
+   */
+  public async processFirst(promiseCount: number): Promise<T[]> {
     this._isProcessing = true;
-    const promiseIds = this.queue.dequeueAll();
+    const promiseIds = this.queue.dequeueFirst(promiseCount);
     const results = await Promise.all(
       promiseIds.map(async (id) => {
         const promise = this.map.get(id)!;
