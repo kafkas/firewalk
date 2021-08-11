@@ -9,9 +9,14 @@ import type {
 } from '../api';
 import { AbstractTraverser } from './abstract';
 
-function getProcessQueueInterval(traversalConfig: FastTraversalConfig): number {
+function getProcessQueueInterval(traversalConfig: FastTraversalConfig, queueSize: number): number {
   // TODO: Implement
   return 250;
+}
+
+function getProcessableItemCount(traversalConfig: FastTraversalConfig, queueSize: number): number {
+  // TODO: Implement
+  return Math.ceil(queueSize / 2);
 }
 
 export class PromiseQueueBasedFastTraverserImplementation<D>
@@ -68,22 +73,34 @@ export class PromiseQueueBasedFastTraverserImplementation<D>
   }
 
   public async traverse(callback: BatchCallbackAsync<D>): Promise<TraversalResult> {
-    const { maxConcurrentBatchCount } = this.traversalConfig;
+    const { traversalConfig } = this;
+    const { maxConcurrentBatchCount } = traversalConfig;
 
     const callbackPromiseQueue = new PromiseQueue<void>();
 
-    const processQueueInterval = getProcessQueueInterval(this.traversalConfig);
-
-    const unregisterQueueProcessor = registerInterval(async () => {
-      if (!callbackPromiseQueue.isProcessing()) {
-        await callbackPromiseQueue.processAll();
-      }
-    }, processQueueInterval);
+    const unregisterQueueProcessor = registerInterval(
+      async () => {
+        if (!callbackPromiseQueue.isProcessing()) {
+          const processableItemCount = getProcessableItemCount(
+            traversalConfig,
+            callbackPromiseQueue.size
+          );
+          await callbackPromiseQueue.processFirst(processableItemCount);
+        }
+      },
+      () => getProcessQueueInterval(traversalConfig, callbackPromiseQueue.size)
+    );
 
     const traversalResult = await this.runTraversal((batchDocs, batchIndex) => {
       callbackPromiseQueue.enqueue(callback(batchDocs, batchIndex));
       return async () => {
         while (callbackPromiseQueue.size >= maxConcurrentBatchCount) {
+          // TODO: The sleep time is currently set to processQueueInterval but there may be a better way
+          // to compute sleep duration.
+          const processQueueInterval = getProcessQueueInterval(
+            traversalConfig,
+            callbackPromiseQueue.size
+          );
           await sleep(processQueueInterval);
         }
       };
