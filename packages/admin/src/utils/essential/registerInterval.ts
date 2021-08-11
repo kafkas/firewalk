@@ -10,13 +10,15 @@ import { sleep } from './sleep';
  */
 export function registerInterval(
   callback: () => Promise<void>,
-  duration: number
+  durationOrGetDuration: number | (() => number)
 ): () => Promise<void> {
   let shouldRun = true;
 
   const promise = (async () => {
     while (shouldRun) {
       await callback();
+      const duration =
+        typeof durationOrGetDuration === 'number' ? durationOrGetDuration : durationOrGetDuration();
       await sleep(duration);
     }
   })();
