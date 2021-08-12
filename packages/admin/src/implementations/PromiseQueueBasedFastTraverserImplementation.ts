@@ -9,11 +9,25 @@ import type {
 } from '../api';
 import { AbstractTraverser } from './abstract';
 
+/**
+ * Computes the duration (in ms) for which to sleep before re-running the queue processing logic.
+ *
+ * @param traversalConfig - Traversal config.
+ * @param queueSize - The current size of the queue.
+ * @returns A non-negative integer.
+ */
 function getProcessQueueInterval(traversalConfig: FastTraversalConfig, queueSize: number): number {
   // TODO: Implement
   return 250;
 }
 
+/**
+ * Computes the number of queue items to process based on the traversal configuration and queue size.
+ *
+ * @param traversalConfig - Traversal config.
+ * @param queueSize - The current size of the queue.
+ * @returns An integer within the range [0, `queueSize`].
+ */
 function getProcessableItemCount(traversalConfig: FastTraversalConfig, queueSize: number): number {
   // TODO: Implement
   return Math.ceil(queueSize / 2);
