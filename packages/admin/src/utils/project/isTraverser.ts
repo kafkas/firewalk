@@ -6,9 +6,13 @@ export function isTraverser<C extends TraversalConfig, D>(
   const t = candidate as Traverser<C, D>;
   return (
     !!t &&
-    typeof t.traverse === 'function' &&
-    typeof t.traverseEach === 'function' &&
     t.traversable !== null &&
-    typeof t.traversable === 'object'
+    typeof t.traversable === 'object' &&
+    t.traversalConfig !== null &&
+    typeof t.traversalConfig === 'object' &&
+    typeof t.withConfig === 'function' &&
+    typeof t.withExitEarlyPredicate === 'function' &&
+    typeof t.traverseEach === 'function' &&
+    typeof t.traverse === 'function'
   );
 }
