@@ -30,7 +30,7 @@ function getProcessQueueInterval(traversalConfig: FastTraversalConfig, queueSize
  */
 function getProcessableItemCount(traversalConfig: FastTraversalConfig, queueSize: number): number {
   // TODO: Implement
-  return Math.ceil(queueSize / 2);
+  return queueSize;
 }
 
 export class PromiseQueueBasedFastTraverserImplementation<D>
