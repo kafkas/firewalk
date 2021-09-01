@@ -30,7 +30,7 @@
     "lerna-publish": "npx lerna publish from-git",
     "lerna-version": "npx lerna version",
     "lint": "npx eslint \"packages/admin/{src,__tests__}/**/*/*.{js,ts}\"",
-    "prebuild": "rm -rf packages/admin/lib",
+    "prebuild": "rm -rf packages/admin/lib && npm install",
     "prelerna-publish": "npm run build",
     "pretest": "npm run build",
     "test": "npm run test:types && npx jest --verbose --runInBand",
