@@ -58,7 +58,7 @@ export interface FastTraverser<D = firestore.DocumentData>
    *
    * **Complexity:**
    *
-   * - Time complexity: _O_(_C_ + (_N_ / `batchSize`) * _Q_(`batchSize`))
+   * - Time complexity: _O_((_N_ / `batchSize`) \* (_Q_(`batchSize`) + _C_ / `maxConcurrentBatchCount`))
    * - Space complexity: _O_(`maxConcurrentBatchCount` * (`batchSize` * _D_ + _S_))
    * - Billing: _max_(1, _N_) reads
    *
