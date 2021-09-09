@@ -199,7 +199,7 @@ Creates a traverser that facilitates Firestore collection traversals. When trave
 
 #### Complexity:
 
-- Time complexity: _O_((_N_ / `batchSize`) \* (_Q_(`batchSize`) + _C_))
+- Time complexity: _O_((_N_ / `batchSize`) \* (_Q_(`batchSize`) + _C_(`batchSize`)))
 - Space complexity: _O_(`batchSize` \* _D_ + _S_)
 - Billing: _max_(1, _N_) reads
 
@@ -208,7 +208,7 @@ where:
 - _N_: number of docs in the traversable
 - _Q_(`batchSize`): average batch query time
 - _D_: average document size
-- _C_: average callback processing time
+- _C_(`batchSize`): average callback processing time
 - _S_: average extra space used by the callback
 
 ### [createFastTraverser](https://kafkas.github.io/firecode/0.8.3/modules.html#createfasttraverser)
@@ -217,7 +217,7 @@ Creates a fast traverser that facilitates Firestore collection traversals. When 
 
 #### Complexity:
 
-- Time complexity: _O_((_N_ / `batchSize`) \* (_Q_(`batchSize`) + _C_ / `maxConcurrentBatchCount`))
+- Time complexity: _O_((_N_ / `batchSize`) \* (_Q_(`batchSize`) + _C_(`batchSize`) / `maxConcurrentBatchCount`))
 - Space complexity: _O_(`maxConcurrentBatchCount` \* (`batchSize` \* _D_ + _S_))
 - Billing: _max_(1, _N_) reads
 
@@ -226,7 +226,7 @@ where:
 - _N_: number of docs in the traversable
 - _Q_(`batchSize`): average batch query time
 - _D_: average document size
-- _C_: average callback processing time
+- _C_(`batchSize`): average callback processing time
 - _S_: average extra space used by the callback
 
 ### [createMigrator](https://kafkas.github.io/firecode/0.8.3/modules.html#createmigrator)
@@ -235,7 +235,7 @@ Creates a migrator that facilitates database migrations. The migrator accepts a 
 
 #### Complexity:
 
-- Time complexity: _TC_(`traverser`) where _C_ = _W_(`batchSize`)
+- Time complexity: _TC_(`traverser`) where _C_(`batchSize`) = _W_(`batchSize`)
 - Space complexity: _SC_(`traverser`) where _S_ = _O_(`batchSize`)
 - Billing: _max_(1, _N_) reads, _K_ writes
 
@@ -253,7 +253,7 @@ Creates a migrator that facilitates database migrations. The migrator accepts a 
 
 #### Complexity:
 
-- Time complexity: _TC_(`traverser`) where _C_ = _W_(`batchSize`)
+- Time complexity: _TC_(`traverser`) where _C_(`batchSize`) = _W_(`batchSize`)
 - Space complexity: _SC_(`traverser`) where _S_ = _O_(`batchSize`)
 - Billing: _max_(1, _N_) reads, _K_ writes
 
