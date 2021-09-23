@@ -207,8 +207,8 @@ where:
 
 - _N_: number of docs in the traversable
 - _Q_(`batchSize`): average batch query time
-- _D_: average document size
 - _C_(`batchSize`): average callback processing time
+- _D_: average document size
 - _S_: average extra space used by the callback
 
 ### [createFastTraverser](https://kafkas.github.io/firecode/0.8.3/modules.html#createfasttraverser)
@@ -225,8 +225,8 @@ where:
 
 - _N_: number of docs in the traversable
 - _Q_(`batchSize`): average batch query time
-- _D_: average document size
 - _C_(`batchSize`): average callback processing time
+- _D_: average document size
 - _S_: average extra space used by the callback
 
 ### [createMigrator](https://kafkas.github.io/firecode/0.8.3/modules.html#createmigrator)

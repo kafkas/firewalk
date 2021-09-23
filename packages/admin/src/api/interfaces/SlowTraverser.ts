@@ -63,8 +63,8 @@ export interface SlowTraverser<D = firestore.DocumentData> extends Traverser<Tra
    *
    * - _N_: number of docs in the traversable
    * - _Q_(`batchSize`): average batch query time
-   * - _D_: average document size
    * - _C_(`batchSize`): average callback processing time
+   * - _D_: average document size
    * - _S_: average extra space used by the callback
    *
    * @param callback - An asynchronous callback function to invoke for each batch of document snapshots.
