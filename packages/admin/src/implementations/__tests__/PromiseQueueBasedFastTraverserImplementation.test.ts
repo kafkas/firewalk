@@ -1,9 +1,9 @@
 import { app } from '../../../__tests__/app';
-import { PromiseQueueBasedFastTraverserImplementation } from '../PromiseQueueBasedFastTraverserImplementation';
+import { PromiseQueueBasedFastTraverserImpl } from '../PromiseQueueBasedFastTraverserImpl';
 import { runBasicTraverserTests } from './runBasicTraverserTests';
 
-describe('PromiseQueueBasedFastTraverserImplementation', () => {
+describe('PromiseQueueBasedFastTraverserImpl', () => {
   const itemsColRef = app().admin.firestore().collection('items');
-  const traverser = new PromiseQueueBasedFastTraverserImplementation(itemsColRef);
+  const traverser = new PromiseQueueBasedFastTraverserImpl(itemsColRef);
   runBasicTraverserTests(traverser, itemsColRef, () => ({ number: Math.random() }));
 });

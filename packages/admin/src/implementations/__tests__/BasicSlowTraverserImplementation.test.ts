@@ -1,9 +1,9 @@
 import { app } from '../../../__tests__/app';
-import { BasicSlowTraverserImplementation } from '../BasicSlowTraverserImplementation';
+import { BasicSlowTraverserImpl } from '../BasicSlowTraverserImpl';
 import { runBasicTraverserTests } from './runBasicTraverserTests';
 
-describe('BasicSlowTraverserImplementation', () => {
+describe('BasicSlowTraverserImpl', () => {
   const itemsColRef = app().admin.firestore().collection('items');
-  const traverser = new BasicSlowTraverserImplementation(itemsColRef);
+  const traverser = new BasicSlowTraverserImpl(itemsColRef);
   runBasicTraverserTests(traverser, itemsColRef, () => ({ number: Math.random() }));
 });

@@ -1,15 +1,13 @@
 import type { firestore } from 'firebase-admin';
 import { createTraverser } from '../../api';
 import { app } from '../../../__tests__/app';
-import { BasicBatchMigratorImplementation } from '../BasicBatchMigratorImplementation';
+import { BasicBatchMigratorImpl } from '../BasicBatchMigratorImpl';
 import { runBasicMigratorTests, TestItemDoc } from './runBasicMigratorTests';
 
-describe('BasicBatchMigratorImplementation', () => {
+describe('BasicBatchMigratorImpl', () => {
   const itemsColRef = app()
     .admin.firestore()
     .collection('items') as firestore.CollectionReference<TestItemDoc>;
-  const migrator = new BasicBatchMigratorImplementation(
-    createTraverser(itemsColRef, { batchSize: 10 })
-  );
+  const migrator = new BasicBatchMigratorImpl(createTraverser(itemsColRef, { batchSize: 10 }));
   runBasicMigratorTests(migrator, itemsColRef);
 });
