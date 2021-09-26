@@ -23,7 +23,7 @@
     "typescript": "4.4.2"
   },
   "scripts": {
-    "build": "npx lerna run build",
+    "build": "npx lerna run compile",
     "docs": "cd scripts && sh docs.sh",
     "format": "prettier --write \"./packages/**/{src,test}/**/*.{ts,tsx,json}\"",
     "format-check": "prettier --check \"./packages/**/{src,test}/**/*.{ts,tsx,json}\"",
