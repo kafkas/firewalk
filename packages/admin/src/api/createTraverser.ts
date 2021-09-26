@@ -1,5 +1,5 @@
 import type { firestore } from 'firebase-admin';
-import { BasicSlowTraverserImplementation } from '../implementations';
+import { BasicSlowTraverserImpl } from '../implementations';
 import type { SlowTraverser, Traversable, TraversalConfig } from './interfaces';
 
 /**
@@ -15,5 +15,5 @@ export function createTraverser<D = firestore.DocumentData>(
   traversable: Traversable<D>,
   config?: Partial<TraversalConfig>
 ): SlowTraverser<D> {
-  return new BasicSlowTraverserImplementation(traversable, [], config);
+  return new BasicSlowTraverserImpl(traversable, [], config);
 }

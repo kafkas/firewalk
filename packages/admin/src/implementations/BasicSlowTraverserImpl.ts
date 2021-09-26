@@ -8,7 +8,7 @@ import type {
 } from '../api';
 import { AbstractTraverser } from './abstract';
 
-export class BasicSlowTraverserImplementation<D>
+export class BasicSlowTraverserImpl<D>
   extends AbstractTraverser<TraversalConfig, D>
   implements SlowTraverser<D> {
   private static readonly defaultConfig: TraversalConfig = {
@@ -20,21 +20,21 @@ export class BasicSlowTraverserImplementation<D>
     exitEarlyPredicates: ExitEarlyPredicate<D>[] = [],
     config?: Partial<TraversalConfig>
   ) {
-    super({ ...BasicSlowTraverserImplementation.defaultConfig, ...config }, exitEarlyPredicates);
+    super({ ...BasicSlowTraverserImpl.defaultConfig, ...config }, exitEarlyPredicates);
   }
 
   // eslint-disable-next-line
   private validateConfig(config: Partial<TraversalConfig> = {}): void {}
 
   public withConfig(config: Partial<TraversalConfig>): SlowTraverser<D> {
-    return new BasicSlowTraverserImplementation(this.traversable, this.exitEarlyPredicates, {
+    return new BasicSlowTraverserImpl(this.traversable, this.exitEarlyPredicates, {
       ...this.traversalConfig,
       ...config,
     });
   }
 
   public withExitEarlyPredicate(predicate: ExitEarlyPredicate<D>): SlowTraverser<D> {
-    return new BasicSlowTraverserImplementation(
+    return new BasicSlowTraverserImpl(
       this.traversable,
       [...this.exitEarlyPredicates, predicate],
       this.traversalConfig

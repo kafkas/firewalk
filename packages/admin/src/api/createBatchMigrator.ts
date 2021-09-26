@@ -1,6 +1,6 @@
 import type { firestore } from 'firebase-admin';
 import { isTraverser } from '../utils';
-import { BasicBatchMigratorImplementation } from '../implementations';
+import { BasicBatchMigratorImpl } from '../implementations';
 import type { BatchMigrator, Traversable, TraversalConfig, Traverser } from './interfaces';
 import { createTraverser } from './createTraverser';
 
@@ -53,5 +53,5 @@ export function createBatchMigrator<
   const traverser = isTraverser(traversableOrTraverser)
     ? traversableOrTraverser
     : createTraverser(traversableOrTraverser, traversalConfig);
-  return new BasicBatchMigratorImplementation(traverser);
+  return new BasicBatchMigratorImpl(traverser);
 }

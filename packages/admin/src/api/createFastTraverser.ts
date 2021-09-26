@@ -1,5 +1,5 @@
 import type { firestore } from 'firebase-admin';
-import { PromiseQueueBasedFastTraverserImplementation } from '../implementations';
+import { PromiseQueueBasedFastTraverserImpl } from '../implementations';
 import type { FastTraversalConfig, FastTraverser, Traversable } from './interfaces';
 
 /**
@@ -17,5 +17,5 @@ export function createFastTraverser<D = firestore.DocumentData>(
   traversable: Traversable<D>,
   config?: Partial<FastTraversalConfig>
 ): FastTraverser<D> {
-  return new PromiseQueueBasedFastTraverserImplementation(traversable, [], config);
+  return new PromiseQueueBasedFastTraverserImpl(traversable, [], config);
 }

@@ -1,6 +1,6 @@
 import type { firestore } from 'firebase-admin';
 import { isTraverser } from '../utils';
-import { BasicDefaultMigratorImplementation } from '../implementations';
+import { BasicDefaultMigratorImpl } from '../implementations';
 import type { DefaultMigrator, Traversable, TraversalConfig, Traverser } from './interfaces';
 import { createTraverser } from './createTraverser';
 
@@ -41,5 +41,5 @@ export function createMigrator<
   const traverser = isTraverser(traversableOrTraverser)
     ? traversableOrTraverser
     : createTraverser(traversableOrTraverser, traversalConfig);
-  return new BasicDefaultMigratorImplementation(traverser);
+  return new BasicDefaultMigratorImpl(traverser);
 }

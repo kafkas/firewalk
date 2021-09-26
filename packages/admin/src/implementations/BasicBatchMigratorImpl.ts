@@ -1,6 +1,7 @@
 import { firestore } from 'firebase-admin';
+import { isPositiveInteger } from '../utils';
 import type {
-  DefaultMigrator,
+  BatchMigrator,
   MigrationPredicate,
   MigrationResult,
   SetDataGetter,
@@ -12,9 +13,11 @@ import type {
 } from '../api';
 import { AbstractMigrator, RegisteredCallbacks } from './abstract';
 
-export class BasicDefaultMigratorImplementation<C extends TraversalConfig, D>
+export class BasicBatchMigratorImpl<C extends TraversalConfig, D>
   extends AbstractMigrator<C, D>
-  implements DefaultMigrator<C, D> {
+  implements BatchMigrator<C, D> {
+  private static readonly MAX_BATCH_WRITE_DOC_COUNT = 500;
+
   public constructor(
     public readonly traverser: Traverser<C, D>,
     registeredCallbacks?: RegisteredCallbacks<D>,
@@ -24,13 +27,21 @@ export class BasicDefaultMigratorImplementation<C extends TraversalConfig, D>
     this.validateConfig(traverser.traversalConfig);
   }
 
-  // eslint-disable-next-line
-  private validateConfig(config: Partial<C> = {}): void {
-    // Confirm that the traverser config is compatible with this migrator
+  private validateConfig(config: Partial<TraversalConfig> = {}): void {
+    const { batchSize } = config;
+    if (
+      typeof batchSize === 'number' &&
+      (!isPositiveInteger(batchSize) ||
+        batchSize > BasicBatchMigratorImpl.MAX_BATCH_WRITE_DOC_COUNT)
+    ) {
+      throw new Error(
+        `The 'batchSize' field in the traversal config of a BatchMigrator's traverser must be a positive integer less than or equal to ${BasicBatchMigratorImpl.MAX_BATCH_WRITE_DOC_COUNT}. In Firestore, each write batch can write to a maximum of ${BasicBatchMigratorImpl.MAX_BATCH_WRITE_DOC_COUNT} documents.`
+      );
+    }
   }
 
-  public withPredicate(predicate: MigrationPredicate<D>): DefaultMigrator<C, D> {
-    return new BasicDefaultMigratorImplementation(this.traverser, this.registeredCallbacks, [
+  public withPredicate(predicate: MigrationPredicate<D>): BatchMigrator<C, D> {
+    return new BasicBatchMigratorImpl(this.traverser, this.registeredCallbacks, [
       ...this.migrationPredicates,
       predicate,
     ]);
@@ -38,8 +49,8 @@ export class BasicDefaultMigratorImplementation<C extends TraversalConfig, D>
 
   public withTraverser<C2 extends TraversalConfig>(
     traverser: Traverser<C2, D>
-  ): DefaultMigrator<C2, D> {
-    return new BasicDefaultMigratorImplementation(
+  ): BatchMigrator<C2, D> {
+    return new BasicBatchMigratorImpl(
       traverser,
       this.registeredCallbacks,
       this.migrationPredicates
@@ -51,13 +62,13 @@ export class BasicDefaultMigratorImplementation<C extends TraversalConfig, D>
   public set(data: Partial<D>, options: SetOptions): Promise<MigrationResult>;
 
   public async set(data: D | Partial<D>, options?: SetOptions): Promise<MigrationResult> {
-    return this.migrate(async (doc) => {
+    return this.migrate((writeBatch, doc) => {
       if (options === undefined) {
         // Signature 1
-        await doc.ref.set(data as D);
+        writeBatch.set(doc.ref, data as D);
       } else {
         // Signature 2
-        await doc.ref.set(data as Partial<D>, options);
+        writeBatch.set(doc.ref, data as Partial<D>, options);
       }
     });
   }
@@ -69,19 +80,19 @@ export class BasicDefaultMigratorImplementation<C extends TraversalConfig, D>
     options: SetOptions
   ): Promise<MigrationResult>;
 
-  public async setWithDerivedData(
+  public setWithDerivedData(
     getData: SetDataGetter<D> | SetDataGetter<Partial<D>>,
     options?: SetOptions
   ): Promise<MigrationResult> {
-    return this.migrate(async (doc) => {
+    return this.migrate((writeBatch, doc) => {
       if (options === undefined) {
         // Signature 1
         const data = (getData as SetDataGetter<D>)(doc);
-        await doc.ref.set(data);
+        writeBatch.set(doc.ref, data);
       } else {
         // Signature 2
         const data = (getData as SetDataGetter<Partial<D>>)(doc);
-        await doc.ref.set(data, options);
+        writeBatch.set(doc.ref, data, options);
       }
     });
   }
@@ -102,20 +113,20 @@ export class BasicDefaultMigratorImplementation<C extends TraversalConfig, D>
     preconditionOrValue?: any,
     ...moreFieldsOrPrecondition: any[]
   ): Promise<MigrationResult> {
-    return this.migrate(async (doc) => {
+    return this.migrate((writeBatch, doc) => {
       if (typeof dataOrField === 'string' || dataOrField instanceof firestore.FieldPath) {
         // Signature 2
         const field = dataOrField;
         const value = preconditionOrValue;
-        await doc.ref.update(field, value, ...moreFieldsOrPrecondition);
+        writeBatch.update(doc.ref, field, value, ...moreFieldsOrPrecondition);
       } else {
         // Signature 1
         const data = dataOrField;
         const precondition = preconditionOrValue as firestore.Precondition | undefined;
         if (precondition === undefined) {
-          await doc.ref.update(data);
+          writeBatch.update(doc.ref, data);
         } else {
-          await doc.ref.update(data, precondition);
+          writeBatch.update(doc.ref, data, precondition);
         }
       }
     });
@@ -134,35 +145,35 @@ export class BasicDefaultMigratorImplementation<C extends TraversalConfig, D>
     ) => ReturnType<UpdateDataGetter<D>> | ReturnType<UpdateFieldValueGetter<D>>,
     precondition?: firestore.Precondition
   ): Promise<MigrationResult> {
-    return this.migrate(async (doc) => {
+    return this.migrate((writeBatch, doc) => {
       const data = getData(doc);
-
       if (Array.isArray(data)) {
         // Signature 2
-        await doc.ref.update(...data);
+        writeBatch.update(doc.ref, ...data);
       } else {
         // Signature 1
         if (precondition === undefined) {
-          await doc.ref.update(data);
+          writeBatch.update(doc.ref, data);
         } else {
-          await doc.ref.update(data, precondition);
+          writeBatch.update(doc.ref, data, precondition);
         }
       }
     });
   }
 
   private async migrate(
-    migrateDoc: (doc: firestore.QueryDocumentSnapshot<D>) => Promise<void>
+    migrateDoc: (writeBatch: firestore.WriteBatch, doc: firestore.QueryDocumentSnapshot<D>) => void
   ): Promise<MigrationResult> {
     return this.migrateWithTraverser(async (batchDocs) => {
       let migratedDocCount = 0;
-      const promises = batchDocs.map(async (doc) => {
+      const writeBatch = this.traverser.traversable.firestore.batch();
+      batchDocs.forEach((doc) => {
         if (this.shouldMigrateDoc(doc)) {
-          await migrateDoc(doc);
+          migrateDoc(writeBatch, doc);
           migratedDocCount++;
         }
       });
-      await Promise.all(promises);
+      await writeBatch.commit();
       return migratedDocCount;
     });
   }

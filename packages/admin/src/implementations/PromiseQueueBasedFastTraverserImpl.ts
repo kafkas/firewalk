@@ -33,7 +33,7 @@ function getProcessableItemCount(traversalConfig: FastTraversalConfig, queueSize
   return queueSize;
 }
 
-export class PromiseQueueBasedFastTraverserImplementation<D>
+export class PromiseQueueBasedFastTraverserImpl<D>
   extends AbstractTraverser<FastTraversalConfig, D>
   implements FastTraverser<D> {
   private static readonly defaultConfig: FastTraversalConfig = {
@@ -46,10 +46,7 @@ export class PromiseQueueBasedFastTraverserImplementation<D>
     exitEarlyPredicates: ExitEarlyPredicate<D>[] = [],
     config?: Partial<FastTraversalConfig>
   ) {
-    super(
-      { ...PromiseQueueBasedFastTraverserImplementation.defaultConfig, ...config },
-      exitEarlyPredicates
-    );
+    super({ ...PromiseQueueBasedFastTraverserImpl.defaultConfig, ...config }, exitEarlyPredicates);
     this.validateConfig(config);
   }
 
@@ -68,18 +65,14 @@ export class PromiseQueueBasedFastTraverserImplementation<D>
   }
 
   public withConfig(config: Partial<FastTraversalConfig>): FastTraverser<D> {
-    return new PromiseQueueBasedFastTraverserImplementation(
-      this.traversable,
-      this.exitEarlyPredicates,
-      {
-        ...this.traversalConfig,
-        ...config,
-      }
-    );
+    return new PromiseQueueBasedFastTraverserImpl(this.traversable, this.exitEarlyPredicates, {
+      ...this.traversalConfig,
+      ...config,
+    });
   }
 
   public withExitEarlyPredicate(predicate: ExitEarlyPredicate<D>): FastTraverser<D> {
-    return new PromiseQueueBasedFastTraverserImplementation(
+    return new PromiseQueueBasedFastTraverserImpl(
       this.traversable,
       [...this.exitEarlyPredicates, predicate],
       this.traversalConfig
