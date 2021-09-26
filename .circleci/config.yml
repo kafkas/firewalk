@@ -38,7 +38,7 @@ workflows:
     jobs:
       - lint_and_format_check
       - compile
-      - test: # TODO: Make sure to compile tests as well (with noEmit)
+      - test:
           requires:
             - compile
             - lint_and_format_check
