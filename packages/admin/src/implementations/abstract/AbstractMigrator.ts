@@ -39,6 +39,10 @@ export abstract class AbstractMigrator<C extends TraversalConfig, D> implements 
     this.registeredCallbacks.onAfterBatchComplete = callback;
   }
 
+  public deleteField(field: string | firestore.FieldPath): Promise<MigrationResult> {
+    return this.update(field, this.firestoreConstructor.FieldValue.delete());
+  }
+
   public renameField(
     oldField: string | firestore.FieldPath,
     newField: string | firestore.FieldPath

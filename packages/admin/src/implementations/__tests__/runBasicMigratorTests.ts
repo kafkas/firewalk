@@ -5,6 +5,7 @@ import { populateCollection } from '../../../__tests__/utils';
 export interface TestItemDoc {
   number: number;
   text: string;
+  someOldFieldToRemove: string;
 }
 
 export function runBasicMigratorTests<C extends TraversalConfig>(
@@ -15,7 +16,11 @@ export function runBasicMigratorTests<C extends TraversalConfig>(
     let collectionDocIds: string[] = [];
 
     async function initItemsCollection(): Promise<firestore.DocumentReference<TestItemDoc>[]> {
-      return await populateCollection(collectionRef, { number: 0, text: 'abc' }, 100);
+      return await populateCollection(
+        collectionRef,
+        { number: 0, text: 'abc', someOldFieldToRemove: 'abc' },
+        100
+      );
     }
 
     async function clearItemsCollection(): Promise<void> {
@@ -55,6 +60,16 @@ export function runBasicMigratorTests<C extends TraversalConfig>(
         const data = snap.data();
         expect(data.number).toBe(updateData.number);
         expect(data.text).toBe(snap.id);
+      });
+    }, 15_000);
+
+    test('correctly deletes a field', async () => {
+      const { migratedDocCount } = await migrator.deleteField('someOldFieldToRemove');
+      const { docs } = await collectionRef.get();
+      expect(migratedDocCount).toEqual(docs.length);
+      docs.forEach((snap) => {
+        const data = snap.data();
+        expect(data.someOldFieldToRemove).toBeUndefined();
       });
     }, 15_000);
 
