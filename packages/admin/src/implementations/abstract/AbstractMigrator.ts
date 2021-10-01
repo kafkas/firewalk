@@ -1,4 +1,4 @@
-import { firestore } from 'firebase-admin';
+import type { firestore } from 'firebase-admin';
 import type {
   BatchCallback,
   MigrationPredicate,
@@ -23,6 +23,14 @@ export abstract class AbstractMigrator<C extends TraversalConfig, D> implements 
     protected readonly migrationPredicates: MigrationPredicate<D>[] = []
   ) {}
 
+  protected get firestoreInstance(): firestore.Firestore {
+    return this.traverser.traversable.firestore;
+  }
+
+  protected get firestoreConstructor(): typeof firestore {
+    return this.firestoreInstance.constructor as typeof firestore;
+  }
+
   public onBeforeBatchStart(callback: BatchCallback<D>): void {
     this.registeredCallbacks.onBeforeBatchStart = callback;
   }
@@ -38,7 +46,7 @@ export abstract class AbstractMigrator<C extends TraversalConfig, D> implements 
     return this.withPredicate((snap) => snap.get(oldField) !== undefined).updateWithDerivedData(
       (snap) => {
         const value = snap.get(oldField);
-        return [oldField, firestore.FieldValue.delete(), newField, value];
+        return [oldField, this.firestoreConstructor.FieldValue.delete(), newField, value];
       }
     );
   }

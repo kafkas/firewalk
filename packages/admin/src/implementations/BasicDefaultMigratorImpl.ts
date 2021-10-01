@@ -1,4 +1,4 @@
-import { firestore } from 'firebase-admin';
+import type { firestore } from 'firebase-admin';
 import type {
   DefaultMigrator,
   MigrationPredicate,
@@ -103,7 +103,10 @@ export class BasicDefaultMigratorImpl<C extends TraversalConfig, D>
     ...moreFieldsOrPrecondition: any[]
   ): Promise<MigrationResult> {
     return this.migrate(async (doc) => {
-      if (typeof dataOrField === 'string' || dataOrField instanceof firestore.FieldPath) {
+      if (
+        typeof dataOrField === 'string' ||
+        dataOrField instanceof this.firestoreConstructor.FieldPath
+      ) {
         // Signature 2
         const field = dataOrField;
         const value = preconditionOrValue;
