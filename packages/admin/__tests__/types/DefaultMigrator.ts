@@ -40,6 +40,9 @@ defaultMigrator.onAfterBatchComplete((batchDocs, batchIndex) => {
   expectType<number>(batchIndex);
 });
 
+defaultMigrator.deleteField('oldField');
+defaultMigrator.deleteField(new firestore.FieldPath('nested', 'field'));
+
 defaultMigrator.renameField('oldField', new firestore.FieldPath('new', 'field'));
 defaultMigrator.renameField(new firestore.FieldPath('old', 'field'), 'newField');
 
