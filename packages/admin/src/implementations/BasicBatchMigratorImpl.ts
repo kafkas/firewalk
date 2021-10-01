@@ -1,4 +1,4 @@
-import { firestore } from 'firebase-admin';
+import type { firestore } from 'firebase-admin';
 import { isPositiveInteger } from '../utils';
 import type {
   BatchMigrator,
@@ -114,7 +114,10 @@ export class BasicBatchMigratorImpl<C extends TraversalConfig, D>
     ...moreFieldsOrPrecondition: any[]
   ): Promise<MigrationResult> {
     return this.migrate((writeBatch, doc) => {
-      if (typeof dataOrField === 'string' || dataOrField instanceof firestore.FieldPath) {
+      if (
+        typeof dataOrField === 'string' ||
+        dataOrField instanceof this.firestoreConstructor.FieldPath
+      ) {
         // Signature 2
         const field = dataOrField;
         const value = preconditionOrValue;
@@ -166,7 +169,7 @@ export class BasicBatchMigratorImpl<C extends TraversalConfig, D>
   ): Promise<MigrationResult> {
     return this.migrateWithTraverser(async (batchDocs) => {
       let migratedDocCount = 0;
-      const writeBatch = this.traverser.traversable.firestore.batch();
+      const writeBatch = this.firestoreInstance.batch();
       batchDocs.forEach((doc) => {
         if (this.shouldMigrateDoc(doc)) {
           migrateDoc(writeBatch, doc);
