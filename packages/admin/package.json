@@ -47,5 +47,8 @@
   },
   "tsd": {
     "directory": "__tests__/types"
+  },
+  "dependencies": {
+    "@proficient/util": "0.1.0"
   }
 }
