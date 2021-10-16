@@ -5,16 +5,18 @@ import { collectionPopulator } from '../../../__tests__/utils';
 
 export interface TestItemDoc {
   map1: {
-    num1: number;
-    string1: string;
+    num1?: number;
+    num2?: number;
+    string1?: string;
   };
   num2: number;
   string2: string;
   string3: string;
-  timestamp1: firestore.Timestamp;
+  timestamp1?: firestore.Timestamp;
+  timestamp2?: firestore.Timestamp;
 }
 
-const initialTestItemData = Object.freeze<TestItemDoc>({
+const INITIAL_DATA = Object.freeze<TestItemDoc>({
   map1: {
     num1: 1,
     string1: 'abc',
@@ -39,7 +41,7 @@ export function runBasicMigratorTests<C extends TraversalConfig>(
 
     async function initItemsCollection(): Promise<firestore.DocumentReference<TestItemDoc>[]> {
       return await collectionPopulator(collectionRef)
-        .withData(initialTestItemData)
+        .withData(INITIAL_DATA)
         .populate({ count: 40 });
     }
 
@@ -61,7 +63,7 @@ export function runBasicMigratorTests<C extends TraversalConfig>(
       updatedDocs.forEach((snap) => {
         const data = snap.data();
         expect(data).toEqual({
-          ...cloneDeep(initialTestItemData),
+          ...cloneDeep(INITIAL_DATA),
           docId: snap.id,
         });
       });
@@ -76,7 +78,7 @@ export function runBasicMigratorTests<C extends TraversalConfig>(
       updatedDocs.forEach((snap) => {
         const data = snap.data();
         expect(data).toEqual({
-          ...cloneDeep(initialTestItemData),
+          ...cloneDeep(INITIAL_DATA),
           ...updateData,
         });
       });
@@ -91,7 +93,7 @@ export function runBasicMigratorTests<C extends TraversalConfig>(
       docs.forEach((snap) => {
         const data = snap.data();
         const expected = (() => {
-          const copy = cloneDeep(initialTestItemData);
+          const copy = cloneDeep(INITIAL_DATA);
           delete copy.map1.string1;
           return copy;
         })();
@@ -106,9 +108,9 @@ export function runBasicMigratorTests<C extends TraversalConfig>(
       docs.forEach((snap) => {
         const data = snap.data();
         const expected = (() => {
-          const copy = { ...cloneDeep(initialTestItemData) };
+          const copy = { ...cloneDeep(INITIAL_DATA) };
           delete copy.timestamp1;
-          copy['timestamp2'] = initialTestItemData.timestamp1;
+          copy['timestamp2'] = INITIAL_DATA.timestamp1;
           return copy;
         })();
         expect(data).toEqual(expected);
@@ -125,11 +127,11 @@ export function runBasicMigratorTests<C extends TraversalConfig>(
       docs.forEach((snap) => {
         const data = snap.data();
         const expected = (() => {
-          const copy = { ...cloneDeep(initialTestItemData) };
+          const copy = { ...cloneDeep(INITIAL_DATA) };
           delete copy.map1.num1;
           delete copy.timestamp1;
-          copy['map1']['num2'] = initialTestItemData.map1.num1;
-          copy['timestamp2'] = initialTestItemData.timestamp1;
+          copy['map1']['num2'] = INITIAL_DATA.map1.num1;
+          copy['timestamp2'] = INITIAL_DATA.timestamp1;
           return copy;
         })();
         expect(data).toEqual(expected);
