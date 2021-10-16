@@ -5,9 +5,9 @@ import { BasicDefaultMigratorImpl } from '../BasicDefaultMigratorImpl';
 import { runBasicMigratorTests, TestItemDoc } from './runBasicMigratorTests';
 
 describe('BasicDefaultMigratorImpl', () => {
-  const itemsColRef = app()
+  const colRef = app()
     .admin.firestore()
-    .collection('items') as firestore.CollectionReference<TestItemDoc>;
-  const migrator = new BasicDefaultMigratorImpl(createTraverser(itemsColRef, { batchSize: 10 }));
-  runBasicMigratorTests(migrator, itemsColRef);
+    .collection('BasicDefaultMigratorImpl') as firestore.CollectionReference<TestItemDoc>;
+  const migrator = new BasicDefaultMigratorImpl(createTraverser(colRef, { batchSize: 10 }));
+  runBasicMigratorTests(migrator, colRef);
 });

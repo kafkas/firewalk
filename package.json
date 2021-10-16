@@ -35,7 +35,7 @@
     "prebuild": "rm -rf packages/admin/lib && npm install",
     "prelerna-publish": "npm run build",
     "pretest": "npm run build",
-    "test": "npm run test:types && npx jest --verbose --runInBand",
+    "test": "npm run test:types && npx jest --verbose",
     "test:types": "cd packages/admin && npx tsd"
   },
   "dependencies": {
