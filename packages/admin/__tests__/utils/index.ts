@@ -1,2 +1,2 @@
-export { populateCollection } from './populateCollection';
+export { collectionPopulator } from './collectionPopulator';
 export { writeFileAndMkdirSync } from './writeFileAndMkdirSync';

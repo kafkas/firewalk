@@ -1,6 +1,6 @@
 import type { firestore } from 'firebase-admin';
 import type { Migrator, TraversalConfig } from '../../../src';
-import { populateCollection } from '../../../__tests__/utils';
+import { collectionPopulator } from '../../../__tests__/utils';
 
 export interface TestItemDoc {
   number: number;
@@ -15,28 +15,30 @@ export function runBasicMigratorTests<C extends TraversalConfig>(
   describe('basic migrator tests', () => {
     let collectionDocIds: string[] = [];
 
+    beforeEach(async () => {
+      const docRefs = await initItemsCollection();
+      collectionDocIds = docRefs.map((docRef) => docRef.id);
+    }, 15_000);
+
     async function initItemsCollection(): Promise<firestore.DocumentReference<TestItemDoc>[]> {
-      return await populateCollection(
-        collectionRef,
-        { number: 0, text: 'abc', someOldFieldToRemove: 'abc' },
-        100
-      );
+      return await collectionPopulator(collectionRef)
+        .withData({
+          number: 0,
+          text: 'abc',
+          someOldFieldToRemove: 'abc',
+        })
+        .populate({ count: 40 });
     }
+
+    afterEach(async () => {
+      await clearItemsCollection();
+      collectionDocIds = [];
+    }, 15_000);
 
     async function clearItemsCollection(): Promise<void> {
       const { docs } = await collectionRef.get();
       await Promise.all(docs.map((snap) => snap.ref.delete()));
     }
-
-    beforeAll(async () => {
-      const docRefs = await initItemsCollection();
-      collectionDocIds = docRefs.map((docRef) => docRef.id);
-    }, 15_000);
-
-    afterAll(async () => {
-      await clearItemsCollection();
-      collectionDocIds = [];
-    }, 15_000);
 
     test('correctly updates each document with the provided data getter', async () => {
       await migrator.updateWithDerivedData((snap) => ({ text: snap.id }));

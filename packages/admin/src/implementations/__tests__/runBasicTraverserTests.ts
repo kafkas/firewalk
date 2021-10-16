@@ -1,6 +1,6 @@
 import type { firestore } from 'firebase-admin';
 import type { Traverser, TraversalConfig } from '../../../src';
-import { populateCollection } from '../../../__tests__/utils';
+import { collectionPopulator } from '../../../__tests__/utils';
 
 export function runBasicTraverserTests<C extends TraversalConfig, D>(
   traverser: Traverser<C, D>,
@@ -11,7 +11,9 @@ export function runBasicTraverserTests<C extends TraversalConfig, D>(
     let collectionDocIds: string[] = [];
 
     async function initItemsCollection(): Promise<firestore.DocumentReference<D>[]> {
-      return await populateCollection(collectionRef, getInitialData(), 100);
+      return await collectionPopulator(collectionRef)
+        .withData(getInitialData())
+        .populate({ count: 100 });
     }
 
     async function clearItemsCollection(): Promise<void> {
