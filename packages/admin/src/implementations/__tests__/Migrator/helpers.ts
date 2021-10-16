@@ -7,10 +7,10 @@ export type MigratorImplClass = {
   new <C extends TraversalConfig, D>(traverser: Traverser<C, D>): Migrator<C, D>;
 };
 
-export function describeMigratorMethodTest<C extends TraversalConfig>(
+export function describeMigratorMethodTest(
   migratorImplClass: MigratorImplClass,
   methodName: string,
-  methodTester: MigratorMethodTester<C>
+  methodTester: MigratorMethodTester
 ): void {
   const description = `${migratorImplClass.name}.${methodName}`;
   const colRef = app()

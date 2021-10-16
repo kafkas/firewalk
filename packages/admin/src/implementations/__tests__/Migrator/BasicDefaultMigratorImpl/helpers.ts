@@ -1,11 +1,10 @@
-import type { TraversalConfig } from '../../../../api';
 import { BasicDefaultMigratorImpl } from '../../../BasicDefaultMigratorImpl';
 import { describeMigratorMethodTest } from '../helpers';
 import type { MigratorMethodTester } from '../config';
 
-export function describeBasicDefaultMigratorMethodTest<C extends TraversalConfig>(
+export function describeBasicDefaultMigratorMethodTest(
   methodName: string,
-  methodTester: MigratorMethodTester<C>
+  methodTester: MigratorMethodTester
 ): void {
   describeMigratorMethodTest(BasicDefaultMigratorImpl, methodName, methodTester);
 }
