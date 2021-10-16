@@ -1,20 +1,11 @@
-import type { firestore } from 'firebase-admin';
-import { app } from '../../../../../__tests__/app';
-import { createTraverser, TraversalConfig } from '../../../../api';
+import type { TraversalConfig } from '../../../../api';
 import { BasicBatchMigratorImpl } from '../../../BasicBatchMigratorImpl';
-import { TestItemDoc, MigratorMethodTester, TRAVERSAL_CONFIG } from '../config';
-import { IMPL_CLASS_NAME } from './config';
+import { describeMigratorMethodTest } from '../helpers';
+import type { MigratorMethodTester } from '../config';
 
-export function describeBasicBatchMigratorMethodTest(
+export function describeBasicBatchMigratorMethodTest<C extends TraversalConfig>(
   methodName: string,
-  tester: MigratorMethodTester<TraversalConfig>
+  methodTester: MigratorMethodTester<C>
 ): void {
-  const description = `${IMPL_CLASS_NAME}.${methodName}`;
-  const colRef = app()
-    .admin.firestore()
-    .collection(description) as firestore.CollectionReference<TestItemDoc>;
-  const migrator = new BasicBatchMigratorImpl(createTraverser(colRef, TRAVERSAL_CONFIG));
-  describe(description, () => {
-    tester(migrator, colRef);
-  });
+  describeMigratorMethodTest(BasicBatchMigratorImpl, methodName, methodTester);
 }
