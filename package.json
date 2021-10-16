@@ -6,6 +6,7 @@
     "@babel/preset-env": "^7.14.7",
     "@babel/preset-typescript": "^7.14.5",
     "@types/jest": "^26.0.23",
+    "@types/lodash": "^4.14.175",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
     "babel-jest": "^27.0.6",
@@ -16,6 +17,7 @@
     "firebase-admin": "^9.6.0",
     "jest": "^27.0.6",
     "lerna": "^4.0.0",
+    "lodash": "^4.17.21",
     "prettier": "2.2.1",
     "ts-node": "^10.0.0",
     "tsd": "^0.17.0",
@@ -33,7 +35,7 @@
     "prebuild": "rm -rf packages/admin/lib && npm install",
     "prelerna-publish": "npm run build",
     "pretest": "npm run build",
-    "test": "npm run test:types && npx jest --verbose --runInBand",
+    "test": "npm run test:types && npx jest --verbose",
     "test:types": "cd packages/admin && npx tsd"
   },
   "dependencies": {
