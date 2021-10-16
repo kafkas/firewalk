@@ -95,8 +95,7 @@ export interface Migrator<C extends TraversalConfig = TraversalConfig, D = fires
   deleteField(field: string | firestore.FieldPath): Promise<MigrationResult>;
 
   /**
-   * Renames the specified field in all documents in this collection. The documents where the field is missing
-   * will be ignored.
+   * Renames the specified field in all documents in this collection. Ignores the fields that are missing.
    *
    * @remarks
    *
@@ -121,6 +120,39 @@ export interface Migrator<C extends TraversalConfig = TraversalConfig, D = fires
   renameField(
     oldField: string | firestore.FieldPath,
     newField: string | firestore.FieldPath
+  ): Promise<MigrationResult>;
+
+  /**
+   * Renames the specified fields in all documents in this collection. Ignores the fields that are missing.
+   *
+   * @remarks
+   *
+   * **Complexity:**
+   *
+   * - Time complexity: _TC_(`traverser`) where _C_(`batchSize`) = _W_(`batchSize`)
+   * - Space complexity: _SC_(`traverser`) where _S_ = _O_(`batchSize`)
+   * - Billing: _max_(1, _N_) reads, _K_ writes
+   *
+   * where:
+   *
+   * - _N_: number of docs in the traversable
+   * - _K_: number of docs that passed the migration predicate (_K_<=_N_)
+   * - _W_(`batchSize`): average batch write time
+   * - _TC_(`traverser`): time complexity of the underlying traverser
+   * - _SC_(`traverser`): space complexity of the underlying traverser
+   *
+   * @example
+   *
+   * ```ts
+   * await migrator.renameFields(['surname', 'lastName'], ['lastUpdatedAt', 'lastModifiedAt']);
+   * ```
+   *
+   * @param changes - A list of `[oldField, newField]` tuples. Each tuple is an array of 2 elements:
+   * the old field to rename and the new field.
+   * @returns A Promise resolving to an object representing the details of the migration.
+   */
+  renameFields(
+    ...changes: [oldField: string | firestore.FieldPath, newField: string | firestore.FieldPath][]
   ): Promise<MigrationResult>;
 
   /**

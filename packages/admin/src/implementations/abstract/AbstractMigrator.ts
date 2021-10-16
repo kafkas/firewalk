@@ -47,12 +47,30 @@ export abstract class AbstractMigrator<C extends TraversalConfig, D> implements 
     oldField: string | firestore.FieldPath,
     newField: string | firestore.FieldPath
   ): Promise<MigrationResult> {
-    return this.withPredicate((snap) => snap.get(oldField) !== undefined).updateWithDerivedData(
-      (snap) => {
+    return this.renameFields([oldField, newField]);
+  }
+
+  public renameFields(
+    ...changes: [oldField: string | firestore.FieldPath, newField: string | firestore.FieldPath][]
+  ): Promise<MigrationResult> {
+    return this.withPredicate((snap) =>
+      changes.some(([oldField]) => snap.get(oldField) !== undefined)
+    ).updateWithDerivedData((snap) => {
+      const updateFieldValuePairs: unknown[] = [];
+      changes.forEach((change) => {
+        const [oldField, newField] = change;
         const value = snap.get(oldField);
-        return [oldField, this.firestoreConstructor.FieldValue.delete(), newField, value];
-      }
-    );
+        if (value !== undefined) {
+          updateFieldValuePairs.push(
+            oldField,
+            this.firestoreConstructor.FieldValue.delete(),
+            newField,
+            value
+          );
+        }
+      });
+      return updateFieldValuePairs as [string | firestore.FieldPath, any, ...any[]];
+    });
   }
 
   protected async migrateWithTraverser(
