@@ -1,5 +1,10 @@
 import { firestore } from 'firebase-admin';
-import type { TraversalConfig } from '../../../../src';
+import type { TraversalConfig, Migrator } from '../../../../src';
+
+export type MigratorMethodTester<C extends TraversalConfig> = (
+  migrator: Migrator<C, TestItemDoc>,
+  colRef: firestore.CollectionReference<TestItemDoc>
+) => void;
 
 export interface TestItemDoc {
   map1: {

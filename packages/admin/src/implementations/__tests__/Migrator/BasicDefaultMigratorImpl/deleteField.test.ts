@@ -1,17 +1,4 @@
-import type { firestore } from 'firebase-admin';
-import { app } from '../../../../../__tests__/app';
-import { TestItemDoc } from '../config';
 import { testDeleteField } from '../shared/deleteField';
-import { IMPL_CLASS_NAME } from './config';
-import { createBasicDefaultMigratorImpl } from './helpers';
+import { describeBasicDefaultMigratorMethodTest } from './helpers';
 
-const METHOD_NAME = 'deleteField';
-const DESCRIPTION = `${IMPL_CLASS_NAME}.${METHOD_NAME}`;
-
-describe(DESCRIPTION, () => {
-  const colRef = app()
-    .admin.firestore()
-    .collection(DESCRIPTION) as firestore.CollectionReference<TestItemDoc>;
-  const migrator = createBasicDefaultMigratorImpl(colRef);
-  testDeleteField(migrator, colRef);
-});
+describeBasicDefaultMigratorMethodTest('deleteField', testDeleteField);
