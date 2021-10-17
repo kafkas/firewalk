@@ -43,8 +43,15 @@ defaultMigrator.onAfterBatchComplete((batchDocs, batchIndex) => {
 defaultMigrator.deleteField('oldField');
 defaultMigrator.deleteField(new firestore.FieldPath('nested', 'field'));
 
+defaultMigrator.deleteFields(new firestore.FieldPath('nested', 'field'), 'field2', 'field3');
+
 defaultMigrator.renameField('oldField', new firestore.FieldPath('new', 'field'));
 defaultMigrator.renameField(new firestore.FieldPath('old', 'field'), 'newField');
+
+defaultMigrator.renameFields(
+  ['field1', new firestore.FieldPath('nested', 'field2')],
+  ['field1', 'field2']
+);
 
 expectError(defaultMigrator.set({ num: 0 }));
 defaultMigrator.set({ num: 0, text: '' });

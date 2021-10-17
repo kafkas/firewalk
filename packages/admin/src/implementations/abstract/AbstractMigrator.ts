@@ -17,6 +17,12 @@ export type RegisteredCallbacks<D> = {
   onAfterBatchComplete?: BatchCallback<D>;
 };
 
+type UpdateFieldValueArgs = [
+  field: string | firestore.FieldPath,
+  value: any,
+  ...moreFieldsOrPrecondition: any[]
+];
+
 export abstract class AbstractMigrator<C extends TraversalConfig, D> implements Migrator<C, D> {
   protected constructor(
     protected readonly registeredCallbacks: RegisteredCallbacks<D> = {},
@@ -40,7 +46,15 @@ export abstract class AbstractMigrator<C extends TraversalConfig, D> implements 
   }
 
   public deleteField(field: string | firestore.FieldPath): Promise<MigrationResult> {
-    return this.update(field, this.firestoreConstructor.FieldValue.delete());
+    return this.deleteFields(field);
+  }
+
+  public deleteFields(...fields: (string | firestore.FieldPath)[]): Promise<MigrationResult> {
+    const updateFieldValuePairs = fields.reduce((acc, field) => {
+      acc.push(field, this.firestoreConstructor.FieldValue.delete());
+      return acc;
+    }, ([] as unknown) as UpdateFieldValueArgs);
+    return this.update(...updateFieldValuePairs);
   }
 
   public renameField(
