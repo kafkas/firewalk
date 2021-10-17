@@ -43,6 +43,7 @@ This site contains the full API reference and documentation for each version of 
 
 ### Versions
 
+- [0.10.0](./0.10.0)
 - [0.9.0](./0.9.0)
 - [0.8.3](./0.8.3)
 - [0.8.2](./0.8.2)
@@ -63,7 +64,6 @@ This site contains the full API reference and documentation for each version of 
 - [0.2.2](./0.2.2)
 - [0.2.1](./0.2.1)
 - [0.2.0](./0.2.0)
-- [0.10.0](./0.10.0)
 - [0.1.0](./0.1.0)
 - [0.0.9](./0.0.9)
 - [0.0.8](./0.0.8)
