@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import compareVersions from 'compare-versions';
 
 function main(): void {
   const docsPath = path.join(__dirname, '../docs');
@@ -10,7 +11,7 @@ function main(): void {
     return fs
       .readdirSync(docsPath)
       .filter((dirName) => versionNumRegex.test(dirName))
-      .sort((v1, v2) => v2.localeCompare(v1));
+      .sort((v1, v2) => -compareVersions(v1, v2));
   }
 
   // Get dynamic content
