@@ -84,7 +84,7 @@
 					<img src="https://img.shields.io/github/last-commit/kafkas/firecode" /></a>
 					<a href="https://lerna.js.org/" alt="Framework">
 					<img src="https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg" /></a>
-					<a href="https://kafkas.github.io/firecode/0.9.0/">
+					<a href="https://kafkas.github.io/firecode/0.10.0/">
 					<img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs welcome!" /></a>
 				</p>
 				<p>Firecode is a Node.js library that lets you efficiently traverse Firestore collections.</p>
@@ -119,7 +119,7 @@
 				</a>
 				<p>There are only 2 kinds of objects you need to be familiar with when using this library:</p>
 				<ol>
-					<li><p><strong>Traverser</strong>: An object that walks you through a collection of documents (or more generally a <a href="https://kafkas.github.io/firecode/0.9.0/modules.html#traversable">Traversable</a>).</p>
+					<li><p><strong>Traverser</strong>: An object that walks you through a collection of documents (or more generally a <a href="https://kafkas.github.io/firecode/0.10.0/modules.html#traversable">Traversable</a>).</p>
 					</li>
 					<li><p><strong>Migrator</strong>: A convenience object used for database migrations. It lets you easily write to the documents within a given traversable and uses a traverser to do that. You can easily write your own migration logic in the traverser callback if you don&#39;t want to use a migrator.</p>
 					</li>
@@ -235,7 +235,7 @@
 				</a>
 				<p>You can find the full API reference for <code>@firecode/admin</code> <a href="https://kafkas.github.io/firecode/">here</a>. We maintain detailed docs for every version! Here are some of the core functions that this library provides.</p>
 				<a href="#createtraverser" id="createtraverser" style="color: inherit; text-decoration: none;">
-					<h3><a href="https://kafkas.github.io/firecode/0.9.0/modules.html#createtraverser">createTraverser</a></h3>
+					<h3><a href="https://kafkas.github.io/firecode/0.10.0/modules.html#createtraverser">createTraverser</a></h3>
 				</a>
 				<p>Creates a traverser that facilitates Firestore collection traversals. When traversing the collection, this traverser invokes a specified async callback for each batch of document snapshots and waits for the callback Promise to resolve before moving to the next batch.</p>
 				<a href="#complexity" id="complexity" style="color: inherit; text-decoration: none;">
@@ -255,7 +255,7 @@
 					<li><em>S</em>: average extra space used by the callback</li>
 				</ul>
 				<a href="#createfasttraverser" id="createfasttraverser" style="color: inherit; text-decoration: none;">
-					<h3><a href="https://kafkas.github.io/firecode/0.9.0/modules.html#createfasttraverser">createFastTraverser</a></h3>
+					<h3><a href="https://kafkas.github.io/firecode/0.10.0/modules.html#createfasttraverser">createFastTraverser</a></h3>
 				</a>
 				<p>Creates a fast traverser that facilitates Firestore collection traversals. When traversing the collection, this traverser invokes a specified async callback for each batch of document snapshots and immediately moves to the next batch. It does not wait for the callback Promise to resolve before moving to the next batch so there is no guarantee that any given batch will finish processing before a later batch. This traverser uses more memory but is significantly faster than the default traverser.</p>
 				<a href="#complexity-1" id="complexity-1" style="color: inherit; text-decoration: none;">
@@ -275,7 +275,7 @@
 					<li><em>S</em>: average extra space used by the callback</li>
 				</ul>
 				<a href="#createmigrator" id="createmigrator" style="color: inherit; text-decoration: none;">
-					<h3><a href="https://kafkas.github.io/firecode/0.9.0/modules.html#createmigrator">createMigrator</a></h3>
+					<h3><a href="https://kafkas.github.io/firecode/0.10.0/modules.html#createmigrator">createMigrator</a></h3>
 				</a>
 				<p>Creates a migrator that facilitates database migrations. The migrator accepts a custom traverser to traverse the collection. Otherwise it will create a default traverser with your desired traversal config. This migrator does not use atomic batch writes so it is possible that when a write fails other writes go through.</p>
 				<a href="#complexity-2" id="complexity-2" style="color: inherit; text-decoration: none;">
@@ -295,7 +295,7 @@
 					<li><em>SC</em>(<code>traverser</code>): space complexity of the underlying traverser</li>
 				</ul>
 				<a href="#createbatchmigrator" id="createbatchmigrator" style="color: inherit; text-decoration: none;">
-					<h3><a href="https://kafkas.github.io/firecode/0.9.0/modules.html#createbatchmigrator">createBatchMigrator</a></h3>
+					<h3><a href="https://kafkas.github.io/firecode/0.10.0/modules.html#createbatchmigrator">createBatchMigrator</a></h3>
 				</a>
 				<p>Creates a migrator that facilitates database migrations. The migrator accepts a custom traverser to traverse the collection. Otherwise it will create a default traverser with your desired traversal config. This migrator uses atomic batch writes so the entire operation will fail if a single write isn&#39;t successful.</p>
 				<a href="#complexity-3" id="complexity-3" style="color: inherit; text-decoration: none;">
