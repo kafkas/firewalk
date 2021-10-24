@@ -8,4 +8,4 @@ export type TraverseEachCallback<D = firestore.DocumentData> = (
   doc: firestore.QueryDocumentSnapshot<D>,
   docIndex: number,
   batchIndex: number
-) => Promise<void>;
+) => void | Promise<void>;
