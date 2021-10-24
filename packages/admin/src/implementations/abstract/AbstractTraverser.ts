@@ -2,7 +2,6 @@ import type { firestore } from 'firebase-admin';
 import { sleep, isPositiveInteger } from '../../utils';
 import type {
   BatchCallback,
-  BatchCallbackAsync,
   ExitEarlyPredicate,
   Traversable,
   TraversalConfig,
@@ -135,5 +134,5 @@ export abstract class AbstractTraverser<C extends TraversalConfig, D> implements
 
   public abstract withExitEarlyPredicate(predicate: ExitEarlyPredicate<D>): Traverser<C, D>;
 
-  public abstract traverse(callback: BatchCallbackAsync<D>): Promise<TraversalResult>;
+  public abstract traverse(callback: BatchCallback<D>): Promise<TraversalResult>;
 }

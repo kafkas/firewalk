@@ -1,5 +1,5 @@
 import type { firestore } from 'firebase-admin';
-import type { BatchCallback } from './BatchCallback';
+import type { BatchCallback } from '.';
 
 /**
  * A function that takes batch doc snapshots and the 0-based batch index and returns a boolean

@@ -1,6 +1,6 @@
 import { sleep, PromiseQueue, registerInterval, isPositiveInteger } from '../utils';
 import type {
-  BatchCallbackAsync,
+  BatchCallback,
   ExitEarlyPredicate,
   FastTraversalConfig,
   FastTraverser,
@@ -79,7 +79,7 @@ export class PromiseQueueBasedFastTraverserImpl<D>
     );
   }
 
-  public async traverse(callback: BatchCallbackAsync<D>): Promise<TraversalResult> {
+  public async traverse(callback: BatchCallback<D>): Promise<TraversalResult> {
     const { traversalConfig } = this;
     const { maxConcurrentBatchCount } = traversalConfig;
 
@@ -99,7 +99,7 @@ export class PromiseQueueBasedFastTraverserImpl<D>
     );
 
     const traversalResult = await this.runTraversal((batchDocs, batchIndex) => {
-      callbackPromiseQueue.enqueue(callback(batchDocs, batchIndex));
+      callbackPromiseQueue.enqueue(callback(batchDocs, batchIndex) ?? Promise.resolve());
       return async () => {
         while (callbackPromiseQueue.size >= maxConcurrentBatchCount) {
           // TODO: The sleep time is currently set to processQueueInterval but there may be a better way

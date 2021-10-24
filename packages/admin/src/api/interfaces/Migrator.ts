@@ -1,5 +1,4 @@
 import type { firestore } from 'firebase-admin';
-import type { Traverser } from './Traverser';
 import type {
   BatchCallback,
   MigrationPredicate,
@@ -7,6 +6,7 @@ import type {
   SetDataGetter,
   SetOptions,
   TraversalConfig,
+  Traverser,
   UpdateDataGetter,
   UpdateFieldValueGetter,
 } from '.';

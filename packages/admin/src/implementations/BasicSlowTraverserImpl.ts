@@ -1,5 +1,5 @@
 import type {
-  BatchCallbackAsync,
+  BatchCallback,
   ExitEarlyPredicate,
   SlowTraverser,
   Traversable,
@@ -41,7 +41,7 @@ export class BasicSlowTraverserImpl<D>
     );
   }
 
-  public traverse(callback: BatchCallbackAsync<D>): Promise<TraversalResult> {
+  public traverse(callback: BatchCallback<D>): Promise<TraversalResult> {
     return this.runTraversal(async (batchDocs, batchIndex) => {
       await callback(batchDocs, batchIndex);
     });
