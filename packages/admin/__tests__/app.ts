@@ -4,7 +4,7 @@ import { resolve } from 'path';
 
 class Application {
   public constructor() {
-    this.safelyInitFirebaseApp();
+    this.#safelyInitFirebaseApp();
   }
 
   public get pathToServiceAccountKey(): string {
@@ -19,7 +19,7 @@ class Application {
     return admin;
   }
 
-  private safelyInitFirebaseApp(): void {
+  #safelyInitFirebaseApp(): void {
     if (!fs.existsSync(this.pathToServiceAccountKey)) {
       throw new Error(
         'Could not find a service account key with which to initialize the Firebase app.'

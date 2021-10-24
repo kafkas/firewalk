@@ -36,7 +36,7 @@ function getProcessableItemCount(traversalConfig: FastTraversalConfig, queueSize
 export class PromiseQueueBasedFastTraverserImpl<D>
   extends AbstractTraverser<FastTraversalConfig, D>
   implements FastTraverser<D> {
-  private static readonly defaultConfig: FastTraversalConfig = {
+  static readonly #defaultConfig: FastTraversalConfig = {
     ...AbstractTraverser.baseConfig,
     maxConcurrentBatchCount: 10,
   };
@@ -46,16 +46,16 @@ export class PromiseQueueBasedFastTraverserImpl<D>
     exitEarlyPredicates: ExitEarlyPredicate<D>[] = [],
     config?: Partial<FastTraversalConfig>
   ) {
-    super({ ...PromiseQueueBasedFastTraverserImpl.defaultConfig, ...config }, exitEarlyPredicates);
-    this.validateConfig(config);
+    super({ ...PromiseQueueBasedFastTraverserImpl.#defaultConfig, ...config }, exitEarlyPredicates);
+    this.#validateConfig(config);
   }
 
-  private validateConfig(config: Partial<FastTraversalConfig> = {}): void {
+  #validateConfig(config: Partial<FastTraversalConfig> = {}): void {
     const { maxConcurrentBatchCount } = config;
-    this.assertPositiveIntegerInConfig(maxConcurrentBatchCount, 'maxConcurrentBatchCount');
+    this.#assertPositiveIntegerInConfig(maxConcurrentBatchCount, 'maxConcurrentBatchCount');
   }
 
-  private assertPositiveIntegerInConfig(
+  #assertPositiveIntegerInConfig(
     num: number | undefined,
     field: keyof FastTraversalConfig
   ): asserts num {
