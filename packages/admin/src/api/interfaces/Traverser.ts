@@ -1,6 +1,6 @@
 import type { firestore } from 'firebase-admin';
 import type {
-  BatchCallbackAsync,
+  BatchCallback,
   ExitEarlyPredicate,
   Traversable,
   TraversalConfig,
@@ -82,5 +82,5 @@ export interface Traverser<
    * @param callback - An asynchronous callback function to invoke for each batch of document snapshots.
    * @returns A Promise resolving to an object representing the details of the traversal.
    */
-  traverse(callback: BatchCallbackAsync<D>): Promise<TraversalResult>;
+  traverse(callback: BatchCallback<D>): Promise<TraversalResult>;
 }

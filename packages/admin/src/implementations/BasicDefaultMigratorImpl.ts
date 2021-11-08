@@ -21,11 +21,11 @@ export class BasicDefaultMigratorImpl<C extends TraversalConfig, D>
     migrationPredicates?: MigrationPredicate<D>[]
   ) {
     super(registeredCallbacks, migrationPredicates);
-    this.validateConfig(traverser.traversalConfig);
+    this.#validateConfig(traverser.traversalConfig);
   }
 
   // eslint-disable-next-line
-  private validateConfig(config: Partial<C> = {}): void {
+  #validateConfig(config: Partial<C> = {}): void {
     // Confirm that the traverser config is compatible with this migrator
   }
 
@@ -51,7 +51,7 @@ export class BasicDefaultMigratorImpl<C extends TraversalConfig, D>
   public set(data: Partial<D>, options: SetOptions): Promise<MigrationResult>;
 
   public async set(data: D | Partial<D>, options?: SetOptions): Promise<MigrationResult> {
-    return this.migrate(async (doc) => {
+    return this.#migrate(async (doc) => {
       if (options === undefined) {
         // Signature 1
         await doc.ref.set(data as D);
@@ -73,7 +73,7 @@ export class BasicDefaultMigratorImpl<C extends TraversalConfig, D>
     getData: SetDataGetter<D> | SetDataGetter<Partial<D>>,
     options?: SetOptions
   ): Promise<MigrationResult> {
-    return this.migrate(async (doc) => {
+    return this.#migrate(async (doc) => {
       if (options === undefined) {
         // Signature 1
         const data = (getData as SetDataGetter<D>)(doc);
@@ -102,7 +102,7 @@ export class BasicDefaultMigratorImpl<C extends TraversalConfig, D>
     preconditionOrValue?: any,
     ...moreFieldsOrPrecondition: any[]
   ): Promise<MigrationResult> {
-    return this.migrate(async (doc) => {
+    return this.#migrate(async (doc) => {
       if (
         typeof dataOrField === 'string' ||
         dataOrField instanceof this.firestoreConstructor.FieldPath
@@ -137,7 +137,7 @@ export class BasicDefaultMigratorImpl<C extends TraversalConfig, D>
     ) => ReturnType<UpdateDataGetter<D>> | ReturnType<UpdateFieldValueGetter<D>>,
     precondition?: firestore.Precondition
   ): Promise<MigrationResult> {
-    return this.migrate(async (doc) => {
+    return this.#migrate(async (doc) => {
       const data = getData(doc);
 
       if (Array.isArray(data)) {
@@ -154,7 +154,7 @@ export class BasicDefaultMigratorImpl<C extends TraversalConfig, D>
     });
   }
 
-  private async migrate(
+  async #migrate(
     migrateDoc: (doc: firestore.QueryDocumentSnapshot<D>) => Promise<void>
   ): Promise<MigrationResult> {
     return this.migrateWithTraverser(async (batchDocs) => {

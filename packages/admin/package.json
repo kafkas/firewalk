@@ -49,6 +49,7 @@
     "directory": "__tests__/types"
   },
   "dependencies": {
+    "@proficient/ds": "0.0.1",
     "@proficient/util": "0.1.0"
   }
 }

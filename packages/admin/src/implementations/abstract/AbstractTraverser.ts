@@ -2,7 +2,6 @@ import type { firestore } from 'firebase-admin';
 import { sleep, isPositiveInteger } from '../../utils';
 import type {
   BatchCallback,
-  BatchCallbackAsync,
   ExitEarlyPredicate,
   Traversable,
   TraversalConfig,
@@ -35,21 +34,21 @@ export abstract class AbstractTraverser<C extends TraversalConfig, D> implements
     public readonly traversalConfig: C,
     protected readonly exitEarlyPredicates: ExitEarlyPredicate<D>[]
   ) {
-    this.validateBaseConfig(traversalConfig);
+    this.#validateBaseConfig(traversalConfig);
   }
 
-  private validateBaseConfig(config: Partial<TraversalConfig> = {}): void {
+  #validateBaseConfig(config: Partial<TraversalConfig> = {}): void {
     const { batchSize, sleepTimeBetweenBatches, maxDocCount } = config;
 
-    this.assertPositiveIntegerInBaseConfig(batchSize, 'batchSize');
-    this.assertPositiveIntegerInBaseConfig(sleepTimeBetweenBatches, 'sleepTimeBetweenBatches');
+    this.#assertPositiveIntegerInBaseConfig(batchSize, 'batchSize');
+    this.#assertPositiveIntegerInBaseConfig(sleepTimeBetweenBatches, 'sleepTimeBetweenBatches');
 
     if (maxDocCount !== Infinity) {
-      this.assertPositiveIntegerInBaseConfig(maxDocCount, 'maxDocCount');
+      this.#assertPositiveIntegerInBaseConfig(maxDocCount, 'maxDocCount');
     }
   }
 
-  private assertPositiveIntegerInBaseConfig(
+  #assertPositiveIntegerInBaseConfig(
     num: number | undefined,
     field: keyof TraversalConfig
   ): asserts num {
@@ -135,5 +134,5 @@ export abstract class AbstractTraverser<C extends TraversalConfig, D> implements
 
   public abstract withExitEarlyPredicate(predicate: ExitEarlyPredicate<D>): Traverser<C, D>;
 
-  public abstract traverse(callback: BatchCallbackAsync<D>): Promise<TraversalResult>;
+  public abstract traverse(callback: BatchCallback<D>): Promise<TraversalResult>;
 }

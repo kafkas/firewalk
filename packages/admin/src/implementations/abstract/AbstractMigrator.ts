@@ -92,10 +92,10 @@ export abstract class AbstractMigrator<C extends TraversalConfig, D> implements 
   ): Promise<MigrationResult> {
     let migratedDocCount = 0;
     const traversalResult = await this.traverser.traverse(async (batchDocs, batchIndex) => {
-      this.registeredCallbacks.onBeforeBatchStart?.(batchDocs, batchIndex);
+      await this.registeredCallbacks.onBeforeBatchStart?.(batchDocs, batchIndex);
       const migratedBatchDocCount = await migrateBatch(batchDocs);
       migratedDocCount += migratedBatchDocCount;
-      this.registeredCallbacks.onAfterBatchComplete?.(batchDocs, batchIndex);
+      await this.registeredCallbacks.onAfterBatchComplete?.(batchDocs, batchIndex);
     });
     return { traversalResult, migratedDocCount };
   }

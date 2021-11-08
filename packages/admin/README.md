@@ -71,7 +71,7 @@ npm install @firecode/admin
 
 There are only 2 kinds of objects you need to be familiar with when using this library:
 
-1. **Traverser**: An object that walks you through a collection of documents (or more generally a [Traversable](https://kafkas.github.io/firecode/0.10.0/modules.html#traversable)).
+1. **Traverser**: An object that walks you through a collection of documents (or more generally a [Traversable](https://kafkas.github.io/firecode/0.10.0/modules.html#Traversable)).
 
 2. **Migrator**: A convenience object used for database migrations. It lets you easily write to the documents within a given traversable and uses a traverser to do that. You can easily write your own migration logic in the traverser callback if you don't want to use a migrator.
 

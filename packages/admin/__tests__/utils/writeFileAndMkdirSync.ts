@@ -7,15 +7,15 @@ export function writeFileAndMkdirSync(
   opts?: Parameters<typeof writeFileSync>[2]
 ): void {
   const d = typeof data === 'string' ? data : JSON.stringify(data);
-  ensureDirectoryExistence(path);
+  ensureDirectoryExists(path);
   writeFileSync(path, d, opts);
 }
 
-function ensureDirectoryExistence(path: string): void {
+function ensureDirectoryExists(path: string): void {
   const dirName = dirname(path);
   if (existsSync(dirName)) {
     return;
   }
-  ensureDirectoryExistence(dirName);
+  ensureDirectoryExists(dirName);
   mkdirSync(dirName);
 }

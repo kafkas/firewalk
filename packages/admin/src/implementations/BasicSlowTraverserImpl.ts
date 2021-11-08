@@ -1,5 +1,5 @@
 import type {
-  BatchCallbackAsync,
+  BatchCallback,
   ExitEarlyPredicate,
   SlowTraverser,
   Traversable,
@@ -11,7 +11,7 @@ import { AbstractTraverser } from './abstract';
 export class BasicSlowTraverserImpl<D>
   extends AbstractTraverser<TraversalConfig, D>
   implements SlowTraverser<D> {
-  private static readonly defaultConfig: TraversalConfig = {
+  static readonly #defaultConfig: TraversalConfig = {
     ...AbstractTraverser.baseConfig,
   };
 
@@ -20,11 +20,11 @@ export class BasicSlowTraverserImpl<D>
     exitEarlyPredicates: ExitEarlyPredicate<D>[] = [],
     config?: Partial<TraversalConfig>
   ) {
-    super({ ...BasicSlowTraverserImpl.defaultConfig, ...config }, exitEarlyPredicates);
+    super({ ...BasicSlowTraverserImpl.#defaultConfig, ...config }, exitEarlyPredicates);
   }
 
   // eslint-disable-next-line
-  private validateConfig(config: Partial<TraversalConfig> = {}): void {}
+  #validateConfig(config: Partial<TraversalConfig> = {}): void {}
 
   public withConfig(config: Partial<TraversalConfig>): SlowTraverser<D> {
     return new BasicSlowTraverserImpl(this.traversable, this.exitEarlyPredicates, {
@@ -41,7 +41,7 @@ export class BasicSlowTraverserImpl<D>
     );
   }
 
-  public traverse(callback: BatchCallbackAsync<D>): Promise<TraversalResult> {
+  public traverse(callback: BatchCallback<D>): Promise<TraversalResult> {
     return this.runTraversal(async (batchDocs, batchIndex) => {
       await callback(batchDocs, batchIndex);
     });
