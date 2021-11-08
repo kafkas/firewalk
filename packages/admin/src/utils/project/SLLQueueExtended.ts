@@ -10,7 +10,7 @@ export class SLLQueueExtended<E> extends SLLQueue<E> {
   public dequeueFirst(itemCount: number): E[] {
     if (itemCount < 0 || itemCount > this.count || !Number.isInteger(itemCount)) {
       throw new Error(
-        'The `itemCount` argument must be a non-negative integer less than the size of the queue.'
+        'The `itemCount` argument must be a non-negative integer less than or equal to the size of the queue.'
       );
     }
 
