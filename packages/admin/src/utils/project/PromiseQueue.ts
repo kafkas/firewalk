@@ -1,13 +1,13 @@
-import { SLLQueue } from '../essential/SLLQueue';
+import { SLLQueueExtended } from './SLLQueueExtended';
 
 export class PromiseQueue<T> {
-  readonly #queue: SLLQueue<number>;
+  readonly #queue: SLLQueueExtended<number>;
   readonly #map: Map<number, Promise<T>>;
   #lastPromiseId: number;
   #isProcessing: boolean;
 
   public constructor() {
-    this.#queue = new SLLQueue();
+    this.#queue = new SLLQueueExtended();
     this.#map = new Map();
     this.#lastPromiseId = 0;
     this.#isProcessing = false;
@@ -17,7 +17,7 @@ export class PromiseQueue<T> {
     return this.#map.size;
   }
 
-  public isProcessing(): boolean {
+  public get isProcessing(): boolean {
     return this.#isProcessing;
   }
 
@@ -35,7 +35,7 @@ export class PromiseQueue<T> {
    * Processes all Promises in the queue.
    */
   public processAll(): Promise<T[]> {
-    return this.processFirst(this.#queue.size);
+    return this.processFirst(this.#queue.count);
   }
 
   /**

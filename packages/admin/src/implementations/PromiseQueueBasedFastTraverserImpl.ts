@@ -87,7 +87,7 @@ export class PromiseQueueBasedFastTraverserImpl<D>
 
     const unregisterQueueProcessor = registerInterval(
       async () => {
-        if (!callbackPromiseQueue.isProcessing()) {
+        if (!callbackPromiseQueue.isProcessing) {
           const processableItemCount = getProcessableItemCount(
             traversalConfig,
             callbackPromiseQueue.size
