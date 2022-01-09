@@ -1,10 +1,10 @@
 import { firestore } from 'firebase-admin';
-import type { TraversalConfig, Traverser } from '../../../../api';
+import type { Traverser } from '../../../../api';
 import type { TestItemDoc } from '../config';
 import { traversalTester } from '../helpers';
 
-export function testTraverse<C extends TraversalConfig>(
-  traverser: Traverser<C, TestItemDoc>,
+export function testTraverse(
+  traverser: Traverser<TestItemDoc>,
   colRef: firestore.CollectionReference<TestItemDoc>
 ): void {
   traversalTester(colRef).test(

@@ -1,7 +1,7 @@
 import type { firestore } from 'firebase-admin';
 import { app } from '../../../../__tests__/app';
 import { collectionPopulator } from '../../../../__tests__/utils';
-import type { Traversable, TraversalConfig, Traverser } from '../../../api';
+import type { Traversable, Traverser } from '../../../api';
 import {
   TestItemDoc,
   TraverserMethodTester,
@@ -10,12 +10,12 @@ import {
   DEFAULT_TRAVERSABLE_SIZE,
 } from './config';
 
-export type TraverserImplClass<C extends TraversalConfig> = {
-  new <D>(traversable: Traversable<D>): Traverser<C, D>;
+export type TraverserImplClass = {
+  new <D>(traversable: Traversable<D>): Traverser<D>;
 };
 
-export function describeTraverserMethodTest<C extends TraversalConfig>(
-  traverserImplClass: TraverserImplClass<C>,
+export function describeTraverserMethodTest(
+  traverserImplClass: TraverserImplClass,
   methodName: string,
   methodTester: TraverserMethodTester
 ): void {
