@@ -12,13 +12,12 @@ import { createTraverser } from './createTraverser';
  * @param traverser - The traverser object that this migrator will use when traversing the collection and writing to documents.
  * @returns A new {@link DefaultMigrator} object.
  */
-export function createMigrator<
-  C extends TraversalConfig = TraversalConfig,
-  D = firestore.DocumentData
->(traverser: Traverser<C, D>): DefaultMigrator<C, D>;
+export function createMigrator<D = firestore.DocumentData>(
+  traverser: Traverser<D>
+): DefaultMigrator<D>;
 
 /**
- * Creates a migrator that facilitates database migrations. The migrator creates a default (slow) traverser that
+ * Creates a migrator that facilitates database migrations. The migrator creates a default traverser that
  * it uses when traversing the collection and writing to documents. This migrator does not use atomic batch writes
  * so it is possible that when a write fails other writes go through.
  *
@@ -29,15 +28,12 @@ export function createMigrator<
 export function createMigrator<D = firestore.DocumentData>(
   traversable: Traversable<D>,
   traversalConfig?: Partial<TraversalConfig>
-): DefaultMigrator<TraversalConfig, D>;
+): DefaultMigrator<D>;
 
-export function createMigrator<
-  C extends TraversalConfig = TraversalConfig,
-  D = firestore.DocumentData
->(
-  traversableOrTraverser: Traverser<C, D> | Traversable<D>,
+export function createMigrator<D = firestore.DocumentData>(
+  traversableOrTraverser: Traverser<D> | Traversable<D>,
   traversalConfig?: Partial<TraversalConfig>
-): DefaultMigrator<C, D> | DefaultMigrator<TraversalConfig, D> {
+): DefaultMigrator<D> {
   const traverser = isTraverser(traversableOrTraverser)
     ? traversableOrTraverser
     : createTraverser(traversableOrTraverser, traversalConfig);

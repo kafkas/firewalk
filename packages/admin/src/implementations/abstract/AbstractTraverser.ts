@@ -17,12 +17,13 @@ export type BatchProcessor<D> = (
   ...args: Parameters<BatchCallback<D>>
 ) => void | Promise<void> | OnAfterBatchProcess | Promise<OnAfterBatchProcess>;
 
-export abstract class AbstractTraverser<C extends TraversalConfig, D> implements Traverser<C, D> {
+export abstract class AbstractTraverser<D> implements Traverser<D> {
   protected static readonly baseConfig: TraversalConfig = {
     batchSize: 250,
     sleepBetweenBatches: false,
     sleepTimeBetweenBatches: 500,
     maxDocCount: Infinity,
+    maxConcurrentBatchCount: 1,
   };
 
   protected static readonly baseTraverseEachConfig: TraverseEachConfig = {
@@ -31,7 +32,7 @@ export abstract class AbstractTraverser<C extends TraversalConfig, D> implements
   };
 
   protected constructor(
-    public readonly traversalConfig: C,
+    public readonly traversalConfig: TraversalConfig,
     protected readonly exitEarlyPredicates: ExitEarlyPredicate<D>[]
   ) {
     this.#validateBaseConfig(traversalConfig);
@@ -130,9 +131,9 @@ export abstract class AbstractTraverser<C extends TraversalConfig, D> implements
 
   public abstract readonly traversable: Traversable<D>;
 
-  public abstract withConfig(config: Partial<C>): Traverser<C, D>;
+  public abstract withConfig(config: Partial<TraversalConfig>): Traverser<D>;
 
-  public abstract withExitEarlyPredicate(predicate: ExitEarlyPredicate<D>): Traverser<C, D>;
+  public abstract withExitEarlyPredicate(predicate: ExitEarlyPredicate<D>): Traverser<D>;
 
   public abstract traverse(callback: BatchCallback<D>): Promise<TraversalResult>;
 }

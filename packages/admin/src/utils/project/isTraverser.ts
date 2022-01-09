@@ -1,9 +1,7 @@
-import type { TraversalConfig, Traverser } from '../../api';
+import type { Traverser } from '../../api';
 
-export function isTraverser<C extends TraversalConfig, D>(
-  candidate: Traverser<C, D> | unknown
-): candidate is Traverser<C, D> {
-  const t = candidate as Traverser<C, D>;
+export function isTraverser<D>(candidate: Traverser<D> | unknown): candidate is Traverser<D> {
+  const t = candidate as Traverser<D>;
   return (
     !!t &&
     t.traversable !== null &&

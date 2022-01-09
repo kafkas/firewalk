@@ -6,7 +6,6 @@ import type {
   Migrator,
   SetDataGetter,
   SetOptions,
-  TraversalConfig,
   Traverser,
   UpdateDataGetter,
   UpdateFieldValueGetter,
@@ -23,7 +22,7 @@ type UpdateFieldValueArgs = [
   ...moreFieldsOrPrecondition: any[]
 ];
 
-export abstract class AbstractMigrator<C extends TraversalConfig, D> implements Migrator<C, D> {
+export abstract class AbstractMigrator<D> implements Migrator<D> {
   protected constructor(
     protected readonly registeredCallbacks: RegisteredCallbacks<D> = {},
     protected readonly migrationPredicates: MigrationPredicate<D>[] = []
@@ -104,13 +103,11 @@ export abstract class AbstractMigrator<C extends TraversalConfig, D> implements 
     return this.migrationPredicates.every((predicate) => predicate(doc));
   }
 
-  public abstract readonly traverser: Traverser<C, D>;
+  public abstract readonly traverser: Traverser<D>;
 
-  public abstract withPredicate(predicate: MigrationPredicate<D>): Migrator<C, D>;
+  public abstract withPredicate(predicate: MigrationPredicate<D>): Migrator<D>;
 
-  public abstract withTraverser<C2 extends TraversalConfig>(
-    traverser: Traverser<C2, D>
-  ): Migrator<C2, D>;
+  public abstract withTraverser(traverser: Traverser<D>): Migrator<D>;
 
   public abstract set(data: D): Promise<MigrationResult>;
 

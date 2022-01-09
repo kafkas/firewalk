@@ -2,10 +2,10 @@ import { sleep, PromiseQueue, registerInterval, isPositiveInteger } from '../uti
 import type {
   BatchCallback,
   ExitEarlyPredicate,
-  FastTraversalConfig,
-  FastTraverser,
   Traversable,
+  TraversalConfig,
   TraversalResult,
+  Traverser,
 } from '../api';
 import { AbstractTraverser } from './abstract';
 
@@ -16,7 +16,7 @@ import { AbstractTraverser } from './abstract';
  * @param queueSize - The current size of the queue.
  * @returns A non-negative integer.
  */
-function getProcessQueueInterval(traversalConfig: FastTraversalConfig, queueSize: number): number {
+function getProcessQueueInterval(traversalConfig: TraversalConfig, queueSize: number): number {
   // TODO: Implement
   return 250;
 }
@@ -28,51 +28,50 @@ function getProcessQueueInterval(traversalConfig: FastTraversalConfig, queueSize
  * @param queueSize - The current size of the queue.
  * @returns An integer within the range [0, `queueSize`].
  */
-function getProcessableItemCount(traversalConfig: FastTraversalConfig, queueSize: number): number {
+function getProcessableItemCount(traversalConfig: TraversalConfig, queueSize: number): number {
   // TODO: Implement
   return queueSize;
 }
 
-export class PromiseQueueBasedFastTraverserImpl<D>
-  extends AbstractTraverser<FastTraversalConfig, D>
-  implements FastTraverser<D> {
-  static readonly #defaultConfig: FastTraversalConfig = {
+export class PromiseQueueBasedTraverserImpl<D>
+  extends AbstractTraverser<D>
+  implements Traverser<D> {
+  static readonly #defaultConfig: TraversalConfig = {
     ...AbstractTraverser.baseConfig,
-    maxConcurrentBatchCount: 10,
   };
 
   public constructor(
     public readonly traversable: Traversable<D>,
     exitEarlyPredicates: ExitEarlyPredicate<D>[] = [],
-    config?: Partial<FastTraversalConfig>
+    config?: Partial<TraversalConfig>
   ) {
-    super({ ...PromiseQueueBasedFastTraverserImpl.#defaultConfig, ...config }, exitEarlyPredicates);
+    super({ ...PromiseQueueBasedTraverserImpl.#defaultConfig, ...config }, exitEarlyPredicates);
     this.#validateConfig(config);
   }
 
-  #validateConfig(config: Partial<FastTraversalConfig> = {}): void {
+  #validateConfig(config: Partial<TraversalConfig> = {}): void {
     const { maxConcurrentBatchCount } = config;
     this.#assertPositiveIntegerInConfig(maxConcurrentBatchCount, 'maxConcurrentBatchCount');
   }
 
   #assertPositiveIntegerInConfig(
     num: number | undefined,
-    field: keyof FastTraversalConfig
+    field: keyof TraversalConfig
   ): asserts num {
     if (typeof num === 'number' && !isPositiveInteger(num)) {
       throw new Error(`The '${field}' field in traversal config must be a positive integer.`);
     }
   }
 
-  public withConfig(config: Partial<FastTraversalConfig>): FastTraverser<D> {
-    return new PromiseQueueBasedFastTraverserImpl(this.traversable, this.exitEarlyPredicates, {
+  public withConfig(config: Partial<TraversalConfig>): Traverser<D> {
+    return new PromiseQueueBasedTraverserImpl(this.traversable, this.exitEarlyPredicates, {
       ...this.traversalConfig,
       ...config,
     });
   }
 
-  public withExitEarlyPredicate(predicate: ExitEarlyPredicate<D>): FastTraverser<D> {
-    return new PromiseQueueBasedFastTraverserImpl(
+  public withExitEarlyPredicate(predicate: ExitEarlyPredicate<D>): Traverser<D> {
+    return new PromiseQueueBasedTraverserImpl(
       this.traversable,
       [...this.exitEarlyPredicates, predicate],
       this.traversalConfig
@@ -82,6 +81,12 @@ export class PromiseQueueBasedFastTraverserImpl<D>
   public async traverse(callback: BatchCallback<D>): Promise<TraversalResult> {
     const { traversalConfig } = this;
     const { maxConcurrentBatchCount } = traversalConfig;
+
+    if (maxConcurrentBatchCount === 1) {
+      return this.runTraversal(async (batchDocs, batchIndex) => {
+        await callback(batchDocs, batchIndex);
+      });
+    }
 
     const callbackPromiseQueue = new PromiseQueue<void>();
 
