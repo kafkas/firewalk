@@ -12,7 +12,6 @@ expectType<BatchMigrator<D>>(batchMigrator);
 
 const batchMigrator2 = createBatchMigrator(collectionRef, {
   batchSize: 0,
-  sleepBetweenBatches: false,
   sleepTimeBetweenBatches: 0,
   maxDocCount: 0,
 });

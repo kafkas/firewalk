@@ -21,7 +21,6 @@ expectType<TraversalConfig>(traverser.traversalConfig);
   // TODO: See if there is a better way to check inferred parameters
   const modifiedTraverser = traverser.withConfig({
     batchSize: 0,
-    sleepBetweenBatches: false,
     sleepTimeBetweenBatches: 0,
     maxDocCount: 0,
     maxConcurrentBatchCount: 0,

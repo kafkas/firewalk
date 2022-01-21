@@ -12,7 +12,6 @@ expectType<DefaultMigrator<D>>(defaultMigrator);
 
 const defaultMigrator2 = createMigrator(collectionRef, {
   batchSize: 0,
-  sleepBetweenBatches: false,
   sleepTimeBetweenBatches: 0,
   maxDocCount: 0,
   maxConcurrentBatchCount: 0,

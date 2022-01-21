@@ -20,8 +20,7 @@ export type BatchProcessor<D> = (
 export abstract class AbstractTraverser<D> implements Traverser<D> {
   protected static readonly baseConfig: TraversalConfig = {
     batchSize: 250,
-    sleepBetweenBatches: false,
-    sleepTimeBetweenBatches: 500,
+    sleepTimeBetweenBatches: 0,
     maxDocCount: Infinity,
     maxConcurrentBatchCount: 1,
   };
@@ -42,10 +41,19 @@ export abstract class AbstractTraverser<D> implements Traverser<D> {
     const { batchSize, sleepTimeBetweenBatches, maxDocCount } = config;
 
     this.#assertPositiveIntegerInBaseConfig(batchSize, 'batchSize');
-    this.#assertPositiveIntegerInBaseConfig(sleepTimeBetweenBatches, 'sleepTimeBetweenBatches');
+    this.#assertNonNegativeIntegerInBaseConfig(sleepTimeBetweenBatches, 'sleepTimeBetweenBatches');
 
     if (maxDocCount !== Infinity) {
       this.#assertPositiveIntegerInBaseConfig(maxDocCount, 'maxDocCount');
+    }
+  }
+
+  #assertNonNegativeIntegerInBaseConfig(
+    num: number | undefined,
+    field: keyof TraversalConfig
+  ): asserts num {
+    if (typeof num === 'number' && !isPositiveInteger(num) && num !== 0) {
+      throw new Error(`The '${field}' field in traversal config must be a non-negative integer.`);
     }
   }
 
@@ -80,12 +88,7 @@ export abstract class AbstractTraverser<D> implements Traverser<D> {
   }
 
   protected async runTraversal(processBatch: BatchProcessor<D>): Promise<TraversalResult> {
-    const {
-      batchSize,
-      sleepBetweenBatches,
-      sleepTimeBetweenBatches,
-      maxDocCount,
-    } = this.traversalConfig;
+    const { batchSize, sleepTimeBetweenBatches, maxDocCount } = this.traversalConfig;
 
     let curBatchIndex = 0;
     let docCount = 0;
@@ -111,7 +114,7 @@ export abstract class AbstractTraverser<D> implements Traverser<D> {
 
       await onAfterBatchProcess?.();
 
-      if (sleepBetweenBatches) {
+      if (sleepTimeBetweenBatches > 0) {
         await sleep(sleepTimeBetweenBatches);
       }
 

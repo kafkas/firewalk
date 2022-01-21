@@ -10,16 +10,9 @@ export interface TraversalConfig {
   readonly batchSize: number;
 
   /**
-   * Whether to sleep between batches.
-   *
-   * @defaultValue `false`
-   */
-  readonly sleepBetweenBatches: boolean;
-
-  /**
    * The amount of time (in ms) to "sleep" before moving on to the next batch.
    *
-   * @defaultValue 500
+   * @defaultValue 0
    */
   readonly sleepTimeBetweenBatches: number;
 

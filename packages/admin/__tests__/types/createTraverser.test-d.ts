@@ -4,7 +4,6 @@ import { collectionRef, D } from './_helpers';
 
 const traverser = createTraverser(collectionRef, {
   batchSize: 0,
-  sleepBetweenBatches: false,
   sleepTimeBetweenBatches: 0,
   maxDocCount: 0,
   maxConcurrentBatchCount: 0,
