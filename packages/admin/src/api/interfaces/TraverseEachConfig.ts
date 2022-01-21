@@ -3,16 +3,9 @@
  */
 export interface TraverseEachConfig {
   /**
-   * Whether to sleep before moving to the next doc.
-   *
-   * @defaultValue `false`
-   */
-  readonly sleepBetweenDocs: boolean;
-
-  /**
    * The amount of time (in ms) to "sleep" before moving to the next doc.
    *
-   * @defaultValue 500
+   * @defaultValue 0
    */
   readonly sleepTimeBetweenDocs: number;
 }

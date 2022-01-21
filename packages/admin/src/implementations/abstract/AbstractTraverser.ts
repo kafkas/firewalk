@@ -26,8 +26,7 @@ export abstract class AbstractTraverser<D> implements Traverser<D> {
   };
 
   protected static readonly baseTraverseEachConfig: TraverseEachConfig = {
-    sleepBetweenDocs: false,
-    sleepTimeBetweenDocs: 500,
+    sleepTimeBetweenDocs: 0,
   };
 
   protected constructor(
@@ -70,7 +69,7 @@ export abstract class AbstractTraverser<D> implements Traverser<D> {
     callback: TraverseEachCallback<D>,
     config: Partial<TraverseEachConfig> = {}
   ): Promise<TraversalResult> {
-    const { sleepBetweenDocs, sleepTimeBetweenDocs } = {
+    const { sleepTimeBetweenDocs } = {
       ...AbstractTraverser.baseTraverseEachConfig,
       ...config,
     };
@@ -78,7 +77,7 @@ export abstract class AbstractTraverser<D> implements Traverser<D> {
     const { batchCount, docCount } = await this.traverse(async (batchDocs, batchIndex) => {
       for (let i = 0; i < batchDocs.length; i++) {
         await callback(batchDocs[i], i, batchIndex);
-        if (sleepBetweenDocs) {
+        if (sleepTimeBetweenDocs > 0) {
           await sleep(sleepTimeBetweenDocs);
         }
       }
