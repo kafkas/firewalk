@@ -46,21 +46,6 @@ export class PromiseQueueBasedTraverserImpl<D>
     config?: Partial<TraversalConfig>
   ) {
     super({ ...PromiseQueueBasedTraverserImpl.#defaultConfig, ...config }, exitEarlyPredicates);
-    this.#validateConfig(config);
-  }
-
-  #validateConfig(config: Partial<TraversalConfig> = {}): void {
-    const { maxConcurrentBatchCount } = config;
-    this.#assertPositiveIntegerInConfig(maxConcurrentBatchCount, 'maxConcurrentBatchCount');
-  }
-
-  #assertPositiveIntegerInConfig(
-    num: number | undefined,
-    field: keyof TraversalConfig
-  ): asserts num {
-    if (typeof num === 'number' && !isPositiveInteger(num)) {
-      throw new Error(`The '${field}' field in traversal config must be a positive integer.`);
-    }
   }
 
   public withConfig(config: Partial<TraversalConfig>): Traverser<D> {

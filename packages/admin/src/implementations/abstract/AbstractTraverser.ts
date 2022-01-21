@@ -37,13 +37,24 @@ export abstract class AbstractTraverser<D> implements Traverser<D> {
   }
 
   #validateBaseConfig(config: Partial<TraversalConfig> = {}): void {
-    const { batchSize, sleepTimeBetweenBatches, maxDocCount } = config;
+    const { batchSize, sleepTimeBetweenBatches, maxDocCount, maxConcurrentBatchCount } = config;
 
     this.#assertPositiveIntegerInBaseConfig(batchSize, 'batchSize');
     this.#assertNonNegativeIntegerInBaseConfig(sleepTimeBetweenBatches, 'sleepTimeBetweenBatches');
 
     if (maxDocCount !== Infinity) {
       this.#assertPositiveIntegerInBaseConfig(maxDocCount, 'maxDocCount');
+    }
+
+    this.#assertPositiveIntegerInBaseConfig(maxConcurrentBatchCount, 'maxConcurrentBatchCount');
+  }
+
+  #assertPositiveIntegerInBaseConfig(
+    num: number | undefined,
+    field: keyof TraversalConfig
+  ): asserts num {
+    if (typeof num === 'number' && !isPositiveInteger(num)) {
+      throw new Error(`The '${field}' field in traversal config must be a positive integer.`);
     }
   }
 
@@ -53,15 +64,6 @@ export abstract class AbstractTraverser<D> implements Traverser<D> {
   ): asserts num {
     if (typeof num === 'number' && !isPositiveInteger(num) && num !== 0) {
       throw new Error(`The '${field}' field in traversal config must be a non-negative integer.`);
-    }
-  }
-
-  #assertPositiveIntegerInBaseConfig(
-    num: number | undefined,
-    field: keyof TraversalConfig
-  ): asserts num {
-    if (typeof num === 'number' && !isPositiveInteger(num)) {
-      throw new Error(`The '${field}' field in traversal config must be a positive integer.`);
     }
   }
 
