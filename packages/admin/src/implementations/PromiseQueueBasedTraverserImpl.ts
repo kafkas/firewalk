@@ -1,4 +1,4 @@
-import { sleep, PromiseQueue, registerInterval, isPositiveInteger } from '../utils';
+import { sleep, PromiseQueue, registerInterval } from '../utils';
 import type {
   BatchCallback,
   ExitEarlyPredicate,
