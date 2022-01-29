@@ -21,10 +21,6 @@
         <img src="https://img.shields.io/npm/dm/@firecode/admin" /></a>
     <a href="https://" alt="Types">
         <img src="https://img.shields.io/npm/types/@firecode/admin" /></a>
-    <a href="https://github.com/kafkas/firecode" alt="Activity">
-        <img src="https://img.shields.io/github/commit-activity/m/kafkas/firecode" /></a>
-    <a href="https://" alt="Last Commit">
-        <img src="https://img.shields.io/github/last-commit/kafkas/firecode" /></a>
     <a href="https://lerna.js.org/" alt="Framework">
         <img src="https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg" /></a>
     <a href="https://github.com/kafkas/firecode">
@@ -43,6 +39,7 @@ This site contains the full API reference and documentation for each version of 
 
 ### Versions
 
+- [0.12.0](./0.12.0)
 - [0.11.0](./0.11.0)
 - [0.10.0](./0.10.0)
 - [0.9.0](./0.9.0)
