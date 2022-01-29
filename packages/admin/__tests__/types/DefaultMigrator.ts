@@ -1,33 +1,24 @@
 import { firestore } from 'firebase-admin';
 import { expectError, expectType } from 'tsd';
-import {
-  createFastTraverser,
-  createMigrator,
-  DefaultMigrator,
-  FastTraversalConfig,
-  TraversalConfig,
-  Traverser,
-} from '../../src';
+import { createTraverser, createMigrator, DefaultMigrator, Traverser } from '../../src';
 import { collectionRef, D } from './_helpers';
 
 const defaultMigrator = createMigrator(collectionRef);
 
-// TODO: Ideally we want to expect a SlowTraverser<D> here because
-// we (implicitly) initialized the migrator with a SlowTraverser
-expectType<Traverser<TraversalConfig, D>>(defaultMigrator.traverser);
+expectType<Traverser<D>>(defaultMigrator.traverser);
 
 (() => {
   const modifiedMigrator = defaultMigrator.withPredicate((doc) => {
     expectType<firestore.QueryDocumentSnapshot<D>>(doc);
     return false;
   });
-  expectType<DefaultMigrator<TraversalConfig, D>>(modifiedMigrator);
+  expectType<DefaultMigrator<D>>(modifiedMigrator);
 })();
 
 (() => {
-  const fastTraverser = createFastTraverser(collectionRef);
-  const modifiedMigrator = defaultMigrator.withTraverser(fastTraverser);
-  expectType<DefaultMigrator<FastTraversalConfig, D>>(modifiedMigrator);
+  const traverser = createTraverser(collectionRef);
+  const modifiedMigrator = defaultMigrator.withTraverser(traverser);
+  expectType<DefaultMigrator<D>>(modifiedMigrator);
 })();
 
 defaultMigrator.onBeforeBatchStart((batchDocs, batchIndex) => {

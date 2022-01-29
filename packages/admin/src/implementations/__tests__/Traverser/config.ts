@@ -1,8 +1,8 @@
 import type { firestore } from 'firebase-admin';
 import type { TraversalConfig, Traverser } from '../../../../src';
 
-export type TraverserMethodTester = <C extends TraversalConfig>(
-  traverser: Traverser<C, TestItemDoc>,
+export type TraverserMethodTester = (
+  traverser: Traverser<TestItemDoc>,
   colRef: firestore.CollectionReference<TestItemDoc>
 ) => void;
 

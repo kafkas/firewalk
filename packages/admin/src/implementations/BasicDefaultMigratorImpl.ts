@@ -12,11 +12,9 @@ import type {
 } from '../api';
 import { AbstractMigrator, RegisteredCallbacks } from './abstract';
 
-export class BasicDefaultMigratorImpl<C extends TraversalConfig, D>
-  extends AbstractMigrator<C, D>
-  implements DefaultMigrator<C, D> {
+export class BasicDefaultMigratorImpl<D> extends AbstractMigrator<D> implements DefaultMigrator<D> {
   public constructor(
-    public readonly traverser: Traverser<C, D>,
+    public readonly traverser: Traverser<D>,
     registeredCallbacks?: RegisteredCallbacks<D>,
     migrationPredicates?: MigrationPredicate<D>[]
   ) {
@@ -25,20 +23,18 @@ export class BasicDefaultMigratorImpl<C extends TraversalConfig, D>
   }
 
   // eslint-disable-next-line
-  #validateConfig(config: Partial<C> = {}): void {
+  #validateConfig(config: Partial<TraversalConfig> = {}): void {
     // Confirm that the traverser config is compatible with this migrator
   }
 
-  public withPredicate(predicate: MigrationPredicate<D>): DefaultMigrator<C, D> {
+  public withPredicate(predicate: MigrationPredicate<D>): DefaultMigrator<D> {
     return new BasicDefaultMigratorImpl(this.traverser, this.registeredCallbacks, [
       ...this.migrationPredicates,
       predicate,
     ]);
   }
 
-  public withTraverser<C2 extends TraversalConfig>(
-    traverser: Traverser<C2, D>
-  ): DefaultMigrator<C2, D> {
+  public withTraverser(traverser: Traverser<D>): DefaultMigrator<D> {
     return new BasicDefaultMigratorImpl(
       traverser,
       this.registeredCallbacks,

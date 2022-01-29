@@ -1,13 +1,10 @@
 import type { firestore } from 'firebase-admin';
-import type { MigrationPredicate, Migrator, TraversalConfig, Traverser } from '.';
+import type { MigrationPredicate, Migrator, Traverser } from '.';
 
 /**
  * A batch migrator object that uses atomic batch writes.
  */
-export interface BatchMigrator<
-  C extends TraversalConfig = TraversalConfig,
-  D = firestore.DocumentData
-> extends Migrator<C, D> {
+export interface BatchMigrator<D = firestore.DocumentData> extends Migrator<D> {
   /**
    * Applies a migration predicate that indicates whether to migrate the current document or not. By default, all
    * documents are migrated.
@@ -32,7 +29,7 @@ export interface BatchMigrator<
    * @param predicate - A function that takes a document snapshot and returns a boolean indicating whether to migrate it.
    * @returns A new {@link BatchMigrator} object.
    */
-  withPredicate(predicate: MigrationPredicate<D>): BatchMigrator<C, D>;
+  withPredicate(predicate: MigrationPredicate<D>): BatchMigrator<D>;
 
   /**
    * Applies a new traverser that will be used by the migrator.
@@ -40,5 +37,5 @@ export interface BatchMigrator<
    * @param traverser - The new traverser that the migrator will use.
    * @returns A new {@link BatchMigrator} object.
    */
-  withTraverser<C2 extends TraversalConfig>(traverser: Traverser<C2, D>): BatchMigrator<C2, D>;
+  withTraverser(traverser: Traverser<D>): BatchMigrator<D>;
 }

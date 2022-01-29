@@ -17,35 +17,36 @@ export type BatchProcessor<D> = (
   ...args: Parameters<BatchCallback<D>>
 ) => void | Promise<void> | OnAfterBatchProcess | Promise<OnAfterBatchProcess>;
 
-export abstract class AbstractTraverser<C extends TraversalConfig, D> implements Traverser<C, D> {
+export abstract class AbstractTraverser<D> implements Traverser<D> {
   protected static readonly baseConfig: TraversalConfig = {
     batchSize: 250,
-    sleepBetweenBatches: false,
-    sleepTimeBetweenBatches: 500,
+    sleepTimeBetweenBatches: 0,
     maxDocCount: Infinity,
+    maxConcurrentBatchCount: 1,
   };
 
   protected static readonly baseTraverseEachConfig: TraverseEachConfig = {
-    sleepBetweenDocs: false,
-    sleepTimeBetweenDocs: 500,
+    sleepTimeBetweenDocs: 0,
   };
 
   protected constructor(
-    public readonly traversalConfig: C,
+    public readonly traversalConfig: TraversalConfig,
     protected readonly exitEarlyPredicates: ExitEarlyPredicate<D>[]
   ) {
     this.#validateBaseConfig(traversalConfig);
   }
 
   #validateBaseConfig(config: Partial<TraversalConfig> = {}): void {
-    const { batchSize, sleepTimeBetweenBatches, maxDocCount } = config;
+    const { batchSize, sleepTimeBetweenBatches, maxDocCount, maxConcurrentBatchCount } = config;
 
     this.#assertPositiveIntegerInBaseConfig(batchSize, 'batchSize');
-    this.#assertPositiveIntegerInBaseConfig(sleepTimeBetweenBatches, 'sleepTimeBetweenBatches');
+    this.#assertNonNegativeIntegerInBaseConfig(sleepTimeBetweenBatches, 'sleepTimeBetweenBatches');
 
     if (maxDocCount !== Infinity) {
       this.#assertPositiveIntegerInBaseConfig(maxDocCount, 'maxDocCount');
     }
+
+    this.#assertPositiveIntegerInBaseConfig(maxConcurrentBatchCount, 'maxConcurrentBatchCount');
   }
 
   #assertPositiveIntegerInBaseConfig(
@@ -57,11 +58,20 @@ export abstract class AbstractTraverser<C extends TraversalConfig, D> implements
     }
   }
 
+  #assertNonNegativeIntegerInBaseConfig(
+    num: number | undefined,
+    field: keyof TraversalConfig
+  ): asserts num {
+    if (typeof num === 'number' && !isPositiveInteger(num) && num !== 0) {
+      throw new Error(`The '${field}' field in traversal config must be a non-negative integer.`);
+    }
+  }
+
   public async traverseEach(
     callback: TraverseEachCallback<D>,
     config: Partial<TraverseEachConfig> = {}
   ): Promise<TraversalResult> {
-    const { sleepBetweenDocs, sleepTimeBetweenDocs } = {
+    const { sleepTimeBetweenDocs } = {
       ...AbstractTraverser.baseTraverseEachConfig,
       ...config,
     };
@@ -69,7 +79,7 @@ export abstract class AbstractTraverser<C extends TraversalConfig, D> implements
     const { batchCount, docCount } = await this.traverse(async (batchDocs, batchIndex) => {
       for (let i = 0; i < batchDocs.length; i++) {
         await callback(batchDocs[i], i, batchIndex);
-        if (sleepBetweenDocs) {
+        if (sleepTimeBetweenDocs > 0) {
           await sleep(sleepTimeBetweenDocs);
         }
       }
@@ -79,12 +89,7 @@ export abstract class AbstractTraverser<C extends TraversalConfig, D> implements
   }
 
   protected async runTraversal(processBatch: BatchProcessor<D>): Promise<TraversalResult> {
-    const {
-      batchSize,
-      sleepBetweenBatches,
-      sleepTimeBetweenBatches,
-      maxDocCount,
-    } = this.traversalConfig;
+    const { batchSize, sleepTimeBetweenBatches, maxDocCount } = this.traversalConfig;
 
     let curBatchIndex = 0;
     let docCount = 0;
@@ -110,7 +115,7 @@ export abstract class AbstractTraverser<C extends TraversalConfig, D> implements
 
       await onAfterBatchProcess?.();
 
-      if (sleepBetweenBatches) {
+      if (sleepTimeBetweenBatches > 0) {
         await sleep(sleepTimeBetweenBatches);
       }
 
@@ -130,9 +135,9 @@ export abstract class AbstractTraverser<C extends TraversalConfig, D> implements
 
   public abstract readonly traversable: Traversable<D>;
 
-  public abstract withConfig(config: Partial<C>): Traverser<C, D>;
+  public abstract withConfig(config: Partial<TraversalConfig>): Traverser<D>;
 
-  public abstract withExitEarlyPredicate(predicate: ExitEarlyPredicate<D>): Traverser<C, D>;
+  public abstract withExitEarlyPredicate(predicate: ExitEarlyPredicate<D>): Traverser<D>;
 
   public abstract traverse(callback: BatchCallback<D>): Promise<TraversalResult>;
 }

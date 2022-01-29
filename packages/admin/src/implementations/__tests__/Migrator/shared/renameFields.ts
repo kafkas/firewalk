@@ -1,14 +1,14 @@
 import { firestore } from 'firebase-admin';
 import { cloneDeep } from 'lodash';
-import type { Migrator, TraversalConfig } from '../../../../api';
+import type { Migrator } from '../../../../api';
 import type { TestItemDoc } from '../config';
 import { migrationTester } from '../helpers';
 
 /**
  * Assumes that the collection is initially empty.
  */
-export function testRenameFields<C extends TraversalConfig>(
-  migrator: Migrator<C, TestItemDoc>,
+export function testRenameFields(
+  migrator: Migrator<TestItemDoc>,
   colRef: firestore.CollectionReference<TestItemDoc>
 ): void {
   migrationTester(colRef).test(

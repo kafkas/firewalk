@@ -1,7 +1,7 @@
 import type { firestore } from 'firebase-admin';
 import { app } from '../../../../__tests__/app';
 import { collectionPopulator } from '../../../../__tests__/utils';
-import { createTraverser, Migrator, TraversalConfig, Traverser } from '../../../api';
+import { createTraverser, Migrator, Traverser } from '../../../api';
 import {
   TestItemDoc,
   MigratorMethodTester,
@@ -12,7 +12,7 @@ import {
 } from './config';
 
 export type MigratorImplClass = {
-  new <C extends TraversalConfig, D>(traverser: Traverser<C, D>): Migrator<C, D>;
+  new <D>(traverser: Traverser<D>): Migrator<D>;
 };
 
 export function describeMigratorMethodTest(
@@ -24,8 +24,8 @@ export function describeMigratorMethodTest(
   const colRef = app()
     .admin.firestore()
     .collection(description) as firestore.CollectionReference<TestItemDoc>;
-  const slowTraverser = createTraverser(colRef, TRAVERSAL_CONFIG);
-  const migrator = new migratorImplClass(slowTraverser);
+  const traverser = createTraverser(colRef, TRAVERSAL_CONFIG);
+  const migrator = new migratorImplClass(traverser);
   describe(description, () => {
     methodTester(migrator, colRef);
   });

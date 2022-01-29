@@ -13,13 +13,11 @@ import type {
 } from '../api';
 import { AbstractMigrator, RegisteredCallbacks } from './abstract';
 
-export class BasicBatchMigratorImpl<C extends TraversalConfig, D>
-  extends AbstractMigrator<C, D>
-  implements BatchMigrator<C, D> {
+export class BasicBatchMigratorImpl<D> extends AbstractMigrator<D> implements BatchMigrator<D> {
   static readonly #MAX_BATCH_WRITE_DOC_COUNT = 500;
 
   public constructor(
-    public readonly traverser: Traverser<C, D>,
+    public readonly traverser: Traverser<D>,
     registeredCallbacks?: RegisteredCallbacks<D>,
     migrationPredicates?: MigrationPredicate<D>[]
   ) {
@@ -44,16 +42,14 @@ export class BasicBatchMigratorImpl<C extends TraversalConfig, D>
     }
   }
 
-  public withPredicate(predicate: MigrationPredicate<D>): BatchMigrator<C, D> {
+  public withPredicate(predicate: MigrationPredicate<D>): BatchMigrator<D> {
     return new BasicBatchMigratorImpl(this.traverser, this.registeredCallbacks, [
       ...this.migrationPredicates,
       predicate,
     ]);
   }
 
-  public withTraverser<C2 extends TraversalConfig>(
-    traverser: Traverser<C2, D>
-  ): BatchMigrator<C2, D> {
+  public withTraverser(traverser: Traverser<D>): BatchMigrator<D> {
     return new BasicBatchMigratorImpl(
       traverser,
       this.registeredCallbacks,

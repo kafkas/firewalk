@@ -21,10 +21,6 @@
         <img src="https://img.shields.io/npm/dm/@firecode/admin" /></a>
     <a href="https://" alt="Types">
         <img src="https://img.shields.io/npm/types/@firecode/admin" /></a>
-    <a href="https://github.com/kafkas/firecode" alt="Activity">
-        <img src="https://img.shields.io/github/commit-activity/m/kafkas/firecode" /></a>
-    <a href="https://" alt="Last Commit">
-        <img src="https://img.shields.io/github/last-commit/kafkas/firecode" /></a>
     <a href="https://lerna.js.org/" alt="Framework">
         <img src="https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg" /></a>
     <a href="https://github.com/kafkas/firecode">
@@ -58,13 +54,21 @@ Firecode is an extremely light and well-typed library that is useful in a variet
 Firecode is designed to work with the [Firebase Admin SDK](https://github.com/firebase/firebase-admin-node) so if you haven't already installed it, run
 
 ```
+# npm
 npm install firebase-admin
+
+# yarn
+yarn add firebase-admin
 ```
 
 Then run
 
 ```
-npm install @firecode/admin
+# npm
+npm install -E @firecode/admin
+
+# yarn
+yarn add -E @firecode/admin
 ```
 
 ## Core Concepts
@@ -110,13 +114,14 @@ This pretty much sums up the core functionality of this library! The `.traverse(
 
 ## More Examples
 
-### Use a fast traverser
+### Traverse faster by increasing concurrency
 
 ```ts
 const projectsColRef = firestore().collection('projects');
-const traverser = createFastTraverser(projectsColRef, {
+const traverser = createTraverser(projectsColRef, {
   batchSize: 500,
-  // This means we are prepared to hold 500 * 20 = 10,000 docs in memory
+  // This means we are prepared to hold 500 * 20 = 10,000 docs in memory.
+  // We sacrifice some memory to traverse faster.
   maxConcurrentBatchCount: 20,
 });
 const { docCount } = await traverser.traverse(async (_, batchIndex) => {
@@ -153,13 +158,12 @@ const { migratedDocCount } = await migrator.updateWithDerivedData((snap) => {
 console.log(`Updated ${migratedDocCount} users!`);
 ```
 
-### Use a fast migrator
+### Migrate faster by increasing concurrency
 
 ```ts
 const projectsColRef = firestore().collection('projects');
-const fastTraverser = createFastTraverser(projectsColRef, { maxConcurrentBatchCount: 25 });
-const fastMigrator = createMigrator(fastTraverser);
-const { migratedDocCount } = await fastMigrator.update('isCompleted', false);
+const migrator = createMigrator(projectsColRef, { maxConcurrentBatchCount: 25 });
+const { migratedDocCount } = await migrator.update('isCompleted', false);
 console.log(`Updated ${migratedDocCount} projects super-fast!`);
 ```
 
@@ -170,14 +174,12 @@ const walletsWithNegativeBalance = firestore().collection('wallets').where('mone
 const migrator = createMigrator(walletsWithNegativeBalance, {
   // We want each batch to have 500 docs. The size of the very last batch may be less than 500
   batchSize: 500,
-  // We want to wait before moving to the next batch
-  sleepBetweenBatches: true,
   // We want to wait 500ms before moving to the next batch
   sleepTimeBetweenBatches: 500,
 });
 // Wipe out their debts!
 const { migratedDocCount } = await migrator.set({ money: 0 });
-console.log(`Updated ${migratedDocCount} wallets!`);
+console.log(`Set ${migratedDocCount} wallets!`);
 ```
 
 ### Rename a field
@@ -195,25 +197,11 @@ You can find the full API reference for `@firecode/admin` [here](https://kafkas.
 
 ### [createTraverser](https://kafkas.github.io/firecode/0.11.0/modules.html#createtraverser)
 
-Creates a traverser that facilitates Firestore collection traversals. When traversing the collection, this traverser invokes a specified async callback for each batch of document snapshots and waits for the callback Promise to resolve before moving to the next batch.
+Creates an object which can be used to traverse a Firestore collection or, more generally, a [Traversable](https://kafkas.github.io/firecode/0.11.0/modules.html#Traversable).
 
-#### Complexity:
+For each batch of document snapshots in the traversable, the traverser invokes a specified async callback and immediately moves to the next batch. It does not wait for the callback Promise to resolve before moving to the next batch. That is, when `maxConcurrentBatchCount` > 1, there is no guarantee that any given batch will finish processing before a later batch.
 
-- Time complexity: _O_((_N_ / `batchSize`) \* (_Q_(`batchSize`) + _C_(`batchSize`)))
-- Space complexity: _O_(`batchSize` \* _D_ + _S_)
-- Billing: _max_(1, _N_) reads
-
-where:
-
-- _N_: number of docs in the traversable
-- _Q_(`batchSize`): average batch query time
-- _C_(`batchSize`): average callback processing time
-- _D_: average document size
-- _S_: average extra space used by the callback
-
-### [createFastTraverser](https://kafkas.github.io/firecode/0.11.0/modules.html#createfasttraverser)
-
-Creates a fast traverser that facilitates Firestore collection traversals. When traversing the collection, this traverser invokes a specified async callback for each batch of document snapshots and immediately moves to the next batch. It does not wait for the callback Promise to resolve before moving to the next batch so there is no guarantee that any given batch will finish processing before a later batch. This traverser uses more memory but is significantly faster than the default traverser.
+The traverser becomes faster as you increase `maxConcurrentBatchCount`, but this will consume more memory. You should increase concurrency when you want to trade some memory for speed.
 
 #### Complexity:
 

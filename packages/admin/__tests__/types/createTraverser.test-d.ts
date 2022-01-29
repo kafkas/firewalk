@@ -1,12 +1,12 @@
 import { expectType } from 'tsd';
-import { createTraverser, SlowTraverser } from '../../src';
+import { createTraverser, Traverser } from '../../src';
 import { collectionRef, D } from './_helpers';
 
-const slowTraverser = createTraverser(collectionRef, {
+const traverser = createTraverser(collectionRef, {
   batchSize: 0,
-  sleepBetweenBatches: false,
   sleepTimeBetweenBatches: 0,
   maxDocCount: 0,
+  maxConcurrentBatchCount: 0,
 });
 
-expectType<SlowTraverser<D>>(slowTraverser);
+expectType<Traverser<D>>(traverser);
