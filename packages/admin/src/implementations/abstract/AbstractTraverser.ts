@@ -23,6 +23,8 @@ export abstract class AbstractTraverser<D> implements Traverser<D> {
     sleepTimeBetweenBatches: 0,
     maxDocCount: Infinity,
     maxConcurrentBatchCount: 1,
+    maxBatchRetryCount: 0,
+    sleepTimeBetweenTrials: 1_000,
   };
 
   protected static readonly baseTraverseEachConfig: TraverseEachConfig = {
