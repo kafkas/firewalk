@@ -50,6 +50,6 @@
   },
   "dependencies": {
     "@proficient/ds": "0.2.0",
-    "@proficient/util": "0.1.0"
+    "@proficient/util": "0.2.0"
   }
 }
