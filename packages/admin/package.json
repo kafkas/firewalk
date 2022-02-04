@@ -33,8 +33,8 @@
   },
   "scripts": {
     "compile": "npm run compile:tests && npm run compile:src",
-    "compile:src": "tsc -p src",
-    "compile:tests": "tsc -p __tests__/tsconfig.json"
+    "compile:src": "npx tsc -p src",
+    "compile:tests": "npx tsc -p __tests__/tsconfig.json"
   },
   "bugs": {
     "url": "https://github.com/kafkas/firecode/issues"
