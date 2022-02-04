@@ -39,7 +39,14 @@ export abstract class AbstractTraverser<D> implements Traverser<D> {
   }
 
   #validateBaseConfig(config: Partial<TraversalConfig> = {}): void {
-    const { batchSize, sleepTimeBetweenBatches, maxDocCount, maxConcurrentBatchCount } = config;
+    const {
+      batchSize,
+      sleepTimeBetweenBatches,
+      maxDocCount,
+      maxConcurrentBatchCount,
+      maxBatchRetryCount,
+      sleepTimeBetweenTrials,
+    } = config;
 
     this.#assertPositiveIntegerInBaseConfig(batchSize, 'batchSize');
     this.#assertNonNegativeIntegerInBaseConfig(sleepTimeBetweenBatches, 'sleepTimeBetweenBatches');
@@ -49,6 +56,10 @@ export abstract class AbstractTraverser<D> implements Traverser<D> {
     }
 
     this.#assertPositiveIntegerInBaseConfig(maxConcurrentBatchCount, 'maxConcurrentBatchCount');
+    this.#assertNonNegativeIntegerInBaseConfig(maxBatchRetryCount, 'maxBatchRetryCount');
+    if (typeof sleepTimeBetweenTrials === 'number') {
+      this.#assertNonNegativeIntegerInBaseConfig(sleepTimeBetweenTrials, 'sleepTimeBetweenTrials');
+    }
   }
 
   #assertPositiveIntegerInBaseConfig(
