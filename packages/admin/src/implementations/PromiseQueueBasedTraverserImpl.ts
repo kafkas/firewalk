@@ -67,26 +67,28 @@ export class PromiseQueueBasedTraverserImpl<D>
     const { traversalConfig } = this;
     const { maxConcurrentBatchCount, maxBatchRetryCount, sleepTimeBetweenTrials } = traversalConfig;
 
-    const retriableCallback = makeRetriable(callback, {
-      maxTrialCount: 1 + maxBatchRetryCount,
-      sleepTimeBetweenTrials,
-      returnErrors: true,
-    });
+    let cb = callback;
 
-    const retriableThrowingCallback = async (
-      ...args: Parameters<typeof retriableCallback>
-    ): Promise<void> => {
-      const result = await retriableCallback(...args);
-      if (!result.hasSucceeded) {
-        const { errors } = result;
-        const lastError = errors[errors.length - 1];
-        throw lastError;
-      }
-    };
+    if (maxBatchRetryCount > 0) {
+      const retriableCallback = makeRetriable(callback, {
+        maxTrialCount: 1 + maxBatchRetryCount,
+        sleepTimeBetweenTrials,
+        returnErrors: true,
+      });
+
+      cb = async (...args: Parameters<typeof retriableCallback>): Promise<void> => {
+        const result = await retriableCallback(...args);
+        if (!result.hasSucceeded) {
+          const { errors } = result;
+          const lastError = errors[errors.length - 1];
+          throw lastError;
+        }
+      };
+    }
 
     if (maxConcurrentBatchCount === 1) {
       return this.runTraversal(async (batchDocs, batchIndex) => {
-        await retriableThrowingCallback(batchDocs, batchIndex);
+        await cb(batchDocs, batchIndex);
       });
     }
 
@@ -106,9 +108,7 @@ export class PromiseQueueBasedTraverserImpl<D>
     );
 
     const traversalResult = await this.runTraversal((batchDocs, batchIndex) => {
-      callbackPromiseQueue.enqueue(
-        retriableThrowingCallback(batchDocs, batchIndex) ?? Promise.resolve()
-      );
+      callbackPromiseQueue.enqueue(cb(batchDocs, batchIndex) ?? Promise.resolve());
       return async () => {
         while (callbackPromiseQueue.size >= maxConcurrentBatchCount) {
           // TODO: The sleep time is currently set to processQueueInterval but there may be a better way
