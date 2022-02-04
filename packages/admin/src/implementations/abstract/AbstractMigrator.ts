@@ -52,7 +52,7 @@ export abstract class AbstractMigrator<D> implements Migrator<D> {
     const updateFieldValuePairs = fields.reduce((acc, field) => {
       acc.push(field, this.firestoreConstructor.FieldValue.delete());
       return acc;
-    }, ([] as unknown) as UpdateFieldValueArgs);
+    }, [] as unknown as UpdateFieldValueArgs);
     return this.update(...updateFieldValuePairs);
   }
 

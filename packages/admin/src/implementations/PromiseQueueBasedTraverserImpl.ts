@@ -35,7 +35,8 @@ function getProcessableItemCount(traversalConfig: TraversalConfig, queueSize: nu
 
 export class PromiseQueueBasedTraverserImpl<D>
   extends AbstractTraverser<D>
-  implements Traverser<D> {
+  implements Traverser<D>
+{
   static readonly #defaultConfig: TraversalConfig = {
     ...AbstractTraverser.baseConfig,
   };
