@@ -1,4 +1,4 @@
-import { sleep, PromiseQueue, registerInterval } from '../utils';
+import { makeRetriable, PromiseQueue, registerInterval, sleep } from '../utils';
 import type {
   BatchCallback,
   ExitEarlyPredicate,
@@ -65,11 +65,30 @@ export class PromiseQueueBasedTraverserImpl<D>
 
   public async traverse(callback: BatchCallback<D>): Promise<TraversalResult> {
     const { traversalConfig } = this;
-    const { maxConcurrentBatchCount } = traversalConfig;
+    const { maxConcurrentBatchCount, maxBatchRetryCount, sleepTimeBetweenTrials } = traversalConfig;
+
+    let cb = callback;
+
+    if (maxBatchRetryCount > 0) {
+      const retriableCallback = makeRetriable(callback, {
+        maxTrialCount: 1 + maxBatchRetryCount,
+        sleepTimeBetweenTrials,
+        returnErrors: true,
+      });
+
+      cb = async (...args: Parameters<typeof retriableCallback>): Promise<void> => {
+        const result = await retriableCallback(...args);
+        if (!result.hasSucceeded) {
+          const { errors } = result;
+          const lastError = errors[errors.length - 1];
+          throw lastError;
+        }
+      };
+    }
 
     if (maxConcurrentBatchCount === 1) {
       return this.runTraversal(async (batchDocs, batchIndex) => {
-        await callback(batchDocs, batchIndex);
+        await cb(batchDocs, batchIndex);
       });
     }
 
@@ -89,7 +108,7 @@ export class PromiseQueueBasedTraverserImpl<D>
     );
 
     const traversalResult = await this.runTraversal((batchDocs, batchIndex) => {
-      callbackPromiseQueue.enqueue(callback(batchDocs, batchIndex) ?? Promise.resolve());
+      callbackPromiseQueue.enqueue(cb(batchDocs, batchIndex) ?? Promise.resolve());
       return async () => {
         while (callbackPromiseQueue.size >= maxConcurrentBatchCount) {
           // TODO: The sleep time is currently set to processQueueInterval but there may be a better way

@@ -51,4 +51,28 @@ export interface TraversalConfig {
    * @defaultValue 1
    */
   readonly maxConcurrentBatchCount: number;
+
+  /**
+   * The maximum number of times the traverser will retry processing a given batch, in case of an error.
+   * By default, batches are not retried.
+   *
+   * @remarks
+   *
+   * This field must be a non-negative integer representing the maximum number of times the traverser will
+   * retry processing a given batch. By default, the traverser invokes the batch callback only once i.e.
+   * with 0 retries but, if `maxBatchRetryCount` > 0, it will keep invoking the callback until it succeeds
+   * or the total number of retries reaches `maxBatchRetryCount`.
+   *
+   * @defaultValue 0
+   */
+  readonly maxBatchRetryCount: number;
+
+  /**
+   * A non-negative integer or a function that takes the 0-based index of the last trial and returns a
+   * non-negative integer indicating the amount of time (in ms) to "sleep" before retrying processing
+   * the current batch. This is useful if you want to implement something like exponential backoff.
+   *
+   * @defaultValue 1000
+   */
+  readonly sleepTimeBetweenTrials: number | ((lastTrialIndex: number) => number);
 }
