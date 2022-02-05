@@ -1,6 +1,6 @@
 import type { firestore } from 'firebase-admin';
-import { isTraverser } from '../utils';
-import { BasicDefaultMigratorImpl } from '../implementations';
+import { isTraverser } from '../internal/utils';
+import { BasicDefaultMigratorImpl } from '../internal/implementations';
 import type { InvalidConfigError } from '../errors'; /* eslint-disable-line */
 import type { DefaultMigrator, Traversable, TraversalConfig, Traverser } from './interfaces';
 import { createTraverser } from './createTraverser';

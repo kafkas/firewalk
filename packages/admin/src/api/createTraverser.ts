@@ -1,5 +1,5 @@
 import type { firestore } from 'firebase-admin';
-import { PromiseQueueBasedTraverserImpl } from '../implementations';
+import { PromiseQueueBasedTraverserImpl } from '../internal/implementations';
 import type { InvalidConfigError } from '../errors'; /* eslint-disable-line */
 import type { Traversable, TraversalConfig, Traverser } from './interfaces';
 
