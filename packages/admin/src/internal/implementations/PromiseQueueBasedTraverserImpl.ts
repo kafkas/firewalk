@@ -12,30 +12,6 @@ import { PromiseQueue } from '../ds';
 import { makeRetriable, registerInterval, sleep } from '../utils';
 import { AbstractTraverser } from './abstract';
 
-/**
- * Computes the duration (in ms) for which to sleep before re-running the queue processing logic.
- *
- * @param traversalConfig - Traversal config.
- * @param queueSize - The current size of the queue.
- * @returns A non-negative integer.
- */
-function getProcessQueueInterval(traversalConfig: TraversalConfig, queueSize: number): number {
-  // TODO: Implement
-  return 250;
-}
-
-/**
- * Computes the number of queue items to process based on the traversal configuration and queue size.
- *
- * @param traversalConfig - Traversal config.
- * @param queueSize - The current size of the queue.
- * @returns An integer within the range [0, `queueSize`].
- */
-function getProcessableItemCount(traversalConfig: TraversalConfig, queueSize: number): number {
-  // TODO: Implement
-  return queueSize;
-}
-
 export class PromiseQueueBasedTraverserImpl<D>
   extends AbstractTraverser<D>
   implements Traverser<D>
@@ -69,42 +45,18 @@ export class PromiseQueueBasedTraverserImpl<D>
 
   public async traverse(callback: BatchCallback<D>): Promise<TraversalResult> {
     const { traversalConfig } = this;
-    const { maxConcurrentBatchCount, maxBatchRetryCount, sleepTimeBetweenTrials } = traversalConfig;
-
-    let cb = callback;
-
-    if (maxBatchRetryCount > 0) {
-      const retriableCallback = makeRetriable(callback, {
-        maxTrialCount: 1 + maxBatchRetryCount,
-        sleepTimeBetweenTrials,
-        returnErrors: true,
-      });
-
-      cb = async (...args: Parameters<typeof retriableCallback>): Promise<void> => {
-        const result = await retriableCallback(...args);
-        if (!result.hasSucceeded) {
-          const { errors } = result;
-          const lastError = errors[errors.length - 1];
-          throw lastError;
-        }
-      };
-    }
-
+    const { maxConcurrentBatchCount } = traversalConfig;
+    callback = this.#makeRetriableAccordingToConfig(callback);
     if (maxConcurrentBatchCount === 1) {
       return this.runTraversal(async (batchDocs, batchIndex) => {
-        await cb(batchDocs, batchIndex);
+        await callback(batchDocs, batchIndex);
       });
     }
-
     const callbackPromiseQueue = new PromiseQueue<void>();
-
     const unregisterQueueProcessor = registerInterval(
       async () => {
         if (!callbackPromiseQueue.isProcessing) {
-          const processableItemCount = getProcessableItemCount(
-            traversalConfig,
-            callbackPromiseQueue.size
-          );
+          const processableItemCount = this.#getProcessableItemCount(callbackPromiseQueue.size);
           try {
             await callbackPromiseQueue.processFirst(processableItemCount);
           } catch (err) {
@@ -116,30 +68,65 @@ export class PromiseQueueBasedTraverserImpl<D>
           }
         }
       },
-      () => getProcessQueueInterval(traversalConfig, callbackPromiseQueue.size)
+      () => this.#getProcessQueueInterval(callbackPromiseQueue.size)
     );
-
     const traversalResult = await this.runTraversal((batchDocs, batchIndex) => {
-      callbackPromiseQueue.enqueue(cb(batchDocs, batchIndex) ?? Promise.resolve());
+      callbackPromiseQueue.enqueue(callback(batchDocs, batchIndex) ?? Promise.resolve());
       return async () => {
         while (callbackPromiseQueue.size >= maxConcurrentBatchCount) {
-          // TODO: The sleep time is currently set to processQueueInterval but there may be a better way
-          // to compute sleep duration.
-          const processQueueInterval = getProcessQueueInterval(
-            traversalConfig,
-            callbackPromiseQueue.size
-          );
+          // TODO: There probably is a better way to compute sleep duration
+          const processQueueInterval = this.#getProcessQueueInterval(callbackPromiseQueue.size);
           await sleep(processQueueInterval);
         }
       };
     });
-
     await unregisterQueueProcessor();
-
     // There may still be some Promises left in the queue but there won't be any new ones coming in.
     // Wait for the existing ones to resolve and exit.
     await callbackPromiseQueue.processAll();
-
     return traversalResult;
+  }
+
+  #makeRetriableAccordingToConfig(callback: BatchCallback<D>): BatchCallback<D> {
+    const { maxBatchRetryCount, sleepTimeBetweenTrials } = this.traversalConfig;
+    let cb = callback;
+    if (maxBatchRetryCount > 0) {
+      const retriableCallback = makeRetriable(callback, {
+        maxTrialCount: 1 + maxBatchRetryCount,
+        sleepTimeBetweenTrials,
+        returnErrors: true,
+      });
+      cb = async (...args) => {
+        const result = await retriableCallback(...args);
+        if (!result.hasSucceeded) {
+          const { errors } = result;
+          const lastError = errors[errors.length - 1];
+          throw lastError;
+        }
+      };
+    }
+    return cb;
+  }
+
+  /**
+   * Computes the number of queue items to process based on the traversal configuration and queue size.
+   *
+   * @param queueSize - The current size of the queue.
+   * @returns An integer within the range [0, `queueSize`].
+   */
+  #getProcessableItemCount(queueSize: number): number {
+    // TODO: Implement using traversal config and queue size
+    return queueSize;
+  }
+
+  /**
+   * Computes the duration (in ms) for which to sleep before re-running the queue processing logic.
+   *
+   * @param queueSize - The current size of the queue.
+   * @returns A non-negative integer.
+   */
+  #getProcessQueueInterval(queueSize: number): number {
+    // TODO: Implement using traversal config and queue size
+    return 250;
   }
 }
