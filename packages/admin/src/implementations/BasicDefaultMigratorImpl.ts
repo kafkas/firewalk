@@ -5,7 +5,6 @@ import type {
   MigrationResult,
   SetDataGetter,
   SetOptions,
-  TraversalConfig,
   Traverser,
   UpdateDataGetter,
   UpdateFieldValueGetter,
@@ -19,12 +18,6 @@ export class BasicDefaultMigratorImpl<D> extends AbstractMigrator<D> implements 
     migrationPredicates?: MigrationPredicate<D>[]
   ) {
     super(registeredCallbacks, migrationPredicates);
-    this.#validateConfig(traverser.traversalConfig);
-  }
-
-  // eslint-disable-next-line
-  #validateConfig(config: Partial<TraversalConfig> = {}): void {
-    // Confirm that the traverser config is compatible with this migrator
   }
 
   public withPredicate(predicate: MigrationPredicate<D>): DefaultMigrator<D> {

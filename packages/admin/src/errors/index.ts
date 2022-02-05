@@ -1,0 +1,1 @@
+export { InvalidConfigError } from './InvalidConfigError';

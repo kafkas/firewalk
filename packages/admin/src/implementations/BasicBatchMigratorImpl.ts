@@ -6,11 +6,11 @@ import type {
   MigrationResult,
   SetDataGetter,
   SetOptions,
-  TraversalConfig,
   Traverser,
   UpdateDataGetter,
   UpdateFieldValueGetter,
 } from '../api';
+import { InvalidConfigError } from '../errors';
 import { AbstractMigrator, RegisteredCallbacks } from './abstract';
 
 export class BasicBatchMigratorImpl<D> extends AbstractMigrator<D> implements BatchMigrator<D> {
@@ -22,22 +22,18 @@ export class BasicBatchMigratorImpl<D> extends AbstractMigrator<D> implements Ba
     migrationPredicates?: MigrationPredicate<D>[]
   ) {
     super(registeredCallbacks, migrationPredicates);
-    this.#validateConfig(traverser.traversalConfig);
+    this.#validateTraverserCompatibility();
   }
 
-  #validateConfig(config: Partial<TraversalConfig> = {}): void {
-    const { batchSize } = config;
+  #validateTraverserCompatibility(): void {
+    const { batchSize } = this.traverser.traversalConfig;
+    const maxBatchWriteDocCount = BasicBatchMigratorImpl.#MAX_BATCH_WRITE_DOC_COUNT;
     if (
       typeof batchSize === 'number' &&
-      (!isPositiveInteger(batchSize) ||
-        batchSize > BasicBatchMigratorImpl.#MAX_BATCH_WRITE_DOC_COUNT)
+      (!isPositiveInteger(batchSize) || batchSize > maxBatchWriteDocCount)
     ) {
-      throw new Error(
-        `The 'batchSize' field in the traversal config of a BatchMigrator's traverser must be a positive integer less than or equal to ${
-          BasicBatchMigratorImpl.#MAX_BATCH_WRITE_DOC_COUNT
-        }. In Firestore, each write batch can write to a maximum of ${
-          BasicBatchMigratorImpl.#MAX_BATCH_WRITE_DOC_COUNT
-        } documents.`
+      throw new InvalidConfigError(
+        `The 'batchSize' field in the traversal config of a BatchMigrator's traverser must be a positive integer less than or equal to ${maxBatchWriteDocCount}. In Firestore, each write batch can write to a maximum of ${maxBatchWriteDocCount} documents.`
       );
     }
   }

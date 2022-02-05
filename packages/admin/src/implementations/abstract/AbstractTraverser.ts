@@ -10,6 +10,7 @@ import type {
   TraverseEachConfig,
   Traverser,
 } from '../../api';
+import { InvalidConfigError } from '../../errors';
 
 export type OnAfterBatchProcess = () => void | Promise<void>;
 
@@ -67,7 +68,9 @@ export abstract class AbstractTraverser<D> implements Traverser<D> {
     field: keyof TraversalConfig
   ): asserts num {
     if (typeof num === 'number' && !isPositiveInteger(num)) {
-      throw new Error(`The '${field}' field in traversal config must be a positive integer.`);
+      throw new InvalidConfigError(
+        `The '${field}' field in traversal config must be a positive integer.`
+      );
     }
   }
 
@@ -76,7 +79,9 @@ export abstract class AbstractTraverser<D> implements Traverser<D> {
     field: keyof TraversalConfig
   ): asserts num {
     if (typeof num === 'number' && !isPositiveInteger(num) && num !== 0) {
-      throw new Error(`The '${field}' field in traversal config must be a non-negative integer.`);
+      throw new InvalidConfigError(
+        `The '${field}' field in traversal config must be a non-negative integer.`
+      );
     }
   }
 
