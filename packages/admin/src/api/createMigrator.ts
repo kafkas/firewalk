@@ -1,6 +1,7 @@
 import type { firestore } from 'firebase-admin';
-import { isTraverser } from '../utils';
-import { BasicDefaultMigratorImpl } from '../implementations';
+import { isTraverser } from '../internal/utils';
+import { BasicDefaultMigratorImpl } from '../internal/implementations';
+import type { InvalidConfigError } from '../errors'; /* eslint-disable-line */
 import type { DefaultMigrator, Traversable, TraversalConfig, Traverser } from './interfaces';
 import { createTraverser } from './createTraverser';
 
@@ -24,6 +25,7 @@ export function createMigrator<D = firestore.DocumentData>(
  * @param traversable - A collection-like traversable group of documents to migrate.
  * @param traversalConfig - Optional. The traversal configuration with which the default traverser will be created.
  * @returns A new {@link DefaultMigrator} object.
+ * @throws {@link InvalidConfigError} Thrown if the specified `traversalConfig` is invalid.
  */
 export function createMigrator<D = firestore.DocumentData>(
   traversable: Traversable<D>,

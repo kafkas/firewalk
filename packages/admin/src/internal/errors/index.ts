@@ -1,0 +1,1 @@
+export { IllegalArgumentError } from './IllegalArgumentError';

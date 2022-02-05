@@ -1,5 +1,6 @@
 import type { firestore } from 'firebase-admin';
-import { PromiseQueueBasedTraverserImpl } from '../implementations';
+import { PromiseQueueBasedTraverserImpl } from '../internal/implementations';
+import type { InvalidConfigError } from '../errors'; /* eslint-disable-line */
 import type { Traversable, TraversalConfig, Traverser } from './interfaces';
 
 /**
@@ -19,6 +20,7 @@ import type { Traversable, TraversalConfig, Traverser } from './interfaces';
  * @param traversable - A collection-like group of documents. Can be one of [CollectionReference](https://googleapis.dev/nodejs/firestore/latest/CollectionReference.html), [CollectionGroup](https://googleapis.dev/nodejs/firestore/latest/CollectionGroup.html) and [Query](https://googleapis.dev/nodejs/firestore/latest/Query.html).
  * @param config - Optional. The traversal configuration with which the traverser will be created.
  * @returns A new {@link Traverser} object.
+ * @throws {@link InvalidConfigError} Thrown if the specified `config` is invalid.
  */
 export function createTraverser<D = firestore.DocumentData>(
   traversable: Traversable<D>,
