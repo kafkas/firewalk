@@ -6,6 +6,8 @@ import type {
   TraversalResult,
   Traverser,
 } from '../../api';
+import { ImplementationError } from '../../errors';
+import { IllegalArgumentError } from '../errors';
 import { PromiseQueue } from '../ds';
 import { makeRetriable, registerInterval, sleep } from '../utils';
 import { AbstractTraverser } from './abstract';
@@ -103,7 +105,15 @@ export class PromiseQueueBasedTraverserImpl<D>
             traversalConfig,
             callbackPromiseQueue.size
           );
-          await callbackPromiseQueue.processFirst(processableItemCount);
+          try {
+            await callbackPromiseQueue.processFirst(processableItemCount);
+          } catch (err) {
+            throw err instanceof IllegalArgumentError
+              ? new ImplementationError(
+                  `Encountered an expected error originating from an incorrectly implemented PromiseQueue data structure.`
+                )
+              : err;
+          }
         }
       },
       () => getProcessQueueInterval(traversalConfig, callbackPromiseQueue.size)

@@ -1,3 +1,4 @@
+import type { IllegalArgumentError } from '../errors'; /* eslint-disable-line */
 import { SLLQueueExtended } from './SLLQueueExtended';
 
 export class PromiseQueue<T> {
@@ -40,6 +41,7 @@ export class PromiseQueue<T> {
 
   /**
    * Processes the first `promiseCount` Promises in the queue.
+   * @throws {@link IllegalArgumentError} Thrown if `promiseCount` is invalid.
    */
   public async processFirst(promiseCount: number): Promise<T[]> {
     this.#isProcessing = true;
