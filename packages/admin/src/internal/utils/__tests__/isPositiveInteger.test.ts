@@ -1,4 +1,4 @@
-import { isPositiveInteger } from '../isPositiveInteger';
+import { isPositiveInteger } from '..';
 
 describe('isPositiveInteger', () => {
   test('respects math', () => {

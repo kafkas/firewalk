@@ -10,13 +10,26 @@ import type {
   Traverser,
 } from '../../../api';
 import { InvalidConfigError } from '../../../errors';
-import { sleep, isPositiveInteger } from '../../utils';
+import {
+  extractKeys,
+  isNonNegativeInteger,
+  isPositiveInteger,
+  isUnboundedPositiveInteger,
+  sleep,
+} from '../../utils';
 
 export type OnAfterBatchProcess = () => void | Promise<void>;
 
 export type BatchProcessor<D> = (
   ...args: Parameters<BatchCallback<D>>
 ) => void | Promise<void> | OnAfterBatchProcess | Promise<OnAfterBatchProcess>;
+
+type TraversalConfigRules = {
+  [K in keyof TraversalConfig]: {
+    isValid: (val: unknown) => boolean;
+    valDescription: string;
+  };
+};
 
 export abstract class AbstractTraverser<D> implements Traverser<D> {
   protected static readonly baseConfig: TraversalConfig = {
@@ -28,6 +41,33 @@ export abstract class AbstractTraverser<D> implements Traverser<D> {
     sleepTimeBetweenTrials: 1_000,
   };
 
+  static readonly #configRules: TraversalConfigRules = {
+    batchSize: {
+      isValid: isPositiveInteger,
+      valDescription: 'a positive integer',
+    },
+    sleepTimeBetweenBatches: {
+      isValid: isNonNegativeInteger,
+      valDescription: 'a non-negative integer',
+    },
+    maxDocCount: {
+      isValid: isUnboundedPositiveInteger,
+      valDescription: 'a positive integer or infinity',
+    },
+    maxConcurrentBatchCount: {
+      isValid: isPositiveInteger,
+      valDescription: 'a positive integer',
+    },
+    maxBatchRetryCount: {
+      isValid: isNonNegativeInteger,
+      valDescription: 'a non-negative integer',
+    },
+    sleepTimeBetweenTrials: {
+      isValid: (val) => typeof val === 'function' || isNonNegativeInteger(val),
+      valDescription: 'a non-negative integer or a function that returns a non-negative integer',
+    },
+  };
+
   protected static readonly baseTraverseEachConfig: TraverseEachConfig = {
     sleepTimeBetweenDocs: 0,
   };
@@ -36,53 +76,20 @@ export abstract class AbstractTraverser<D> implements Traverser<D> {
     public readonly traversalConfig: TraversalConfig,
     protected readonly exitEarlyPredicates: ExitEarlyPredicate<D>[]
   ) {
-    this.#validateBaseConfig(traversalConfig);
+    this.#validateConfig();
   }
 
-  #validateBaseConfig(config: Partial<TraversalConfig> = {}): void {
-    const {
-      batchSize,
-      sleepTimeBetweenBatches,
-      maxDocCount,
-      maxConcurrentBatchCount,
-      maxBatchRetryCount,
-      sleepTimeBetweenTrials,
-    } = config;
+  #validateConfig(): void {
+    extractKeys(AbstractTraverser.#configRules).forEach((key) => {
+      const val = this.traversalConfig[key];
+      const { isValid, valDescription } = AbstractTraverser.#configRules[key];
 
-    this.#assertPositiveIntegerInBaseConfig(batchSize, 'batchSize');
-    this.#assertNonNegativeIntegerInBaseConfig(sleepTimeBetweenBatches, 'sleepTimeBetweenBatches');
-
-    if (maxDocCount !== Infinity) {
-      this.#assertPositiveIntegerInBaseConfig(maxDocCount, 'maxDocCount');
-    }
-
-    this.#assertPositiveIntegerInBaseConfig(maxConcurrentBatchCount, 'maxConcurrentBatchCount');
-    this.#assertNonNegativeIntegerInBaseConfig(maxBatchRetryCount, 'maxBatchRetryCount');
-    if (typeof sleepTimeBetweenTrials === 'number') {
-      this.#assertNonNegativeIntegerInBaseConfig(sleepTimeBetweenTrials, 'sleepTimeBetweenTrials');
-    }
-  }
-
-  #assertPositiveIntegerInBaseConfig(
-    num: number | undefined,
-    field: keyof TraversalConfig
-  ): asserts num {
-    if (typeof num === 'number' && !isPositiveInteger(num)) {
-      throw new InvalidConfigError(
-        `The '${field}' field in traversal config must be a positive integer.`
-      );
-    }
-  }
-
-  #assertNonNegativeIntegerInBaseConfig(
-    num: number | undefined,
-    field: keyof TraversalConfig
-  ): asserts num {
-    if (typeof num === 'number' && !isPositiveInteger(num) && num !== 0) {
-      throw new InvalidConfigError(
-        `The '${field}' field in traversal config must be a non-negative integer.`
-      );
-    }
+      if (!isValid(val)) {
+        throw new InvalidConfigError(
+          `The '${key}' field in traversal config must be ${valDescription}.`
+        );
+      }
+    });
   }
 
   public async traverseEach(
