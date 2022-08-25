@@ -40,7 +40,7 @@
     "url": "https://github.com/kafkas/firecode/issues"
   },
   "peerDependencies": {
-    "firebase-admin": "9.x || 10.x"
+    "firebase-admin": "9.x || 10.x || 11.x"
   },
   "publishConfig": {
     "access": "public"
