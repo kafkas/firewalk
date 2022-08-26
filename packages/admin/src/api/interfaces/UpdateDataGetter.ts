@@ -5,4 +5,4 @@ import type { firestore } from 'firebase-admin';
  */
 export type UpdateDataGetter<D = firestore.DocumentData> = (
   doc: firestore.QueryDocumentSnapshot<D>
-) => firestore.UpdateData;
+) => firestore.UpdateData<D>;

@@ -7,6 +7,7 @@ export type MigratorMethodTester = (
 ) => void;
 
 export interface TestItemDoc {
+  docId?: string;
   map1: {
     num1?: number;
     num2?: number;

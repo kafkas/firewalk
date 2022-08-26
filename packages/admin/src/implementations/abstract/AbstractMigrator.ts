@@ -5,7 +5,7 @@ import type {
   MigrationResult,
   Migrator,
   SetDataGetter,
-  SetOptions,
+  SetPartialDataGetter,
   Traverser,
   UpdateDataGetter,
   UpdateFieldValueGetter,
@@ -109,19 +109,22 @@ export abstract class AbstractMigrator<D> implements Migrator<D> {
 
   public abstract withTraverser(traverser: Traverser<D>): Migrator<D>;
 
-  public abstract set(data: D): Promise<MigrationResult>;
+  public abstract set(
+    data: firestore.PartialWithFieldValue<D>,
+    options: firestore.SetOptions
+  ): Promise<MigrationResult>;
 
-  public abstract set(data: Partial<D>, options: SetOptions): Promise<MigrationResult>;
+  public abstract set(data: firestore.WithFieldValue<D>): Promise<MigrationResult>;
+
+  public abstract setWithDerivedData(
+    getData: SetPartialDataGetter<D>,
+    options: firestore.SetOptions
+  ): Promise<MigrationResult>;
 
   public abstract setWithDerivedData(getData: SetDataGetter<D>): Promise<MigrationResult>;
 
-  public abstract setWithDerivedData(
-    getData: SetDataGetter<Partial<D>>,
-    options: SetOptions
-  ): Promise<MigrationResult>;
-
   public abstract update(
-    data: firestore.UpdateData,
+    data: firestore.UpdateData<D>,
     precondition?: firestore.Precondition
   ): Promise<MigrationResult>;
 

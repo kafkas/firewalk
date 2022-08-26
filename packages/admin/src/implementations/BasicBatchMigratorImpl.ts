@@ -5,7 +5,7 @@ import type {
   MigrationPredicate,
   MigrationResult,
   SetDataGetter,
-  SetOptions,
+  SetPartialDataGetter,
   TraversalConfig,
   Traverser,
   UpdateDataGetter,
@@ -57,48 +57,54 @@ export class BasicBatchMigratorImpl<D> extends AbstractMigrator<D> implements Ba
     );
   }
 
-  public set(data: D): Promise<MigrationResult>;
+  public set(
+    data: firestore.PartialWithFieldValue<D>,
+    options: firestore.SetOptions
+  ): Promise<MigrationResult>;
 
-  public set(data: Partial<D>, options: SetOptions): Promise<MigrationResult>;
+  public set(data: firestore.WithFieldValue<D>): Promise<MigrationResult>;
 
-  public async set(data: D | Partial<D>, options?: SetOptions): Promise<MigrationResult> {
+  public async set(
+    data: firestore.PartialWithFieldValue<D> | firestore.WithFieldValue<D>,
+    options?: firestore.SetOptions
+  ): Promise<MigrationResult> {
     return this.#migrate((writeBatch, doc) => {
       if (options === undefined) {
-        // Signature 1
-        writeBatch.set(doc.ref, data as D);
-      } else {
         // Signature 2
-        writeBatch.set(doc.ref, data as Partial<D>, options);
+        writeBatch.set(doc.ref, data as firestore.WithFieldValue<D>);
+      } else {
+        // Signature 1
+        writeBatch.set(doc.ref, data as firestore.PartialWithFieldValue<D>, options);
       }
     });
   }
 
+  public setWithDerivedData(
+    getData: SetPartialDataGetter<D>,
+    options: firestore.SetOptions
+  ): Promise<MigrationResult>;
+
   public setWithDerivedData(getData: SetDataGetter<D>): Promise<MigrationResult>;
 
   public setWithDerivedData(
-    getData: SetDataGetter<Partial<D>>,
-    options: SetOptions
-  ): Promise<MigrationResult>;
-
-  public setWithDerivedData(
-    getData: SetDataGetter<D> | SetDataGetter<Partial<D>>,
-    options?: SetOptions
+    getData: SetPartialDataGetter<D> | SetDataGetter<D>,
+    options?: firestore.SetOptions
   ): Promise<MigrationResult> {
     return this.#migrate((writeBatch, doc) => {
       if (options === undefined) {
-        // Signature 1
+        // Signature 2
         const data = (getData as SetDataGetter<D>)(doc);
         writeBatch.set(doc.ref, data);
       } else {
-        // Signature 2
-        const data = (getData as SetDataGetter<Partial<D>>)(doc);
+        // Signature 1
+        const data = (getData as SetPartialDataGetter<D>)(doc);
         writeBatch.set(doc.ref, data, options);
       }
     });
   }
 
   public update(
-    data: firestore.UpdateData,
+    data: firestore.UpdateData<D>,
     precondition?: firestore.Precondition
   ): Promise<MigrationResult>;
 
@@ -109,7 +115,7 @@ export class BasicBatchMigratorImpl<D> extends AbstractMigrator<D> implements Ba
   ): Promise<MigrationResult>;
 
   public update(
-    dataOrField: firestore.UpdateData | string | firestore.FieldPath,
+    dataOrField: firestore.UpdateData<D> | string | firestore.FieldPath,
     preconditionOrValue?: any,
     ...moreFieldsOrPrecondition: any[]
   ): Promise<MigrationResult> {
