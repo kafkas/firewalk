@@ -1,6 +1,12 @@
 import { firestore } from 'firebase-admin';
 import { expectError, expectType } from 'tsd';
-import { createTraverser, createMigrator, DefaultMigrator, Traverser } from '../../src';
+import {
+  createTraverser,
+  createMigrator,
+  DefaultMigrator,
+  Traverser,
+  UpdateFieldValueArray,
+} from '../../src';
 import { collectionRef, D } from './_helpers';
 
 const defaultMigrator = createMigrator(collectionRef);
@@ -79,7 +85,7 @@ defaultMigrator.updateWithDerivedData((doc) => {
 
 defaultMigrator.updateWithDerivedData((doc) => {
   expectType<firestore.QueryDocumentSnapshot<D>>(doc);
-  return ['anyField', 'anyValue'];
+  return ['anyField', 'anyValue'] as UpdateFieldValueArray;
 });
 
 // TODO: We need to expect an error here if the return type of the callback is not a plain object or an array
