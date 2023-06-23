@@ -1,15 +1,5 @@
 name: Node.js CI
-
-on:
-  push:
-    branches:
-      - main
-      - dev
-  pull_request:
-    branches:
-      - main
-      - dev
-
+on: [push]
 jobs:
   lint:
     runs-on: ubuntu-latest
