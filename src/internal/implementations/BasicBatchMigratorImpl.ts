@@ -148,7 +148,7 @@ export class BasicBatchMigratorImpl<D> extends AbstractMigrator<D> implements Ba
       const data = getData(doc);
       if (Array.isArray(data)) {
         // Signature 2
-        writeBatch.update(doc.ref, ...data);
+        writeBatch.update(doc.ref, ...data as [string | firestore.FieldPath, any, ...any[]]);
       } else {
         // Signature 1
         if (precondition === undefined) {
