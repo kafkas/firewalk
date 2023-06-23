@@ -17,14 +17,14 @@
   "author": "Proficient AI <team@proficientai.com>",
   "homepage": "https://firewalk.proficientai.com",
   "license": "MIT",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "directories": {
-    "lib": "lib",
+    "dist": "dist",
     "test": "__tests__"
   },
   "files": [
-    "lib"
+    "dist"
   ],
   "repository": {
     "type": "git",
@@ -62,7 +62,7 @@
     "format": "prettier --write \"{src,test}/**/*.{ts,tsx,json}\"",
     "format-check": "prettier --check \"{src,test}/**/*.{ts,tsx,json}\"",
     "lint": "eslint \"{src,__tests__}/**/*/*.{js,ts}\"",
-    "prebuild": "rm -rf lib && npm install",
+    "prebuild": "rm -rf dist && npm install",
     "pretest": "npm run build",
     "test": "npm run test:types && jest --verbose",
     "test:types": "tsd"

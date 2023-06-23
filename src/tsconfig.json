@@ -3,7 +3,7 @@
     "declaration": true,
     "module": "CommonJS",
     "moduleResolution": "node",
-    "outDir": "../lib",
+    "outDir": "../dist",
     "sourceMap": true,
     "strict": true,
     "target": "ES6",
