@@ -5,7 +5,6 @@ commands:
     description: "Install project dependencies"
     steps:
       - run: npm install
-      - run: cd packages/admin && npm install
 
 jobs:
   lint_and_format_check:
@@ -22,7 +21,7 @@ jobs:
     steps:
       - checkout
       - install_deps
-      - run: rm -rf packages/admin/lib
+      - run: rm -rf lib
       - run: npm run build
   test:
     docker:
@@ -30,7 +29,7 @@ jobs:
     steps:
       - checkout
       - install_deps
-      - run: cd packages/admin/__tests__ && echo "$FB_SERVICE_ACCOUNT_KEY" | base64 --decode > service-account.json
+      - run: cd __tests__ && echo "$FB_SERVICE_ACCOUNT_KEY" | base64 --decode > service-account.json
       - run: npm test
 
 workflows:
