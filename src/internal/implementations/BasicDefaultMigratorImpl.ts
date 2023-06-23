@@ -131,7 +131,7 @@ export class BasicDefaultMigratorImpl<D> extends AbstractMigrator<D> implements 
 
       if (Array.isArray(data)) {
         // Signature 2
-        await doc.ref.update(...data as [string | firestore.FieldPath, any, ...any[]]);
+        await doc.ref.update(...(data as [string | firestore.FieldPath, any, ...any[]]));
       } else {
         // Signature 1
         if (precondition === undefined) {
