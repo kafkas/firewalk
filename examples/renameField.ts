@@ -1,5 +1,5 @@
 import { firestore } from 'firebase-admin';
-import { createMigrator } from '@firecode/admin';
+import { createMigrator } from 'firewalk';
 
 const postsColGroup = firestore().collectionGroup('posts');
 const migrator = createMigrator(postsColGroup);

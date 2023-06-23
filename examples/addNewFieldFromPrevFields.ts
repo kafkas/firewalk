@@ -1,5 +1,5 @@
 import { firestore } from 'firebase-admin';
-import { createMigrator } from '@firecode/admin';
+import { createMigrator } from 'firewalk';
 
 type UserDoc = {
   firstName: string;
