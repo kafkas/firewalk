@@ -1,7 +1,7 @@
 name: Node.js CI
 on: [push]
 jobs:
-  lint:
+  lint_and_format_check:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,8 +17,43 @@ jobs:
       - name: Install dependencies from the root
         run: npm install
 
-      - name: Build
-        run: npm run build
-
       - name: Run lint
         run: npm run lint
+
+  compile:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+
+      - name: Install dependencies from the root
+        run: npm install
+
+      - name: Run lint
+        run: npm run build
+
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+
+      - name: Install dependencies from the root
+        run: npm install
+
+      - name: Run lint
+        run: npm test
