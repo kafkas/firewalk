@@ -61,8 +61,7 @@
     "format": "prettier --write \"{src,test}/**/*.{ts,tsx,json}\"",
     "format-check": "prettier --check \"{src,test}/**/*.{ts,tsx,json}\"",
     "lint": "eslint \"{src,__tests__}/**/*/*.{js,ts}\"",
-    "test": "npm run test:types && jest --verbose",
-    "test:main": "jest --verbose",
+    "test": "jest",
     "test:types": "tsd"
   },
   "bugs": {
