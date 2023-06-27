@@ -39,7 +39,7 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run lint
+      - name: Run build
         run: npm run build
 
   test:
@@ -58,5 +58,8 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run lint
+      - name: Run build
+        run: npm run build
+
+      - name: Run tests
         run: npm test ${{ secrets.SERVICE_ACCOUNT }}
