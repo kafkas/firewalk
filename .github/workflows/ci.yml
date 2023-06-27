@@ -44,6 +44,8 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    env:
+      SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
 
     steps:
       - name: Check out code
@@ -65,4 +67,4 @@ jobs:
         run: npm run test:types
 
       - name: Run main tests
-        run: npm test -- '${{ secrets.SERVICE_ACCOUNT }}'
+        run: npm test

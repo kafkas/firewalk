@@ -13,7 +13,7 @@ class Application {
 let _app: Application | undefined;
 
 export function app(): Application {
-  const serviceAccountAsJsonString = process.argv[2];
+  const serviceAccountAsJsonString = process.env.SERVICE_ACCOUNT;
   const pathToServiceAccount = resolve(__dirname, `service-account.json`);
   const serviceAccountFileExists = fs.existsSync(pathToServiceAccount);
 
