@@ -62,4 +62,4 @@ jobs:
         run: npm run build
 
       - name: Run tests
-        run: npm test ${{ secrets.SERVICE_ACCOUNT }}
+        run: npm test -- ${{ secrets.SERVICE_ACCOUNT }}
