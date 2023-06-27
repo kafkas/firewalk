@@ -62,7 +62,7 @@ jobs:
         run: npm run build
 
       - name: Run tsd tests
-        run: npm test:types
+        run: npm run test:types
 
       - name: Run main tests
         run: npm test -- ${{ secrets.SERVICE_ACCOUNT }}
