@@ -21,9 +21,9 @@ export function describeMigratorMethodTest(
   methodTester: MigratorMethodTester
 ): void {
   const description = `${migratorImplClass.name}.${methodName}`;
-  const colRef = app()
-    .admin.firestore()
-    .collection(description) as firestore.CollectionReference<TestItemDoc>;
+  const colRef = app().firestore.collection(
+    description
+  ) as firestore.CollectionReference<TestItemDoc>;
   const traverser = createTraverser(colRef, TRAVERSAL_CONFIG);
   const migrator = new migratorImplClass(traverser);
   describe(description, () => {

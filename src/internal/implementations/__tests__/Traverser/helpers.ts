@@ -20,9 +20,9 @@ export function describeTraverserMethodTest(
   methodTester: TraverserMethodTester
 ): void {
   const description = `${traverserImplClass.name}.${methodName}`;
-  const colRef = app()
-    .admin.firestore()
-    .collection(description) as firestore.CollectionReference<TestItemDoc>;
+  const colRef = app().firestore.collection(
+    description
+  ) as firestore.CollectionReference<TestItemDoc>;
   const traverser = new traverserImplClass(colRef);
   describe(description, () => {
     methodTester(traverser, colRef);

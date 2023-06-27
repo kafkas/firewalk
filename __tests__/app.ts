@@ -3,39 +3,41 @@ import * as fs from 'fs';
 import { resolve } from 'path';
 
 class Application {
-  public constructor() {
-    this.#safelyInitFirebaseApp();
+  public get firestore(): admin.firestore.Firestore {
+    return this.firebaseApp.firestore();
   }
 
-  public get pathToServiceAccountKey(): string {
-    return resolve(__dirname, `service-account.json`);
-  }
-
-  public get pathToEnvConfig(): string {
-    return resolve(__dirname, `env.json`);
-  }
-
-  public get admin(): typeof admin {
-    return admin;
-  }
-
-  #safelyInitFirebaseApp(): void {
-    if (!fs.existsSync(this.pathToServiceAccountKey)) {
-      throw new Error(
-        'Could not find a service account key with which to initialize the Firebase app.'
-      );
-    }
-
-    if (admin.apps.length === 0) {
-      admin.initializeApp({
-        credential: admin.credential.cert(this.pathToServiceAccountKey),
-      });
-    }
-  }
+  public constructor(private readonly firebaseApp: admin.app.App) {}
 }
 
 let _app: Application | undefined;
 
 export function app(): Application {
-  return _app ?? (_app = new Application());
+  const serviceAccountAsJsonString = process.env.SERVICE_ACCOUNT;
+  const pathToServiceAccount = resolve(__dirname, `service-account.json`);
+  const serviceAccountFileExists = fs.existsSync(pathToServiceAccount);
+
+  let cred;
+
+  if (typeof serviceAccountAsJsonString !== 'string' && !serviceAccountFileExists) {
+    throw new Error('Could not find a service account with which to initialize the Firebase app.');
+  } else if (typeof serviceAccountAsJsonString === 'string') {
+    try {
+      cred = JSON.parse(serviceAccountAsJsonString);
+    } catch {
+      throw new Error('Service account has an invalid shape.');
+    }
+  } else if (serviceAccountFileExists) {
+    cred = pathToServiceAccount;
+  }
+
+  let [firebaseApp] = admin.apps;
+
+  if (!firebaseApp) {
+    firebaseApp = admin.initializeApp({
+      credential: admin.credential.cert(cred),
+    });
+  }
+
+  return _app ?? (_app = new Application(firebaseApp));
 }
