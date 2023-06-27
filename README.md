@@ -5,7 +5,7 @@
 </h1>
 
 <p align="center">
-  A light, fast, and memory-efficient collection traversal library for Firestore and Node.js.
+  A light, fast, and memory-efficient collection traversal library for Firestore and Node.js. Built by <a href="https://proficientai.com">Proficient AI</a>.
 </p>
 
 ---
@@ -17,19 +17,22 @@
         <img src="https://img.shields.io/npm/v/firewalk" /></a>
     <a href="https://npmjs.com/package/firewalk" alt="Size">
         <img src="https://img.shields.io/bundlephobia/min/firewalk" /></a>
-    <a href="https://npmjs.com/package/firewalk" alt="Downloads">
-        <img src="https://img.shields.io/npm/dm/firewalk" /></a>
+    <a href="https://npmjs.com/package/@firecode/admin" alt="Downloads">
+        <img src="https://img.shields.io/npm/dm/@firecode/admin" /></a>
     <a href="https://" alt="Types">
         <img src="https://img.shields.io/npm/types/firewalk" /></a>
     <a href="https://github.com/proficientai/firewalk">
     <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs welcome!" /></a>
 </p>
 
-Firewalk is a Node.js library that lets you efficiently traverse Firestore collections.
+Firewalk is a Node.js library that _walks_ you through Firestore collections.
 
-When you have millions of documents in a collection, you can't just get all of them at once as your program's memory usage will explode. Firewalk's configurable traverser objects let you do this in a simple, intuitive and memory-efficient way using batching.
+When you have millions of documents in a collection and you need to make changes to them or just read them, you can't just retrieve all of them at once as your program's memory usage will explode. Firewalk's configurable traverser objects let you do this in a simple, intuitive and memory-efficient way using batch processing with concurrency control.
 
-Firewalk is an extremely light and well-typed library that is useful in a variety of scenarios. You can use it in database migration scripts (e.g. when you need to add a new field to all docs) or a scheduled Cloud Function that needs to check every doc in a collection periodically or a locally run script that retrieves some data from a collection.
+Firewalk is an extremely light and well-typed library that is useful in a variety of scenarios. You can use it in database migration scripts (e.g. when you need to add a new field to all docs) or a scheduled Cloud Function that needs to check every doc in a collection periodically or even a locally run script that retrieves some data from a collection.
+
+**Note**: This library was previously known as Firecode. We're currently in the process of porting over the documentation from the
+previous site.
 
 [**Firewalk on Google Dev Library ▸**](https://devlibrary.withgoogle.com/products/firebase/repos/kafkas-firecode)
 
