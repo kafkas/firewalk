@@ -69,14 +69,14 @@ export class BasicDefaultMigratorImpl<D> extends AbstractMigrator<D> implements 
         await doc.ref.set(data);
       } else {
         // Signature 2
-        const data = (getData as SetDataGetter<Partial<D>>)(doc);
+        const data = (getData as SetDataGetter<D | Partial<D>>)(doc);
         await doc.ref.set(data, options);
       }
     });
   }
 
   public update(
-    data: firestore.UpdateData,
+    data: firestore.UpdateData<D>,
     precondition?: firestore.Precondition
   ): Promise<MigrationResult>;
 
@@ -87,7 +87,7 @@ export class BasicDefaultMigratorImpl<D> extends AbstractMigrator<D> implements 
   ): Promise<MigrationResult>;
 
   public update(
-    dataOrField: firestore.UpdateData | string | firestore.FieldPath,
+    dataOrField: firestore.UpdateData<D> | string | firestore.FieldPath,
     preconditionOrValue?: any,
     ...moreFieldsOrPrecondition: any[]
   ): Promise<MigrationResult> {

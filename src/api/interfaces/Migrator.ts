@@ -315,7 +315,7 @@ export interface Migrator<D = firestore.DocumentData> {
    * @returns A Promise resolving to an object representing the details of the migration.
    */
   update(
-    data: firestore.UpdateData,
+    data: firestore.UpdateData<D>,
     precondition?: firestore.Precondition
   ): Promise<MigrationResult>;
 

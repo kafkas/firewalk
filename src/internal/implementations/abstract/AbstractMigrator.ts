@@ -120,8 +120,8 @@ export abstract class AbstractMigrator<D> implements Migrator<D> {
     options: SetOptions
   ): Promise<MigrationResult>;
 
-  public abstract update(
-    data: firestore.UpdateData,
+  public abstract update<D>(
+    data: firestore.UpdateData<D>,
     precondition?: firestore.Precondition
   ): Promise<MigrationResult>;
 

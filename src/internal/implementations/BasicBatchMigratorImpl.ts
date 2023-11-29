@@ -87,14 +87,14 @@ export class BasicBatchMigratorImpl<D> extends AbstractMigrator<D> implements Ba
         writeBatch.set(doc.ref, data);
       } else {
         // Signature 2
-        const data = (getData as SetDataGetter<Partial<D>>)(doc);
+        const data = (getData as SetDataGetter<D | Partial<D>>)(doc);
         writeBatch.set(doc.ref, data, options);
       }
     });
   }
 
   public update(
-    data: firestore.UpdateData,
+    data: firestore.UpdateData<D>,
     precondition?: firestore.Precondition
   ): Promise<MigrationResult>;
 
@@ -105,7 +105,7 @@ export class BasicBatchMigratorImpl<D> extends AbstractMigrator<D> implements Ba
   ): Promise<MigrationResult>;
 
   public update(
-    dataOrField: firestore.UpdateData | string | firestore.FieldPath,
+    dataOrField: firestore.UpdateData<D> | string | firestore.FieldPath,
     preconditionOrValue?: any,
     ...moreFieldsOrPrecondition: any[]
   ): Promise<MigrationResult> {
