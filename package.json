@@ -62,7 +62,7 @@
     "format": "prettier --write \"{src,test}/**/*.{ts,tsx,json}\"",
     "format-check": "prettier --check \"{src,test}/**/*.{ts,tsx,json}\"",
     "lint": "eslint \"{src,__tests__}/**/*/*.{js,ts}\"",
-    "test": "firebase --debug emulators:exec --project demo-firecode --only firestore 'jest'",
+    "test": "firebase emulators:exec --project demo-firecode --only firestore 'jest'",
     "test:types": "tsd"
   },
   "bugs": {
