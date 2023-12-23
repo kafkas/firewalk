@@ -20,7 +20,8 @@ jobs:
           name: Run Prettier checks
           command: npm run format-check
   test:
-    executor: node/default
+    docker:
+      - image: cimg/openjdk:20.0.2-node
     steps:
       - checkout
       - node/install-packages:
