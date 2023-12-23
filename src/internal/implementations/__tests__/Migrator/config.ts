@@ -1,5 +1,5 @@
 import { firestore } from 'firebase-admin';
-import type { TraversalConfig, Migrator } from '../../../../../src';
+import type { Migrator, TraversalConfig } from '../../../../../src';
 
 export type MigratorMethodTester = (
   migrator: Migrator<TestItemDoc>,
@@ -7,6 +7,7 @@ export type MigratorMethodTester = (
 ) => void;
 
 export interface TestItemDoc {
+  docId?: string;
   map1: {
     num1?: number;
     num2?: number;

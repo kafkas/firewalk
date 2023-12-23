@@ -5,4 +5,4 @@ import type { firestore } from 'firebase-admin';
  */
 export type SetDataGetter<D = firestore.DocumentData> = (
   doc: firestore.QueryDocumentSnapshot<D>
-) => D;
+) => firestore.WithFieldValue<D>;

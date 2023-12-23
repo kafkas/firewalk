@@ -7,6 +7,7 @@ export type { MigrationResult } from './MigrationResult';
 export type { Migrator } from './Migrator';
 export type { SetDataGetter } from './SetDataGetter';
 export type { SetOptions } from './SetOptions';
+export type { SetPartialDataGetter } from './SetPartialDataGetter';
 export type { Traversable } from './Traversable';
 export type { TraversalConfig } from './TraversalConfig';
 export type { TraversalResult } from './TraversalResult';
