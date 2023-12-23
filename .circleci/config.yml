@@ -1,0 +1,46 @@
+version: 2.1
+
+orbs:
+  node: circleci/node@5.1.1
+
+jobs:
+  lint:
+    executor: node/default
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Compile the source
+          command: npm run compile
+      - run:
+          name: Run ESLint checks
+          command: npm run lint
+      - run:
+          name: Run Prettier checks
+          command: npm run format-check
+  test:
+    executor: node/default
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Compile the source
+          command: npm run compile
+      - run:
+          name: Run tests
+          command: npm run test
+
+workflows:
+  build_and_test:
+    jobs:
+      - lint:
+          filters:
+            tags:
+              only: /.*/
+
+      - test:
+          filters:
+            tags:
+              only: /.*/
