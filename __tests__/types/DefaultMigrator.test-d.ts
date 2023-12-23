@@ -60,8 +60,7 @@ defaultMigrator.setWithDerivedData((doc) => {
 });
 defaultMigrator.setWithDerivedData(
   (doc) => {
-    // TODO: We probably want firestore.QueryDocumentSnapshot<D> here
-    expectType<firestore.QueryDocumentSnapshot<Partial<D>>>(doc);
+    expectType<firestore.QueryDocumentSnapshot<D>>(doc);
     return { num: 0 };
   },
   { merge: true }

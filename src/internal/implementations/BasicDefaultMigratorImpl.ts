@@ -5,6 +5,7 @@ import type {
   MigrationResult,
   SetDataGetter,
   SetOptions,
+  SetPartialDataGetter,
   Traverser,
   UpdateDataGetter,
   UpdateFieldValueGetter,
@@ -35,41 +36,47 @@ export class BasicDefaultMigratorImpl<D> extends AbstractMigrator<D> implements 
     );
   }
 
-  public set(data: D): Promise<MigrationResult>;
-
-  public set(data: Partial<D>, options: SetOptions): Promise<MigrationResult>;
-
-  public async set(data: D | Partial<D>, options?: SetOptions): Promise<MigrationResult> {
-    return this.#migrate(async (doc) => {
-      if (options === undefined) {
-        // Signature 1
-        await doc.ref.set(data as D);
-      } else {
-        // Signature 2
-        await doc.ref.set(data as Partial<D>, options);
-      }
-    });
-  }
-
-  public setWithDerivedData(getData: SetDataGetter<D>): Promise<MigrationResult>;
-
-  public setWithDerivedData(
-    getData: SetDataGetter<Partial<D>>,
+  public set(
+    data: firestore.PartialWithFieldValue<D>,
     options: SetOptions
   ): Promise<MigrationResult>;
 
-  public async setWithDerivedData(
-    getData: SetDataGetter<D> | SetDataGetter<Partial<D>>,
+  public set(data: firestore.WithFieldValue<D>): Promise<MigrationResult>;
+
+  public async set(
+    data: firestore.PartialWithFieldValue<D> | firestore.WithFieldValue<D>,
     options?: SetOptions
   ): Promise<MigrationResult> {
     return this.#migrate(async (doc) => {
       if (options === undefined) {
+        // Signature 2
+        await doc.ref.set(data as firestore.WithFieldValue<D>);
+      } else {
         // Signature 1
+        await doc.ref.set(data as firestore.PartialWithFieldValue<D>, options);
+      }
+    });
+  }
+
+  public setWithDerivedData(
+    getData: SetPartialDataGetter<D>,
+    options: SetOptions
+  ): Promise<MigrationResult>;
+
+  public setWithDerivedData(getData: SetDataGetter<D>): Promise<MigrationResult>;
+
+  public async setWithDerivedData(
+    getData: SetPartialDataGetter<D> | SetDataGetter<D>,
+    options?: SetOptions
+  ): Promise<MigrationResult> {
+    return this.#migrate(async (doc) => {
+      if (options === undefined) {
+        // Signature 2
         const data = (getData as SetDataGetter<D>)(doc);
         await doc.ref.set(data);
       } else {
-        // Signature 2
-        const data = (getData as SetDataGetter<D | Partial<D>>)(doc);
+        // Signature 1
+        const data = (getData as SetPartialDataGetter<D>)(doc);
         await doc.ref.set(data, options);
       }
     });

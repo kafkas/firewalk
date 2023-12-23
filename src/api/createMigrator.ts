@@ -37,7 +37,7 @@ export function createMigrator<D = firestore.DocumentData>(
   traversalConfig?: Partial<TraversalConfig>
 ): DefaultMigrator<D> {
   const traverser = isTraverser(traversableOrTraverser)
-    ? traversableOrTraverser
-    : createTraverser(traversableOrTraverser, traversalConfig);
+    ? (traversableOrTraverser as Traverser<D>)
+    : createTraverser(traversableOrTraverser as Traversable<D>, traversalConfig);
   return new BasicDefaultMigratorImpl(traverser);
 }

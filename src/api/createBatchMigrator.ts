@@ -48,7 +48,7 @@ export function createBatchMigrator<D = firestore.DocumentData>(
   traversalConfig?: Partial<TraversalConfig>
 ): BatchMigrator<D> {
   const traverser = isTraverser(traversableOrTraverser)
-    ? traversableOrTraverser
-    : createTraverser(traversableOrTraverser, traversalConfig);
+    ? (traversableOrTraverser as Traverser<D>)
+    : createTraverser(traversableOrTraverser as Traversable<D>, traversalConfig);
   return new BasicBatchMigratorImpl(traverser);
 }
