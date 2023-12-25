@@ -37,11 +37,13 @@ workflows:
   lint_and_test:
     jobs:
       - lint:
+          name: Run linter and formatter
           filters:
             tags:
               only: /.*/
 
       - test:
+          name: Run tests
           filters:
             tags:
               only: /.*/
