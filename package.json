@@ -58,7 +58,7 @@
   },
   "scripts": {
     "compile": "tsc -p src",
-    "docs-generate": "typedoc --out docs/v2",
+    "docs-generate": "sh scripts/generate-docs.sh",
     "format": "prettier --write \"{src,test}/**/*.{ts,tsx,json}\"",
     "format-check": "prettier --check \"{src,test}/**/*.{ts,tsx,json}\"",
     "lint": "eslint \"{src,__tests__}/**/*/*.{js,ts}\"",
