@@ -40,34 +40,39 @@ previous site.
 
 ## Overview
 
+1. [Prerequisites](#Prerequisites)
+   1. [Compatibility Map](#Compatibility-Map)
 1. [Installation](#Installation)
-2. [Core Concepts](#Core-Concepts)
-3. [Quick Start](#Quick-Start)
-4. [More Examples](#More-Examples)
-5. [API](#API)
-6. [Upgrading](#Upgrading)
-7. [License](#License)
+1. [Core Concepts](#Core-Concepts)
+1. [Quick Start](#Quick-Start)
+1. [More Examples](#More-Examples)
+1. [API](#API)
+1. [Upgrading](#Upgrading)
+1. [License](#License)
+
+## Prerequisites
+
+Firewalk is designed to work with the [Firebase Admin SDK](https://github.com/firebase/firebase-admin-node) so if you haven't already installed it, you'll need add it as a dependency to your project.
+
+```bash
+npm install firebase-admin
+```
+
+### Compatibility Map
+
+Make sure to install the right version of Firewalk depending on the `firebase-admin` version your project is on.
+
+| firewalk | firebase-admin |
+| -------- | -------------- |
+| v1.x     | v9.x, v10.x    |
+| v2.x     | v11.x          |
 
 ## Installation
 
-Firewalk is designed to work with the [Firebase Admin SDK](https://github.com/firebase/firebase-admin-node) so if you haven't already installed it, run
+You can add Firewalk to your project with npm or yarn.
 
-```
-# npm
-npm install firebase-admin
-
-# yarn
-yarn add firebase-admin
-```
-
-Then run
-
-```
-# npm
-npm install -E firewalk
-
-# yarn
-yarn add -E firewalk
+```bash
+npm install firewalk
 ```
 
 ## Core Concepts
@@ -83,8 +88,8 @@ There are only 2 kinds of objects you need to be familiar with when using this l
 Suppose we have a `users` collection and we want to send an email to each user. This is how easy it is to do that efficiently with a Firewalk traverser:
 
 ```ts
-import { value firestore } from 'firebase-admin';
-import { value createTraverser } from 'firewalk';
+import { firestore } from 'firebase-admin';
+import { createTraverser } from 'firewalk';
 
 const usersCollection = firestore().collection('users');
 const traverser = createTraverser(usersCollection);
@@ -254,7 +259,7 @@ where:
 
 ## Upgrading
 
-This project is still very new and we have a lot to work on. We will be moving fast and until we release v1, there may be breaking changes between minor versions (e.g. when upgrading from 0.4 to 0.5). However, all breaking changes will be documented and you can always use our [Releases](https://github.com/kafkas/firewalk/releases) page as a changelog.
+This project adheres to [SemVer](https://semver.org). Before upgrading to a new major version, make sure to check out the [Releases](https://github.com/kafkas/firewalk/releases) page to view all the breaking changes.
 
 ## License
 
