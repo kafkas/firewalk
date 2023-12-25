@@ -14,8 +14,8 @@
     "TypeScript",
     "typescript"
   ],
-  "author": "Proficient AI <team@proficientai.com>",
-  "homepage": "https://firewalk.proficientai.com",
+  "author": "Anar Kafkas <anarkafkas@gmail.com>",
+  "homepage": "https://kafkas.github.io/firewalk",
   "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -28,7 +28,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/proficientai/firewalk.git"
+    "url": "git+https://github.com/kafkas/firewalk.git"
   },
   "devDependencies": {
     "@babel/core": "^7.17.0",
@@ -68,7 +68,7 @@
     "test:types": "tsd"
   },
   "bugs": {
-    "url": "https://github.com/proficientai/firewalk/issues"
+    "url": "https://github.com/kafkas/firewalk/issues"
   },
   "peerDependencies": {
     "firebase-admin": "11.x"
