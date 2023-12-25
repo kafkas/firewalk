@@ -1,5 +1,11 @@
 {
   "entryPoints": ["src/index.ts"],
-  "out": "docs",
-  "tsconfig": "src/tsconfig.json"
+  "tsconfig": "src/tsconfig.json",
+  "searchInComments": true,
+  "navigation": {
+    "includeCategories": true,
+    "includeGroups": true
+  },
+  "categorizeByGroup": true,
+  "githubPages": false
 }
