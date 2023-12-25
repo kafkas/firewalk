@@ -1,5 +1,5 @@
 <h1 align="center">
-  <a href="https://firewalk.proficientai.com">
+  <a href="https://kafkas.github.io/firewalk">
     Firewalk
   </a>
 </h1>
@@ -7,24 +7,21 @@
 <p align="center">
   A light, fast, and memory-efficient collection traversal library for Firestore and Node.js.
 </p>
-<p align="center">
-Built by <a href="https://proficientai.com">Proficient AI</a>.
-</p>
 
 ---
 
 <p align="center">
-    <a href="https://github.com/proficientai/firewalk/blob/main/LICENSE">
+    <a href="https://github.com/kafkas/firewalk/blob/main/LICENSE">
     <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="Firewalk is released under the MIT license." /></a>
     <a href="https://npmjs.com/package/firewalk" alt="Version">
         <img src="https://img.shields.io/npm/v/firewalk" /></a>
     <a href="https://npmjs.com/package/firewalk" alt="Size">
         <img src="https://img.shields.io/bundlephobia/min/firewalk" /></a>
-    <a href="https://npmjs.com/package/@firecode/admin" alt="Downloads">
-        <img src="https://img.shields.io/npm/dm/@firecode/admin" /></a>
+    <a href="https://npmjs.com/package/firewalk" alt="Downloads">
+        <img src="https://img.shields.io/npm/dm/firewalk" /></a>
     <a href="https://" alt="Types">
         <img src="https://img.shields.io/npm/types/firewalk" /></a>
-    <a href="https://github.com/proficientai/firewalk">
+    <a href="https://github.com/kafkas/firewalk">
     <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs welcome!" /></a>
 </p>
 
@@ -37,49 +34,52 @@ Firewalk is an extremely light and well-typed library that is useful in a variet
 **Note**: This library was previously known as Firecode. We're currently in the process of porting over the documentation from the
 previous site.
 
-[**Firewalk on Google Dev Library ▸**](https://devlibrary.withgoogle.com/products/firebase/repos/kafkas-firecode)
-
 [**Read the introductory blog post ▸**](https://anarkafkas.medium.com/traversing-firestore-collections-efficiently-6e43cea1eefd)
 
-[**View the full documentation (docs) ▸**](https://firewalk.proficientai.com)
+[**View the full documentation (docs) ▸**](https://kafkas.github.io/firewalk)
 
 ## Overview
 
+1. [Prerequisites](#Prerequisites)
+   1. [Compatibility Map](#Compatibility-Map)
 1. [Installation](#Installation)
-2. [Core Concepts](#Core-Concepts)
-3. [Quick Start](#Quick-Start)
-4. [More Examples](#More-Examples)
-5. [API](#API)
-6. [Upgrading](#Upgrading)
-7. [License](#License)
+1. [Core Concepts](#Core-Concepts)
+1. [Quick Start](#Quick-Start)
+1. [More Examples](#More-Examples)
+1. [API](#API)
+1. [Upgrading](#Upgrading)
+1. [License](#License)
+
+## Prerequisites
+
+Firewalk is designed to work with the [Firebase Admin SDK](https://github.com/firebase/firebase-admin-node) so if you haven't already installed it, you'll need add it as a dependency to your project.
+
+```bash
+npm install firebase-admin
+```
+
+### Compatibility Map
+
+Make sure to install the right version of Firewalk depending on the `firebase-admin` version your project is on.
+
+| firewalk | firebase-admin |
+| -------- | -------------- |
+| v1.x     | v9.x, v10.x    |
+| v2.x     | v11.x          |
 
 ## Installation
 
-Firewalk is designed to work with the [Firebase Admin SDK](https://github.com/firebase/firebase-admin-node) so if you haven't already installed it, run
+You can add Firewalk to your project with npm or yarn.
 
-```
-# npm
-npm install firebase-admin
-
-# yarn
-yarn add firebase-admin
-```
-
-Then run
-
-```
-# npm
-npm install -E firewalk
-
-# yarn
-yarn add -E firewalk
+```bash
+npm install firewalk
 ```
 
 ## Core Concepts
 
 There are only 2 kinds of objects you need to be familiar with when using this library:
 
-1. **Traverser**: An object that walks you through a collection of documents (or more generally a [Traversable](https://firewalk.proficientai.com/0.12.0/modules.html#Traversable)).
+1. **Traverser**: An object that walks you through a collection of documents (or more generally a [Traversable](https://kafkas.github.io/firewalk/types/Traversable.html)).
 
 2. **Migrator**: A convenience object used for database migrations. It lets you easily write to the documents within a given traversable and uses a traverser to do that. You can easily write your own migration logic in the traverser callback if you don't want to use a migrator.
 
@@ -88,8 +88,8 @@ There are only 2 kinds of objects you need to be familiar with when using this l
 Suppose we have a `users` collection and we want to send an email to each user. This is how easy it is to do that efficiently with a Firewalk traverser:
 
 ```ts
-import { value firestore } from 'firebase-admin';
-import { value createTraverser } from 'firewalk';
+import { firestore } from 'firebase-admin';
+import { createTraverser } from 'firewalk';
 
 const usersCollection = firestore().collection('users');
 const traverser = createTraverser(usersCollection);
@@ -195,13 +195,13 @@ const { migratedDocCount } = await migrator.renameField('postedAt', 'publishedAt
 console.log(`Updated ${migratedDocCount} posts!`);
 ```
 
-## [API](https://firewalk.proficientai.com/)
+## [API](https://kafkas.github.io/firewalk)
 
-You can find the full API reference for `firewalk` [here](https://firewalk.proficientai.com). We maintain detailed docs for every version! Here are some of the core functions that this library provides.
+You can find the full API reference for `firewalk` [here](https://kafkas.github.io/firewalk). We maintain detailed docs for every version! Here are some of the core functions that this library provides.
 
-### [createTraverser](https://firewalk.proficientai.com/0.12.0/modules.html#createtraverser)
+### [createTraverser](https://kafkas.github.io/firewalk/functions/createTraverser.html)
 
-Creates an object which can be used to traverse a Firestore collection or, more generally, a [Traversable](https://firewalk.proficientai.com/0.12.0/modules.html#Traversable).
+Creates an object which can be used to traverse a Firestore collection or, more generally, a [Traversable](https://kafkas.github.io/firewalk/types/Traversable.html).
 
 For each batch of document snapshots in the traversable, the traverser invokes a specified async callback and immediately moves to the next batch. It does not wait for the callback Promise to resolve before moving to the next batch. That is, when `maxConcurrentBatchCount` > 1, there is no guarantee that any given batch will finish processing before a later batch.
 
@@ -221,7 +221,7 @@ where:
 - _D_: average document size
 - _S_: average extra space used by the callback
 
-### [createMigrator](https://firewalk.proficientai.com/0.12.0/modules.html#createmigrator)
+### [createMigrator](https://kafkas.github.io/firewalk/functions/createMigrator.html)
 
 Creates a migrator that facilitates database migrations. The migrator accepts a custom traverser to traverse the collection. Otherwise it will create a default traverser with your desired traversal config. This migrator does not use atomic batch writes so it is possible that when a write fails other writes go through.
 
@@ -239,7 +239,7 @@ where:
 - _TC_(`traverser`): time complexity of the underlying traverser
 - _SC_(`traverser`): space complexity of the underlying traverser
 
-### [createBatchMigrator](https://firewalk.proficientai.com/0.12.0/modules.html#createbatchmigrator)
+### [createBatchMigrator](https://kafkas.github.io/firewalk/functions/createBatchMigrator.html)
 
 Creates a migrator that facilitates database migrations. The migrator accepts a custom traverser to traverse the collection. Otherwise it will create a default traverser with your desired traversal config. This migrator uses atomic batch writes so the entire operation will fail if a single write isn't successful.
 
@@ -259,7 +259,7 @@ where:
 
 ## Upgrading
 
-This project is still very new and we have a lot to work on. We will be moving fast and until we release v1, there may be breaking changes between minor versions (e.g. when upgrading from 0.4 to 0.5). However, all breaking changes will be documented and you can always use our [Releases](https://github.com/proficientai/firewalk/releases) page as a changelog.
+This project adheres to [SemVer](https://semver.org). Before upgrading to a new major version, make sure to check out the [Releases](https://github.com/kafkas/firewalk/releases) page to view all the breaking changes.
 
 ## License
 
