@@ -1,6 +1,5 @@
 {
   "entryPoints": ["src/index.ts"],
-  "out": "docs",
   "tsconfig": "src/tsconfig.json",
   "searchInComments": true,
   "navigation": {
