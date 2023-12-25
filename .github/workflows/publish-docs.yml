@@ -10,7 +10,7 @@ on:
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -35,6 +35,13 @@ jobs:
         run: npm install
       - name: Generate docs for current version
         run: npm run docs-generate
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.email "kafkas@users.noreply.github.com"
+          git config --global user.name "Documentation Bot"
+          git add docs
+          git commit -m "Update docs"
+          git push
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
