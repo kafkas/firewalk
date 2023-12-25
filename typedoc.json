@@ -1,3 +1,5 @@
 {
-  "includeVersion": true
+  "entryPoints": ["src/index.ts"],
+  "out": "docs",
+  "tsconfig": "src/tsconfig.json"
 }
