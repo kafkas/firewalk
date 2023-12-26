@@ -29,6 +29,11 @@ jobs:
         with:
           ref: 'docs'
 
+      - name: Set account identity
+        run: |
+          git config --global user.email "kafkas@users.noreply.github.com"
+          git config --global user.name "Documentation Bot"
+
       - name: Rebase with main branch
         run: |
           git fetch
@@ -42,8 +47,6 @@ jobs:
 
       - name: Commit and Push Changes
         run: |
-          git config --global user.email "kafkas@users.noreply.github.com"
-          git config --global user.name "Documentation Bot"
           git add docs/
           git commit -m "Update documentation" || echo "No changes to commit"
           git push
