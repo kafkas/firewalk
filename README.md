@@ -65,7 +65,7 @@ Make sure to install the right version of Firewalk depending on the `firebase-ad
 | firewalk | firebase-admin |
 | -------- | -------------- |
 | v1.x     | v9.x, v10.x    |
-| v2.x     | v11.x          |
+| v2.x     | v11.x, v12.x   |
 
 ## Installation
 
