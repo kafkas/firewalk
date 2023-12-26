@@ -2,8 +2,8 @@ name: Deploy docs
 
 on:
   # Runs on pushes targeting the main branch
-  # push:
-  #   branches: ['main']
+  push:
+    branches: ['main']
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -21,31 +21,53 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy:
+  generate_and_commit_docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout docs branch
+        uses: actions/checkout@v4
+        with:
+          ref: 'docs'
+
+      - name: Rebase with main branch
+        run: |
+          git fetch origin main
+          git rebase origin/main
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Generate docs for current version
+        run: npm run docs-generate
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.email "kafkas@users.noreply.github.com"
+          git config --global user.name "Documentation Bot"
+          git add docs/
+          git commit -m "Update documentation" || echo "No changes to commit"
+          git push
+
+  deploy_to_github_pages:
+    needs: generate_and_commit_docs
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout docs branch
         uses: actions/checkout@v4
+        with:
+          ref: 'docs'
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
-      - name: Install dependencies
-        run: npm install
-      - name: Generate docs for current version
-        run: npm run docs-generate
-      - name: Commit and Push Changes
-        run: |
-          git config --global user.email "kafkas@users.noreply.github.com"
-          git config --global user.name "Documentation Bot"
-          git add docs
-          git commit -m "Update docs (bot)"
-          git push
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: './docs'
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
