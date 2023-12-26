@@ -33,8 +33,27 @@ jobs:
           name: Run tests
           command: npm run test
 
+  publish:
+    executor: node/default
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Compile the source
+          command: rm -rf dist && npm run compile
+      - run:
+          name: Publish to NPM
+          command: npm publish
+      - when:
+          condition: << pipeline.git.tag >>
+          steps:
+            - run:
+                name: Configure NPM
+                command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+
 workflows:
-  lint_and_test:
+  build_test_deploy:
     jobs:
       - lint:
           name: Run linter and formatter
@@ -47,3 +66,13 @@ workflows:
           filters:
             tags:
               only: /.*/
+
+      - publish:
+          name: Publish to NPM
+          requires: [lint, test]
+          filters:
+            branches:
+              only:
+                - main
+            tags:
+              only: /^v\d+\.\d+\.\d+$/
