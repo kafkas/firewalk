@@ -56,19 +56,16 @@ workflows:
   build_test_deploy:
     jobs:
       - lint:
-          name: Run linter and formatter
           filters:
             tags:
               only: /.*/
 
       - test:
-          name: Run tests
           filters:
             tags:
               only: /.*/
 
       - publish:
-          name: Publish to NPM
           requires: [lint, test]
           filters:
             branches:
