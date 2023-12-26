@@ -71,7 +71,7 @@
     "url": "https://github.com/kafkas/firewalk/issues"
   },
   "peerDependencies": {
-    "firebase-admin": "11.x"
+    "firebase-admin": "11.x || 12.x"
   },
   "publishConfig": {
     "access": "public"
