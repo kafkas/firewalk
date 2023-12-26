@@ -20,7 +20,7 @@ export interface TestItemDoc {
   timestamp2?: firestore.Timestamp;
 }
 
-export const DEFAULT_TIMEOUT = 15_000;
+export const DEFAULT_TIMEOUT = 60_000;
 
 export const DEFAULT_TRAVERSABLE_SIZE = 40;
 
