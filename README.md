@@ -197,7 +197,7 @@ console.log(`Updated ${migratedDocCount} posts!`);
 
 ## [API](https://kafkas.github.io/firewalk)
 
-You can find the full API reference for `firewalk` [here](https://kafkas.github.io/firewalk). We maintain detailed docs for every version! Here are some of the core functions that this library provides.
+You can find the full API reference for Firewalk [here](https://kafkas.github.io/firewalk). We maintain detailed docs for each major version. Here are some of the core functions that this library provides.
 
 ### [createTraverser](https://kafkas.github.io/firewalk/functions/createTraverser.html)
 
