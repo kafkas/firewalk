@@ -37,7 +37,7 @@ jobs:
       - name: Rebase with main branch
         run: |
           git fetch
-          git rebase origin/main
+          git rebase -Xours origin/main
 
       - name: Install dependencies
         run: npm install
