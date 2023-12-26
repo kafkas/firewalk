@@ -40,17 +40,15 @@ jobs:
       - node/install-packages:
           pkg-manager: npm
       - run:
+          name: Configure NPM
+          command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+      - run:
           name: Compile the source
           command: rm -rf dist && npm run compile
       - run:
           name: Publish to NPM
           command: npm publish
-      - when:
-          condition: << pipeline.git.tag >>
-          steps:
-            - run:
-                name: Configure NPM
-                command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+
 
 workflows:
   build_test_deploy:
