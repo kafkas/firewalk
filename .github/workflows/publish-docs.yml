@@ -48,7 +48,7 @@ jobs:
       - name: Commit and Push Changes
         run: |
           git add docs/
-          git commit -m "Update documentation" || echo "No changes to commit"
+          git commit -m "Update docs (bot)" || echo "No changes (bot)"
           git push -f
 
   deploy_to_github_pages:
