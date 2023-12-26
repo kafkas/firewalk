@@ -1,4 +1,4 @@
-name: Deploy docs
+name: Publish docs
 
 on:
   # Runs on pushes targeting the main branch
