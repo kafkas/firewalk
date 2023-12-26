@@ -49,7 +49,7 @@ jobs:
         run: |
           git add docs/
           git commit -m "Update documentation" || echo "No changes to commit"
-          git push
+          git push -f
 
   deploy_to_github_pages:
     needs: generate_and_commit_docs
