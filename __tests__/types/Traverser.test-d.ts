@@ -1,3 +1,5 @@
+/* eslint-disable import/no-unresolved */
+
 import type { firestore } from 'firebase-admin';
 import { expectType } from 'tsd';
 import {

@@ -1,3 +1,5 @@
+/* eslint-disable import/no-unresolved */
+
 import { expectType } from 'tsd';
 import { createTraverser, Traverser } from '../../src';
 import { collectionRef, D } from './_helpers';

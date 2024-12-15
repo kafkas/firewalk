@@ -1,3 +1,5 @@
+/* eslint-disable import/no-unresolved */
+
 import { firestore } from 'firebase-admin';
 import { expectError, expectType } from 'tsd';
 import { DefaultMigrator, Traverser, createMigrator, createTraverser } from '../../src';
