@@ -3,15 +3,17 @@ name: Publish package
 on:
   workflow_dispatch:
     inputs:
-      input1:
-        type: string
+      version_increment:
+        type: choice
         required: true
-        description: Whether to publish a major, minor, or patch version
+        description: 'Select version increment type'
+        options:
+          - major
+          - minor
+          - patch
 
 permissions:
   contents: write
-  pages: write
-  id-token: write
 
 # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
 # However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
@@ -41,10 +43,10 @@ jobs:
           git config --global user.name "Documentation Bot"
 
       - name: Configure NPM
-        run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" >> .npmrc
+        run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> .npmrc
 
       - name: Bump version
-        run: npm version ${{ inputs.input1 }}
+        run: npm version ${{ inputs.version_increment }}
 
       - name: Push commit and create tag and release
         run: |
