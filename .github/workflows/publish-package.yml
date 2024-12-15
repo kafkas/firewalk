@@ -49,6 +49,8 @@ jobs:
         run: npm version ${{ inputs.version_increment }}
 
       - name: Push commit and create tag and release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           version="$(jq -r .version package.json)"
           git push origin
