@@ -1,0 +1,28 @@
+name: CI
+
+on: [pull_request]
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: npm
+      - name: Install project dependencies
+        run: npm ci
+      - name: Compile the source
+        run: npm run compile
+      - name: Run ESLint checks
+        run: npm run lint
+      - name: Run Prettier checks
+        run: npm run format-check
+      - name: Run tests
+        run: npm run test
