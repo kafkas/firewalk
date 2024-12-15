@@ -8,9 +8,9 @@ on:
         required: true
         description: 'Select version increment type'
         options:
-          - major
-          - minor
           - patch
+          - minor
+          - major
 
 permissions:
   contents: write
@@ -42,9 +42,6 @@ jobs:
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
 
-      - name: Configure NPM
-        run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-
       - name: Bump version
         run: npm version ${{ inputs.version_increment }}
 
@@ -59,3 +56,5 @@ jobs:
 
       - name: Publish the package to NPM
         run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
