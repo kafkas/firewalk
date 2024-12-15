@@ -107,7 +107,7 @@ export class BasicDefaultMigratorImpl<D> extends AbstractMigrator<D> implements 
         const field = dataOrField;
         const value = preconditionOrValue;
         await doc.ref.update(field, value, ...moreFieldsOrPrecondition);
-      } else {
+      } else if (typeof dataOrField === 'object' && dataOrField !== null) {
         // Signature 1
         const data = dataOrField;
         const precondition = preconditionOrValue as firestore.Precondition | undefined;
@@ -139,7 +139,7 @@ export class BasicDefaultMigratorImpl<D> extends AbstractMigrator<D> implements 
       if (Array.isArray(data)) {
         // Signature 2
         await doc.ref.update(...(data as [string | firestore.FieldPath, any, ...any[]]));
-      } else {
+      } else if (typeof data === 'object' && data !== null) {
         // Signature 1
         if (precondition === undefined) {
           await doc.ref.update(data);

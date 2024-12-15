@@ -125,7 +125,7 @@ export class BasicBatchMigratorImpl<D> extends AbstractMigrator<D> implements Ba
         const field = dataOrField;
         const value = preconditionOrValue;
         writeBatch.update(doc.ref, field, value, ...moreFieldsOrPrecondition);
-      } else {
+      } else if (dataOrField !== undefined) {
         // Signature 1
         const data = dataOrField;
         const precondition = preconditionOrValue as firestore.Precondition | undefined;
@@ -156,7 +156,7 @@ export class BasicBatchMigratorImpl<D> extends AbstractMigrator<D> implements Ba
       if (Array.isArray(data)) {
         // Signature 2
         writeBatch.update(doc.ref, ...(data as [string | firestore.FieldPath, any, ...any[]]));
-      } else {
+      } else if (data !== undefined) {
         // Signature 1
         if (precondition === undefined) {
           writeBatch.update(doc.ref, data);
