@@ -43,7 +43,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
 
       - name: Configure NPM
-        run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> .npmrc
+        run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
 
       - name: Bump version
         run: npm version ${{ inputs.version_increment }}
