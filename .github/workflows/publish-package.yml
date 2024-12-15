@@ -54,3 +54,6 @@ jobs:
           git push origin
           git push origin "v$version"
           gh release create "v$version" --title "v$version"
+
+      - name: Publish the package to NPM
+        run: npm publish
