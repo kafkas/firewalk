@@ -37,7 +37,7 @@
     "@types/compare-versions": "^3.3.0",
     "@types/jest": "^29.5.10",
     "@types/lodash": "^4.14.178",
-    "@types/node": "^20.11.24",
+    "@types/node": "^22.10.2",
     "@typescript-eslint/eslint-plugin": "^5.10.2",
     "@typescript-eslint/parser": "^5.10.2",
     "babel-jest": "^27.5.1",
@@ -53,8 +53,8 @@
     "prettier": "2.5.1",
     "ts-node": "^10.4.0",
     "tsd": "0.19.1",
-    "typedoc": "0.25.4",
-    "typescript": "5.3.3"
+    "typedoc": "0.27.5",
+    "typescript": "5.7.2"
   },
   "scripts": {
     "compile": "tsc -p src",
