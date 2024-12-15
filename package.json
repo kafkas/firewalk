@@ -57,13 +57,13 @@
     "typescript": "5.7.2"
   },
   "scripts": {
-    "compile": "tsc -p src",
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
     "docs-generate": "sh scripts/generate-docs.sh",
     "format": "prettier --write \"{src,test}/**/*.{ts,tsx,json}\"",
     "format-check": "prettier --check \"{src,test}/**/*.{ts,tsx,json}\"",
     "lint": "eslint \"{src,__tests__}/**/*/*.{js,ts}\"",
     "test": "npm run test:compile && npm run test:types && npm run test:jest",
-    "test:compile": "tsc -p __tests__/tsconfig.json",
+    "test:compile": "tsc -p tsconfig.test.json",
     "test:jest": "firebase emulators:exec --project demo-firewalk --only firestore 'jest'",
     "test:types": "tsd"
   },

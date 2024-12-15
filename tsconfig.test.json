@@ -6,6 +6,6 @@
     "strict": true,
     "target": "ES6"
   },
-  "include": [".", "../src/**/__tests__"],
-  "exclude": ["types"]
+  "extends": "./tsconfig.json",
+  "include": ["jest.config.global.ts", "jest.config.ts", "**/__tests__/**/*"]
 }
