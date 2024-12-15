@@ -1,3 +1,5 @@
+/* eslint-disable import/no-unresolved */
+
 import { expectType } from 'tsd';
 import { createBatchMigrator, createTraverser, BatchMigrator } from '../../src';
 import { collectionRef, D } from './_helpers';

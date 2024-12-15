@@ -3,10 +3,9 @@
     "declaration": true,
     "module": "CommonJS",
     "moduleResolution": "node",
-    "outDir": "../dist",
+    "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
     "target": "ES6"
-  },
-  "exclude": ["**/__tests__/*"]
+  }
 }

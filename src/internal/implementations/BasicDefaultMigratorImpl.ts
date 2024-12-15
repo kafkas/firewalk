@@ -11,6 +11,7 @@ import type {
   UpdateFieldValueGetter,
 } from '../../api';
 import { AbstractMigrator, RegisteredCallbacks } from './abstract';
+import { IllegalArgumentError } from '../errors';
 
 export class BasicDefaultMigratorImpl<D> extends AbstractMigrator<D> implements DefaultMigrator<D> {
   public constructor(
@@ -107,7 +108,7 @@ export class BasicDefaultMigratorImpl<D> extends AbstractMigrator<D> implements 
         const field = dataOrField;
         const value = preconditionOrValue;
         await doc.ref.update(field, value, ...moreFieldsOrPrecondition);
-      } else {
+      } else if (typeof dataOrField === 'object' && dataOrField !== null) {
         // Signature 1
         const data = dataOrField;
         const precondition = preconditionOrValue as firestore.Precondition | undefined;
@@ -116,6 +117,10 @@ export class BasicDefaultMigratorImpl<D> extends AbstractMigrator<D> implements 
         } else {
           await doc.ref.update(data, precondition);
         }
+      } else {
+        throw new IllegalArgumentError(
+          `Unsupported signature detected. The 'dataOrField' argument cannot be undefined. The 'dataOrField' argument must be a string, a FieldPath, or an object.`
+        );
       }
     });
   }
@@ -139,13 +144,17 @@ export class BasicDefaultMigratorImpl<D> extends AbstractMigrator<D> implements 
       if (Array.isArray(data)) {
         // Signature 2
         await doc.ref.update(...(data as [string | firestore.FieldPath, any, ...any[]]));
-      } else {
+      } else if (typeof data === 'object' && data !== null) {
         // Signature 1
         if (precondition === undefined) {
           await doc.ref.update(data);
         } else {
           await doc.ref.update(data, precondition);
         }
+      } else {
+        throw new IllegalArgumentError(
+          `Unsupported signature detected. The 'data' argument must be an array, an object, or a valid Firestore update signature.`
+        );
       }
     });
   }

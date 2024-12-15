@@ -13,6 +13,7 @@ import type {
 import { InvalidConfigError } from '../../errors';
 import { isPositiveInteger } from '../utils';
 import { AbstractMigrator, RegisteredCallbacks } from './abstract';
+import { IllegalArgumentError } from '../errors';
 
 export class BasicBatchMigratorImpl<D> extends AbstractMigrator<D> implements BatchMigrator<D> {
   static readonly #MAX_BATCH_WRITE_DOC_COUNT = 500;
@@ -125,7 +126,7 @@ export class BasicBatchMigratorImpl<D> extends AbstractMigrator<D> implements Ba
         const field = dataOrField;
         const value = preconditionOrValue;
         writeBatch.update(doc.ref, field, value, ...moreFieldsOrPrecondition);
-      } else {
+      } else if (dataOrField !== undefined) {
         // Signature 1
         const data = dataOrField;
         const precondition = preconditionOrValue as firestore.Precondition | undefined;
@@ -134,6 +135,10 @@ export class BasicBatchMigratorImpl<D> extends AbstractMigrator<D> implements Ba
         } else {
           writeBatch.update(doc.ref, data, precondition);
         }
+      } else {
+        throw new IllegalArgumentError(
+          `Unsupported signature detected. The 'dataOrField' argument cannot be undefined. The 'dataOrField' argument must be a string, a FieldPath, or an object.`
+        );
       }
     });
   }
@@ -156,13 +161,17 @@ export class BasicBatchMigratorImpl<D> extends AbstractMigrator<D> implements Ba
       if (Array.isArray(data)) {
         // Signature 2
         writeBatch.update(doc.ref, ...(data as [string | firestore.FieldPath, any, ...any[]]));
-      } else {
+      } else if (data !== undefined) {
         // Signature 1
         if (precondition === undefined) {
           writeBatch.update(doc.ref, data);
         } else {
           writeBatch.update(doc.ref, data, precondition);
         }
+      } else {
+        throw new IllegalArgumentError(
+          `Unsupported signature detected. The 'data' argument cannot be undefined. The 'data' argument must be an array, an object, or a valid Firestore update signature.`
+        );
       }
     });
   }
