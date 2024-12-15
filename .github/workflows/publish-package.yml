@@ -1,0 +1,54 @@
+name: Publish package
+
+on:
+  workflow_dispatch:
+    inputs:
+      input1:
+        type: string
+        required: true
+        description: Whether to publish a major, minor, or patch version
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: 'version'
+  cancel-in-progress: true
+
+jobs:
+  bump_version_and_publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Set account identity
+        run: |
+          git config --global user.email "kafkas@users.noreply.github.com"
+          git config --global user.name "Documentation Bot"
+
+      - name: Configure NPM
+        run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" >> .npmrc
+
+      - name: Bump version
+        run: npm version ${{ inputs.input1 }}
+
+      - name: Push commit and create tag and release
+        run: |
+          version="$(jq -r .version package.json)"
+          git push origin
+          git push origin "v$version"
+          gh release create "v$version" --title "v$version"
