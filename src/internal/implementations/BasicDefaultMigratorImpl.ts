@@ -11,6 +11,7 @@ import type {
   UpdateFieldValueGetter,
 } from '../../api';
 import { AbstractMigrator, RegisteredCallbacks } from './abstract';
+import { IllegalArgumentError } from '../errors';
 
 export class BasicDefaultMigratorImpl<D> extends AbstractMigrator<D> implements DefaultMigrator<D> {
   public constructor(
@@ -116,6 +117,10 @@ export class BasicDefaultMigratorImpl<D> extends AbstractMigrator<D> implements 
         } else {
           await doc.ref.update(data, precondition);
         }
+      } else {
+        throw new IllegalArgumentError(
+          `Unsupported signature detected. The 'dataOrField' argument cannot be undefined. The 'dataOrField' argument must be a string, a FieldPath, or an object.`
+        );
       }
     });
   }
@@ -146,6 +151,10 @@ export class BasicDefaultMigratorImpl<D> extends AbstractMigrator<D> implements 
         } else {
           await doc.ref.update(data, precondition);
         }
+      } else {
+        throw new IllegalArgumentError(
+          `Unsupported signature detected. The 'data' argument must be an array, an object, or a valid Firestore update signature.`
+        );
       }
     });
   }
