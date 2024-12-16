@@ -36,6 +36,7 @@ jobs:
         with:
           node-version: '22.x'
           cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Set git identity
         run: |
