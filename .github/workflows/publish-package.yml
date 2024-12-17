@@ -38,6 +38,12 @@ jobs:
           cache: 'npm'
           registry-url: 'https://registry.npmjs.org'
 
+      - name: Install project dependencies
+        run: npm ci
+
+      - name: Build the source
+        run: npm run build
+
       - name: Set git identity
         run: |
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
