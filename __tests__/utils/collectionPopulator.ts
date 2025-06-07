@@ -5,7 +5,7 @@ interface CollectionPopulatorBuilder<
   DbModelType extends firestore.DocumentData = firestore.DocumentData
 > {
   withData(
-    dataOrGetData: DbModelType | (() => DbModelType)
+    dataOrGetData: AppModelType | (() => AppModelType)
   ): CollectionPopulator<AppModelType, DbModelType>;
 }
 
@@ -29,7 +29,10 @@ export function collectionPopulator<
       return {
         populate: async ({ count: docCount }) => {
           const promises = new Array(docCount).fill(null).map(async () => {
-            const data = typeof dataOrGetData === 'function' ? dataOrGetData() : dataOrGetData;
+            const data =
+              typeof dataOrGetData === 'function'
+                ? (dataOrGetData as () => AppModelType)()
+                : dataOrGetData;
             return await collectionRef.add(data);
           });
 
