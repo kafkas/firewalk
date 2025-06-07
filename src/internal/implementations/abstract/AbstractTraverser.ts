@@ -20,8 +20,11 @@ import {
 
 export type OnAfterBatchProcess = () => void | Promise<void>;
 
-export type BatchProcessor<D> = (
-  ...args: Parameters<BatchCallback<D>>
+export type BatchProcessor<
+  AppModelType = firestore.DocumentData,
+  DbModelType extends firestore.DocumentData = firestore.DocumentData
+> = (
+  ...args: Parameters<BatchCallback<AppModelType, DbModelType>>
 ) => void | Promise<void> | OnAfterBatchProcess | Promise<OnAfterBatchProcess>;
 
 type TraversalConfigRules = {
@@ -31,7 +34,11 @@ type TraversalConfigRules = {
   };
 };
 
-export abstract class AbstractTraverser<D> implements Traverser<D> {
+export abstract class AbstractTraverser<
+  AppModelType = firestore.DocumentData,
+  DbModelType extends firestore.DocumentData = firestore.DocumentData
+> implements Traverser<AppModelType, DbModelType>
+{
   protected static readonly baseConfig: TraversalConfig = {
     batchSize: 250,
     sleepTimeBetweenBatches: 0,
@@ -74,7 +81,7 @@ export abstract class AbstractTraverser<D> implements Traverser<D> {
 
   protected constructor(
     public readonly traversalConfig: TraversalConfig,
-    protected readonly exitEarlyPredicates: ExitEarlyPredicate<D>[]
+    protected readonly exitEarlyPredicates: ExitEarlyPredicate<AppModelType, DbModelType>[]
   ) {
     this.#validateConfig();
   }
@@ -93,7 +100,7 @@ export abstract class AbstractTraverser<D> implements Traverser<D> {
   }
 
   public async traverseEach(
-    callback: TraverseEachCallback<D>,
+    callback: TraverseEachCallback<AppModelType, DbModelType>,
     config: Partial<TraverseEachConfig> = {}
   ): Promise<TraversalResult> {
     const { sleepTimeBetweenDocs } = {
@@ -113,7 +120,9 @@ export abstract class AbstractTraverser<D> implements Traverser<D> {
     return { batchCount, docCount };
   }
 
-  protected async runTraversal(processBatch: BatchProcessor<D>): Promise<TraversalResult> {
+  protected async runTraversal(
+    processBatch: BatchProcessor<AppModelType, DbModelType>
+  ): Promise<TraversalResult> {
     const { batchSize, sleepTimeBetweenBatches, maxDocCount } = this.traversalConfig;
 
     let curBatchIndex = 0;
@@ -152,17 +161,23 @@ export abstract class AbstractTraverser<D> implements Traverser<D> {
   }
 
   protected shouldExitEarly(
-    batchDocs: firestore.QueryDocumentSnapshot<D>[],
+    batchDocs: firestore.QueryDocumentSnapshot<AppModelType, DbModelType>[],
     batchIndex: number
   ): boolean {
     return this.exitEarlyPredicates.some((predicate) => predicate(batchDocs, batchIndex));
   }
 
-  public abstract readonly traversable: Traversable<D>;
+  public abstract readonly traversable: Traversable<AppModelType, DbModelType>;
 
-  public abstract withConfig(config: Partial<TraversalConfig>): Traverser<D>;
+  public abstract withConfig(
+    config: Partial<TraversalConfig>
+  ): Traverser<AppModelType, DbModelType>;
 
-  public abstract withExitEarlyPredicate(predicate: ExitEarlyPredicate<D>): Traverser<D>;
+  public abstract withExitEarlyPredicate(
+    predicate: ExitEarlyPredicate<AppModelType, DbModelType>
+  ): Traverser<AppModelType, DbModelType>;
 
-  public abstract traverse(callback: BatchCallback<D>): Promise<TraversalResult>;
+  public abstract traverse(
+    callback: BatchCallback<AppModelType, DbModelType>
+  ): Promise<TraversalResult>;
 }

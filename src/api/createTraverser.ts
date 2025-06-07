@@ -22,9 +22,12 @@ import type { Traversable, TraversalConfig, Traverser } from './interfaces';
  * @returns A new {@link Traverser} object.
  * @throws {@link InvalidConfigError} Thrown if the specified `config` is invalid.
  */
-export function createTraverser<D = firestore.DocumentData>(
-  traversable: Traversable<D>,
+export function createTraverser<
+  AppModelType = firestore.DocumentData,
+  DbModelType extends firestore.DocumentData = firestore.DocumentData
+>(
+  traversable: Traversable<AppModelType, DbModelType>,
   config?: Partial<TraversalConfig>
-): Traverser<D> {
+): Traverser<AppModelType, DbModelType> {
   return new PromiseQueueBasedTraverserImpl(traversable, [], config);
 }

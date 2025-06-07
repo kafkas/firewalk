@@ -3,33 +3,33 @@
 import { firestore } from 'firebase-admin';
 import { expectError, expectType } from 'tsd';
 import { DefaultMigrator, Traverser, createMigrator, createTraverser } from '../../src';
-import { D, collectionRef } from './_helpers';
+import { TestAppModelType, TestDbModelType, collectionRef } from './_helpers';
 
 const defaultMigrator = createMigrator(collectionRef);
 
-expectType<Traverser<D>>(defaultMigrator.traverser);
+expectType<Traverser<TestAppModelType, TestDbModelType>>(defaultMigrator.traverser);
 
 (() => {
   const modifiedMigrator = defaultMigrator.withPredicate((doc) => {
-    expectType<firestore.QueryDocumentSnapshot<D>>(doc);
+    expectType<firestore.QueryDocumentSnapshot<TestAppModelType, TestDbModelType>>(doc);
     return false;
   });
-  expectType<DefaultMigrator<D>>(modifiedMigrator);
+  expectType<DefaultMigrator<TestAppModelType, TestDbModelType>>(modifiedMigrator);
 })();
 
 (() => {
   const traverser = createTraverser(collectionRef);
   const modifiedMigrator = defaultMigrator.withTraverser(traverser);
-  expectType<DefaultMigrator<D>>(modifiedMigrator);
+  expectType<DefaultMigrator<TestAppModelType, TestDbModelType>>(modifiedMigrator);
 })();
 
 defaultMigrator.onBeforeBatchStart((batchDocs, batchIndex) => {
-  expectType<firestore.QueryDocumentSnapshot<D>[]>(batchDocs);
+  expectType<firestore.QueryDocumentSnapshot<TestAppModelType, TestDbModelType>[]>(batchDocs);
   expectType<number>(batchIndex);
 });
 
 defaultMigrator.onAfterBatchComplete((batchDocs, batchIndex) => {
-  expectType<firestore.QueryDocumentSnapshot<D>[]>(batchDocs);
+  expectType<firestore.QueryDocumentSnapshot<TestAppModelType, TestDbModelType>[]>(batchDocs);
   expectType<number>(batchIndex);
 });
 
@@ -52,17 +52,17 @@ defaultMigrator.set({ num: 0 }, { merge: true });
 
 expectError(
   defaultMigrator.setWithDerivedData((doc) => {
-    expectType<firestore.QueryDocumentSnapshot<D>>(doc);
+    expectType<firestore.QueryDocumentSnapshot<TestAppModelType, TestDbModelType>>(doc);
     return { num: 0 };
   })
 );
 defaultMigrator.setWithDerivedData((doc) => {
-  expectType<firestore.QueryDocumentSnapshot<D>>(doc);
+  expectType<firestore.QueryDocumentSnapshot<TestAppModelType, TestDbModelType>>(doc);
   return { num: 0, text: '' };
 });
 defaultMigrator.setWithDerivedData(
   (doc) => {
-    expectType<firestore.QueryDocumentSnapshot<D>>(doc);
+    expectType<firestore.QueryDocumentSnapshot<TestAppModelType, TestDbModelType>>(doc);
     return { num: 0 };
   },
   { merge: true }
@@ -78,14 +78,14 @@ defaultMigrator.update('anyField', 'anyValue');
 
 expectError(
   defaultMigrator.updateWithDerivedData((doc) => {
-    expectType<firestore.QueryDocumentSnapshot<D>>(doc);
+    expectType<firestore.QueryDocumentSnapshot<TestAppModelType, TestDbModelType>>(doc);
     return { anyField: '' };
   })
 );
 
 expectError(
   defaultMigrator.updateWithDerivedData((doc) => {
-    expectType<firestore.QueryDocumentSnapshot<D>>(doc);
+    expectType<firestore.QueryDocumentSnapshot<TestAppModelType, TestDbModelType>>(doc);
     return ['anyField', 'anyValue'];
   })
 );

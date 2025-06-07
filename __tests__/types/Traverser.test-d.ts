@@ -9,13 +9,13 @@ import {
   TraversalResult,
   Traverser,
 } from '../../src';
-import { collectionRef, D } from './_helpers';
+import { collectionRef, TestAppModelType, TestDbModelType } from './_helpers';
 
 const traverser = createTraverser(collectionRef);
 
-// TODO: Ideally we want to expect a firestore.CollectionReference<D> here because
+// TODO: Ideally we want to expect a firestore.CollectionReference<TestAppModelType, TestDbModelType> here because
 // we initialized the traverser with a collection reference.
-expectType<Traversable<D>>(traverser.traversable);
+expectType<Traversable<TestAppModelType, TestDbModelType>>(traverser.traversable);
 
 expectType<TraversalConfig>(traverser.traversalConfig);
 
@@ -27,21 +27,21 @@ expectType<TraversalConfig>(traverser.traversalConfig);
     maxDocCount: 0,
     maxConcurrentBatchCount: 0,
   });
-  expectType<Traverser<D>>(modifiedTraverser);
+  expectType<Traverser<TestAppModelType, TestDbModelType>>(modifiedTraverser);
 })();
 
 (() => {
   const modifiedTraverser = traverser.withExitEarlyPredicate((batchDocs, batchIndex) => {
-    expectType<firestore.QueryDocumentSnapshot<D>[]>(batchDocs);
+    expectType<firestore.QueryDocumentSnapshot<TestAppModelType, TestDbModelType>[]>(batchDocs);
     expectType<number>(batchIndex);
     return false;
   });
-  expectType<Traverser<D>>(modifiedTraverser);
+  expectType<Traverser<TestAppModelType, TestDbModelType>>(modifiedTraverser);
 })();
 
 (async () => {
   const traversalResult1 = await traverser.traverseEach(async (doc, docIndex, batchIndex) => {
-    expectType<firestore.QueryDocumentSnapshot<D>>(doc);
+    expectType<firestore.QueryDocumentSnapshot<TestAppModelType, TestDbModelType>>(doc);
     expectType<number>(docIndex);
     expectType<number>(batchIndex);
   });
@@ -50,7 +50,7 @@ expectType<TraversalConfig>(traverser.traversalConfig);
 
 (async () => {
   const traversalResult2 = await traverser.traverse(async (batchDocs, batchIndex) => {
-    expectType<firestore.QueryDocumentSnapshot<D>[]>(batchDocs);
+    expectType<firestore.QueryDocumentSnapshot<TestAppModelType, TestDbModelType>[]>(batchDocs);
     expectType<number>(batchIndex);
   });
   expectType<TraversalResult>(traversalResult2);

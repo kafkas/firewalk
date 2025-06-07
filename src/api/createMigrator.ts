@@ -13,9 +13,10 @@ import { createTraverser } from './createTraverser';
  * @param traverser - The traverser object that this migrator will use when traversing the collection and writing to documents.
  * @returns A new {@link DefaultMigrator} object.
  */
-export function createMigrator<D = firestore.DocumentData>(
-  traverser: Traverser<D>
-): DefaultMigrator<D>;
+export function createMigrator<
+  AppModelType = firestore.DocumentData,
+  DbModelType extends firestore.DocumentData = firestore.DocumentData
+>(traverser: Traverser<AppModelType, DbModelType>): DefaultMigrator<AppModelType, DbModelType>;
 
 /**
  * Creates a migrator that facilitates database migrations. The migrator creates a default traverser that
@@ -27,17 +28,28 @@ export function createMigrator<D = firestore.DocumentData>(
  * @returns A new {@link DefaultMigrator} object.
  * @throws {@link InvalidConfigError} Thrown if the specified `traversalConfig` is invalid.
  */
-export function createMigrator<D = firestore.DocumentData>(
-  traversable: Traversable<D>,
+export function createMigrator<
+  AppModelType = firestore.DocumentData,
+  DbModelType extends firestore.DocumentData = firestore.DocumentData
+>(
+  traversable: Traversable<AppModelType, DbModelType>,
   traversalConfig?: Partial<TraversalConfig>
-): DefaultMigrator<D>;
+): DefaultMigrator<AppModelType, DbModelType>;
 
-export function createMigrator<D = firestore.DocumentData>(
-  traversableOrTraverser: Traverser<D> | Traversable<D>,
+export function createMigrator<
+  AppModelType = firestore.DocumentData,
+  DbModelType extends firestore.DocumentData = firestore.DocumentData
+>(
+  traversableOrTraverser:
+    | Traverser<AppModelType, DbModelType>
+    | Traversable<AppModelType, DbModelType>,
   traversalConfig?: Partial<TraversalConfig>
-): DefaultMigrator<D> {
+): DefaultMigrator<AppModelType, DbModelType> {
   const traverser = isTraverser(traversableOrTraverser)
-    ? (traversableOrTraverser as Traverser<D>)
-    : createTraverser(traversableOrTraverser as Traversable<D>, traversalConfig);
+    ? (traversableOrTraverser as Traverser<AppModelType, DbModelType>)
+    : createTraverser(
+        traversableOrTraverser as Traversable<AppModelType, DbModelType>,
+        traversalConfig
+      );
   return new BasicDefaultMigratorImpl(traverser);
 }

@@ -12,11 +12,14 @@ import type {
 /**
  * A traverser object that facilitates Firestore collection traversals.
  */
-export interface Traverser<D = firestore.DocumentData> {
+export interface Traverser<
+  AppModelType = firestore.DocumentData,
+  DbModelType extends firestore.DocumentData = firestore.DocumentData
+> {
   /**
    * The underlying traversable.
    */
-  readonly traversable: Traversable<D>;
+  readonly traversable: Traversable<AppModelType, DbModelType>;
 
   /**
    * Existing traversal config.
@@ -29,7 +32,7 @@ export interface Traverser<D = firestore.DocumentData> {
    * @param config - Partial traversal configuration.
    * @returns A new {@link Traverser} object.
    */
-  withConfig(config: Partial<TraversalConfig>): Traverser<D>;
+  withConfig(config: Partial<TraversalConfig>): Traverser<AppModelType, DbModelType>;
 
   /**
    * Applies the specified exit-early predicate to the traverser. After retrieving each batch, the traverser
@@ -58,7 +61,9 @@ export interface Traverser<D = firestore.DocumentData> {
    * returns a boolean indicating whether to exit traversal early.
    * @returns A new {@link Traverser} object.
    */
-  withExitEarlyPredicate(predicate: ExitEarlyPredicate<D>): Traverser<D>;
+  withExitEarlyPredicate(
+    predicate: ExitEarlyPredicate<AppModelType, DbModelType>
+  ): Traverser<AppModelType, DbModelType>;
 
   /**
    * Traverses the entire collection in batches of the size specified in traversal config. Invokes the specified
@@ -70,7 +75,7 @@ export interface Traverser<D = firestore.DocumentData> {
    * when the entire traversal ends.
    */
   traverseEach(
-    callback: TraverseEachCallback<D>,
+    callback: TraverseEachCallback<AppModelType, DbModelType>,
     config?: Partial<TraverseEachConfig>
   ): Promise<TraversalResult>;
 
@@ -102,5 +107,5 @@ export interface Traverser<D = firestore.DocumentData> {
    * @param callback - An asynchronous callback function to invoke for each batch of document snapshots.
    * @returns A Promise resolving to an object representing the details of the traversal.
    */
-  traverse(callback: BatchCallback<D>): Promise<TraversalResult>;
+  traverse(callback: BatchCallback<AppModelType, DbModelType>): Promise<TraversalResult>;
 }

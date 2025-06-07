@@ -19,9 +19,10 @@ import { createTraverser } from './createTraverser';
  * @returns A new {@link BatchMigrator} object.
  * @throws {@link InvalidConfigError} Thrown if the traversal config of the specified traverser is not compatible with this migrator.
  */
-export function createBatchMigrator<D = firestore.DocumentData>(
-  traverser: Traverser<D>
-): BatchMigrator<D>;
+export function createBatchMigrator<
+  AppModelType = firestore.DocumentData,
+  DbModelType extends firestore.DocumentData = firestore.DocumentData
+>(traverser: Traverser<AppModelType, DbModelType>): BatchMigrator<AppModelType, DbModelType>;
 
 /**
  * Creates a migrator that facilitates database migrations. The migrator creates a default traverser that
@@ -38,17 +39,28 @@ export function createBatchMigrator<D = firestore.DocumentData>(
  * @returns A new {@link BatchMigrator} object.
  * @throws {@link InvalidConfigError} Thrown if the specified `traversalConfig` is invalid or incompatible with this migrator.
  */
-export function createBatchMigrator<D = firestore.DocumentData>(
-  traversable: Traversable<D>,
+export function createBatchMigrator<
+  AppModelType = firestore.DocumentData,
+  DbModelType extends firestore.DocumentData = firestore.DocumentData
+>(
+  traversable: Traversable<AppModelType, DbModelType>,
   traversalConfig?: Partial<TraversalConfig>
-): BatchMigrator<D>;
+): BatchMigrator<AppModelType, DbModelType>;
 
-export function createBatchMigrator<D = firestore.DocumentData>(
-  traversableOrTraverser: Traverser<D> | Traversable<D>,
+export function createBatchMigrator<
+  AppModelType = firestore.DocumentData,
+  DbModelType extends firestore.DocumentData = firestore.DocumentData
+>(
+  traversableOrTraverser:
+    | Traverser<AppModelType, DbModelType>
+    | Traversable<AppModelType, DbModelType>,
   traversalConfig?: Partial<TraversalConfig>
-): BatchMigrator<D> {
+): BatchMigrator<AppModelType, DbModelType> {
   const traverser = isTraverser(traversableOrTraverser)
-    ? (traversableOrTraverser as Traverser<D>)
-    : createTraverser(traversableOrTraverser as Traversable<D>, traversalConfig);
+    ? (traversableOrTraverser as Traverser<AppModelType, DbModelType>)
+    : createTraverser(
+        traversableOrTraverser as Traversable<AppModelType, DbModelType>,
+        traversalConfig
+      );
   return new BasicBatchMigratorImpl(traverser);
 }

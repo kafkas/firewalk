@@ -14,11 +14,14 @@ import type {
 /**
  * Represents the general interface of a migrator.
  */
-export interface Migrator<D = firestore.DocumentData> {
+export interface Migrator<
+  AppModelType = firestore.DocumentData,
+  DbModelType extends firestore.DocumentData = firestore.DocumentData
+> {
   /**
    * The underlying traverser.
    */
-  readonly traverser: Traverser<D>;
+  readonly traverser: Traverser<AppModelType, DbModelType>;
 
   /**
    * Applies a migration predicate that indicates whether to migrate the current document or not. By default, all
@@ -44,7 +47,9 @@ export interface Migrator<D = firestore.DocumentData> {
    * @param predicate - A function that takes a document snapshot and returns a boolean indicating whether to migrate it.
    * @returns A new {@link Migrator} object.
    */
-  withPredicate(predicate: MigrationPredicate<D>): Migrator<D>;
+  withPredicate(
+    predicate: MigrationPredicate<AppModelType, DbModelType>
+  ): Migrator<AppModelType, DbModelType>;
 
   /**
    * Applies a new traverser that will be used by the migrator.
@@ -52,7 +57,9 @@ export interface Migrator<D = firestore.DocumentData> {
    * @param traverser - The new traverser that the migrator will use.
    * @returns A new {@link Migrator} object.
    */
-  withTraverser(traverser: Traverser<D>): Migrator<D>;
+  withTraverser(
+    traverser: Traverser<AppModelType, DbModelType>
+  ): Migrator<AppModelType, DbModelType>;
 
   /**
    * Registers a callback function that fires right before a batch starts processing. You can register at most 1
@@ -60,7 +67,7 @@ export interface Migrator<D = firestore.DocumentData> {
    *
    * @param callback - A synchronous callback that takes batch doc snapshots and the 0-based batch index as its arguments.
    */
-  onBeforeBatchStart(callback: BatchCallback<D>): void;
+  onBeforeBatchStart(callback: BatchCallback<AppModelType, DbModelType>): void;
 
   /**
    * Registers a callback function that fires after a batch is processed. You can register at most 1 callback. If you call
@@ -68,7 +75,7 @@ export interface Migrator<D = firestore.DocumentData> {
    *
    * @param callback - A synchronous callback that takes batch doc snapshots and the 0-based batch index as its arguments.
    */
-  onAfterBatchComplete(callback: BatchCallback<D>): void;
+  onAfterBatchComplete(callback: BatchCallback<AppModelType, DbModelType>): void;
 
   /**
    * Deletes the specified field from all documents in this collection.
@@ -212,7 +219,10 @@ export interface Migrator<D = firestore.DocumentData> {
    * @param options - An object to configure the set behavior.
    * @returns A Promise resolving to an object representing the details of the migration.
    */
-  set(data: firestore.PartialWithFieldValue<D>, options: SetOptions): Promise<MigrationResult>;
+  set(
+    data: firestore.PartialWithFieldValue<AppModelType>,
+    options: SetOptions
+  ): Promise<MigrationResult>;
 
   /**
    * Sets all documents in this collection with the provided data.
@@ -236,7 +246,7 @@ export interface Migrator<D = firestore.DocumentData> {
    * @param data - A data object with which to set each document.
    * @returns A Promise resolving to an object representing the details of the migration.
    */
-  set(data: firestore.WithFieldValue<D>): Promise<MigrationResult>;
+  set(data: firestore.WithFieldValue<AppModelType>): Promise<MigrationResult>;
 
   /**
    * Sets all documents in this collection with the provided data.
@@ -263,7 +273,7 @@ export interface Migrator<D = firestore.DocumentData> {
    * @returns A Promise resolving to an object representing the details of the migration.
    */
   setWithDerivedData(
-    getData: SetPartialDataGetter<D>,
+    getData: SetPartialDataGetter<AppModelType, DbModelType>,
     options: SetOptions
   ): Promise<MigrationResult>;
 
@@ -290,7 +300,7 @@ export interface Migrator<D = firestore.DocumentData> {
    * which to set each document.
    * @returns A Promise resolving to an object representing the details of the migration.
    */
-  setWithDerivedData(getData: SetDataGetter<D>): Promise<MigrationResult>;
+  setWithDerivedData(getData: SetDataGetter<AppModelType, DbModelType>): Promise<MigrationResult>;
 
   /**
    * Updates all documents in this collection with the provided data.
@@ -316,7 +326,7 @@ export interface Migrator<D = firestore.DocumentData> {
    * @returns A Promise resolving to an object representing the details of the migration.
    */
   update(
-    data: firestore.UpdateData<D>,
+    data: firestore.UpdateData<DbModelType>,
     precondition?: firestore.Precondition
   ): Promise<MigrationResult>;
 
@@ -376,7 +386,7 @@ export interface Migrator<D = firestore.DocumentData> {
    * @returns A Promise resolving to an object representing the details of the migration.
    */
   updateWithDerivedData(
-    getData: UpdateDataGetter<D>,
+    getData: UpdateDataGetter<AppModelType, DbModelType>,
     precondition?: firestore.Precondition
   ): Promise<MigrationResult>;
 
@@ -403,5 +413,7 @@ export interface Migrator<D = firestore.DocumentData> {
    * paths and values to update, optionally followed by a Precondition to enforce on this update.
    * @returns A Promise resolving to an object representing the details of the migration.
    */
-  updateWithDerivedData(getData: UpdateFieldValueGetter<D>): Promise<MigrationResult>;
+  updateWithDerivedData(
+    getData: UpdateFieldValueGetter<AppModelType, DbModelType>
+  ): Promise<MigrationResult>;
 }

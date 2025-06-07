@@ -11,7 +11,12 @@ import {
 } from './config';
 
 export type TraverserImplClass = {
-  new <D>(traversable: Traversable<D>): Traverser<D>;
+  new <
+    AppModelType = firestore.DocumentData,
+    DbModelType extends firestore.DocumentData = firestore.DocumentData
+  >(
+    traversable: Traversable<AppModelType, DbModelType>
+  ): Traverser<AppModelType, DbModelType>;
 };
 
 export function describeTraverserMethodTest(
