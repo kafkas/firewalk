@@ -62,7 +62,7 @@ export interface Traverser<
    * @returns A new {@link Traverser} object.
    */
   withExitEarlyPredicate(
-    predicate: ExitEarlyPredicate<AppModelType>
+    predicate: ExitEarlyPredicate<AppModelType, DbModelType>
   ): Traverser<AppModelType, DbModelType>;
 
   /**
