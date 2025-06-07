@@ -12,9 +12,12 @@ import type {
   UpdateFieldValueGetter,
 } from '../../../api';
 
-export type RegisteredCallbacks<D> = {
-  onBeforeBatchStart?: BatchCallback<D>;
-  onAfterBatchComplete?: BatchCallback<D>;
+export type RegisteredCallbacks<
+  AppModelType = firestore.DocumentData,
+  DbModelType extends firestore.DocumentData = firestore.DocumentData
+> = {
+  onBeforeBatchStart?: BatchCallback<AppModelType, DbModelType>;
+  onAfterBatchComplete?: BatchCallback<AppModelType, DbModelType>;
 };
 
 type UpdateFieldValueArgs = [
@@ -23,10 +26,14 @@ type UpdateFieldValueArgs = [
   ...moreFieldsOrPrecondition: any[]
 ];
 
-export abstract class AbstractMigrator<D> implements Migrator<D> {
+export abstract class AbstractMigrator<
+  AppModelType = firestore.DocumentData,
+  DbModelType extends firestore.DocumentData = firestore.DocumentData
+> implements Migrator<AppModelType, DbModelType>
+{
   protected constructor(
-    protected readonly registeredCallbacks: RegisteredCallbacks<D> = {},
-    protected readonly migrationPredicates: MigrationPredicate<D>[] = []
+    protected readonly registeredCallbacks: RegisteredCallbacks<AppModelType, DbModelType> = {},
+    protected readonly migrationPredicates: MigrationPredicate<AppModelType, DbModelType>[] = []
   ) {}
 
   protected get firestoreInstance(): firestore.Firestore {
@@ -37,11 +44,11 @@ export abstract class AbstractMigrator<D> implements Migrator<D> {
     return this.firestoreInstance.constructor as typeof firestore;
   }
 
-  public onBeforeBatchStart(callback: BatchCallback<D>): void {
+  public onBeforeBatchStart(callback: BatchCallback<AppModelType, DbModelType>): void {
     this.registeredCallbacks.onBeforeBatchStart = callback;
   }
 
-  public onAfterBatchComplete(callback: BatchCallback<D>): void {
+  public onAfterBatchComplete(callback: BatchCallback<AppModelType, DbModelType>): void {
     this.registeredCallbacks.onAfterBatchComplete = callback;
   }
 
@@ -88,7 +95,9 @@ export abstract class AbstractMigrator<D> implements Migrator<D> {
   }
 
   protected async migrateWithTraverser(
-    migrateBatch: (batchDocs: firestore.QueryDocumentSnapshot<D>[]) => Promise<number>
+    migrateBatch: (
+      batchDocs: firestore.QueryDocumentSnapshot<AppModelType, DbModelType>[]
+    ) => Promise<number>
   ): Promise<MigrationResult> {
     let migratedDocCount = 0;
     const traversalResult = await this.traverser.traverse(async (batchDocs, batchIndex) => {
@@ -100,32 +109,40 @@ export abstract class AbstractMigrator<D> implements Migrator<D> {
     return { traversalResult, migratedDocCount };
   }
 
-  protected shouldMigrateDoc(doc: firestore.QueryDocumentSnapshot<D>): boolean {
+  protected shouldMigrateDoc(
+    doc: firestore.QueryDocumentSnapshot<AppModelType, DbModelType>
+  ): boolean {
     return this.migrationPredicates.every((predicate) => predicate(doc));
   }
 
-  public abstract readonly traverser: Traverser<D>;
+  public abstract readonly traverser: Traverser<AppModelType, DbModelType>;
 
-  public abstract withPredicate(predicate: MigrationPredicate<D>): Migrator<D>;
+  public abstract withPredicate(
+    predicate: MigrationPredicate<AppModelType, DbModelType>
+  ): Migrator<AppModelType, DbModelType>;
 
-  public abstract withTraverser(traverser: Traverser<D>): Migrator<D>;
+  public abstract withTraverser(
+    traverser: Traverser<AppModelType, DbModelType>
+  ): Migrator<AppModelType, DbModelType>;
 
   public abstract set(
-    data: firestore.PartialWithFieldValue<D>,
+    data: firestore.PartialWithFieldValue<AppModelType>,
     options: SetOptions
   ): Promise<MigrationResult>;
 
-  public abstract set(data: firestore.WithFieldValue<D>): Promise<MigrationResult>;
+  public abstract set(data: firestore.WithFieldValue<AppModelType>): Promise<MigrationResult>;
 
   public abstract setWithDerivedData(
-    getData: SetPartialDataGetter<D>,
+    getData: SetPartialDataGetter<AppModelType, DbModelType>,
     options: SetOptions
   ): Promise<MigrationResult>;
 
-  public abstract setWithDerivedData(getData: SetDataGetter<D>): Promise<MigrationResult>;
+  public abstract setWithDerivedData(
+    getData: SetDataGetter<AppModelType, DbModelType>
+  ): Promise<MigrationResult>;
 
-  public abstract update<D>(
-    data: firestore.UpdateData<D>,
+  public abstract update(
+    data: firestore.UpdateData<AppModelType>,
     precondition?: firestore.Precondition
   ): Promise<MigrationResult>;
 
@@ -136,11 +153,11 @@ export abstract class AbstractMigrator<D> implements Migrator<D> {
   ): Promise<MigrationResult>;
 
   public abstract updateWithDerivedData(
-    getData: UpdateDataGetter<D>,
+    getData: UpdateDataGetter<AppModelType, DbModelType>,
     precondition?: firestore.Precondition
   ): Promise<MigrationResult>;
 
   public abstract updateWithDerivedData(
-    getData: UpdateFieldValueGetter<D>
+    getData: UpdateFieldValueGetter<AppModelType, DbModelType>
   ): Promise<MigrationResult>;
 }

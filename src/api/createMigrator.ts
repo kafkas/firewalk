@@ -13,9 +13,10 @@ import { createTraverser } from './createTraverser';
  * @param traverser - The traverser object that this migrator will use when traversing the collection and writing to documents.
  * @returns A new {@link DefaultMigrator} object.
  */
-export function createMigrator<D = firestore.DocumentData>(
-  traverser: Traverser<D>
-): DefaultMigrator<D>;
+export function createMigrator<
+  AppModelType = firestore.DocumentData,
+  DbModelType extends firestore.DocumentData = firestore.DocumentData
+>(traverser: Traverser<AppModelType, DbModelType>): DefaultMigrator<AppModelType, DbModelType>;
 
 /**
  * Creates a migrator that facilitates database migrations. The migrator creates a default traverser that

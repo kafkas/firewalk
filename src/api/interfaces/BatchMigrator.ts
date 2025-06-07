@@ -4,7 +4,10 @@ import type { MigrationPredicate, Migrator, Traverser } from '.';
 /**
  * A batch migrator object that uses atomic batch writes.
  */
-export interface BatchMigrator<D = firestore.DocumentData> extends Migrator<D> {
+export interface BatchMigrator<
+  AppModelType = firestore.DocumentData,
+  DbModelType extends firestore.DocumentData = firestore.DocumentData
+> extends Migrator<AppModelType, DbModelType> {
   /**
    * Applies a migration predicate that indicates whether to migrate the current document or not. By default, all
    * documents are migrated.
@@ -29,7 +32,9 @@ export interface BatchMigrator<D = firestore.DocumentData> extends Migrator<D> {
    * @param predicate - A function that takes a document snapshot and returns a boolean indicating whether to migrate it.
    * @returns A new {@link BatchMigrator} object.
    */
-  withPredicate(predicate: MigrationPredicate<D>): BatchMigrator<D>;
+  withPredicate(
+    predicate: MigrationPredicate<AppModelType, DbModelType>
+  ): BatchMigrator<AppModelType, DbModelType>;
 
   /**
    * Applies a new traverser that will be used by the migrator.
@@ -37,5 +42,7 @@ export interface BatchMigrator<D = firestore.DocumentData> extends Migrator<D> {
    * @param traverser - The new traverser that the migrator will use.
    * @returns A new {@link BatchMigrator} object.
    */
-  withTraverser(traverser: Traverser<D>): BatchMigrator<D>;
+  withTraverser(
+    traverser: Traverser<AppModelType, DbModelType>
+  ): BatchMigrator<AppModelType, DbModelType>;
 }
