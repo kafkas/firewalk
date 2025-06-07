@@ -2,13 +2,13 @@
 
 import { expectType } from 'tsd';
 import { createMigrator, createTraverser, DefaultMigrator } from '../../src';
-import { collectionRef, D } from './_helpers';
+import { collectionRef, TestAppModelType, TestDbModelType } from './_helpers';
 
 // Signature 1
 
 const traverser = createTraverser(collectionRef);
 const defaultMigrator = createMigrator(traverser);
-expectType<DefaultMigrator<D>>(defaultMigrator);
+expectType<DefaultMigrator<TestAppModelType, TestDbModelType>>(defaultMigrator);
 
 // Signature 2
 
@@ -18,4 +18,4 @@ const defaultMigrator2 = createMigrator(collectionRef, {
   maxDocCount: 0,
   maxConcurrentBatchCount: 0,
 });
-expectType<DefaultMigrator<D>>(defaultMigrator2);
+expectType<DefaultMigrator<TestAppModelType, TestDbModelType>>(defaultMigrator2);

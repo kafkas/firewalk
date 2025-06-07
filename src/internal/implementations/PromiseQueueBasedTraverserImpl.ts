@@ -1,3 +1,4 @@
+import type { firestore } from 'firebase-admin';
 import type {
   BatchCallback,
   ExitEarlyPredicate,
@@ -12,30 +13,35 @@ import { PromiseQueue } from '../ds';
 import { makeRetriable, registerInterval, sleep } from '../utils';
 import { AbstractTraverser } from './abstract';
 
-export class PromiseQueueBasedTraverserImpl<D>
-  extends AbstractTraverser<D>
-  implements Traverser<D>
+export class PromiseQueueBasedTraverserImpl<
+    AppModelType = firestore.DocumentData,
+    DbModelType extends firestore.DocumentData = firestore.DocumentData
+  >
+  extends AbstractTraverser<AppModelType, DbModelType>
+  implements Traverser<AppModelType, DbModelType>
 {
   static readonly #defaultConfig: TraversalConfig = {
     ...AbstractTraverser.baseConfig,
   };
 
   public constructor(
-    public readonly traversable: Traversable<D>,
-    exitEarlyPredicates: ExitEarlyPredicate<D>[] = [],
+    public readonly traversable: Traversable<AppModelType, DbModelType>,
+    exitEarlyPredicates: ExitEarlyPredicate<AppModelType, DbModelType>[] = [],
     config?: Partial<TraversalConfig>
   ) {
     super({ ...PromiseQueueBasedTraverserImpl.#defaultConfig, ...config }, exitEarlyPredicates);
   }
 
-  public withConfig(config: Partial<TraversalConfig>): Traverser<D> {
+  public withConfig(config: Partial<TraversalConfig>): Traverser<AppModelType, DbModelType> {
     return new PromiseQueueBasedTraverserImpl(this.traversable, this.exitEarlyPredicates, {
       ...this.traversalConfig,
       ...config,
     });
   }
 
-  public withExitEarlyPredicate(predicate: ExitEarlyPredicate<D>): Traverser<D> {
+  public withExitEarlyPredicate(
+    predicate: ExitEarlyPredicate<AppModelType, DbModelType>
+  ): Traverser<AppModelType, DbModelType> {
     return new PromiseQueueBasedTraverserImpl(
       this.traversable,
       [...this.exitEarlyPredicates, predicate],
@@ -43,7 +49,9 @@ export class PromiseQueueBasedTraverserImpl<D>
     );
   }
 
-  public async traverse(callback: BatchCallback<D>): Promise<TraversalResult> {
+  public async traverse(
+    callback: BatchCallback<AppModelType, DbModelType>
+  ): Promise<TraversalResult> {
     const { traversalConfig } = this;
     const { maxConcurrentBatchCount } = traversalConfig;
     callback = this.#makeRetriableAccordingToConfig(callback);
@@ -87,7 +95,9 @@ export class PromiseQueueBasedTraverserImpl<D>
     return traversalResult;
   }
 
-  #makeRetriableAccordingToConfig(callback: BatchCallback<D>): BatchCallback<D> {
+  #makeRetriableAccordingToConfig(
+    callback: BatchCallback<AppModelType, DbModelType>
+  ): BatchCallback<AppModelType, DbModelType> {
     const { maxBatchRetryCount, sleepTimeBetweenTrials } = this.traversalConfig;
     let cb = callback;
     if (maxBatchRetryCount > 0) {

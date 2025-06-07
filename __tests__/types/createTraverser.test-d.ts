@@ -2,7 +2,7 @@
 
 import { expectType } from 'tsd';
 import { createTraverser, Traverser } from '../../src';
-import { collectionRef, D } from './_helpers';
+import { collectionRef, TestAppModelType, TestDbModelType } from './_helpers';
 
 const traverser = createTraverser(collectionRef, {
   batchSize: 0,
@@ -11,4 +11,4 @@ const traverser = createTraverser(collectionRef, {
   maxConcurrentBatchCount: 0,
 });
 
-expectType<Traverser<D>>(traverser);
+expectType<Traverser<TestAppModelType, TestDbModelType>>(traverser);

@@ -1,7 +1,11 @@
+import type { firestore } from 'firebase-admin';
 import type { Traverser } from '../../api';
 
-export function isTraverser<D>(candidate: unknown): candidate is Traverser<D> {
-  const t = candidate as Traverser<D>;
+export function isTraverser<
+  AppModelType = firestore.DocumentData,
+  DbModelType extends firestore.DocumentData = firestore.DocumentData
+>(candidate: unknown): candidate is Traverser<AppModelType, DbModelType> {
+  const t = candidate as Traverser<AppModelType, DbModelType>;
   return (
     !!t &&
     typeof t === 'object' &&

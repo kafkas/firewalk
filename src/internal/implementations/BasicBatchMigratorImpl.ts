@@ -15,13 +15,19 @@ import { isPositiveInteger } from '../utils';
 import { AbstractMigrator, RegisteredCallbacks } from './abstract';
 import { IllegalArgumentError } from '../errors';
 
-export class BasicBatchMigratorImpl<D> extends AbstractMigrator<D> implements BatchMigrator<D> {
+export class BasicBatchMigratorImpl<
+    AppModelType = firestore.DocumentData,
+    DbModelType extends firestore.DocumentData = firestore.DocumentData
+  >
+  extends AbstractMigrator<AppModelType, DbModelType>
+  implements BatchMigrator<AppModelType, DbModelType>
+{
   static readonly #MAX_BATCH_WRITE_DOC_COUNT = 500;
 
   public constructor(
-    public readonly traverser: Traverser<D>,
-    registeredCallbacks?: RegisteredCallbacks<D>,
-    migrationPredicates?: MigrationPredicate<D>[]
+    public readonly traverser: Traverser<AppModelType, DbModelType>,
+    registeredCallbacks?: RegisteredCallbacks<AppModelType, DbModelType>,
+    migrationPredicates?: MigrationPredicate<AppModelType, DbModelType>[]
   ) {
     super(registeredCallbacks, migrationPredicates);
     this.#validateTraverserCompatibility();
@@ -40,14 +46,18 @@ export class BasicBatchMigratorImpl<D> extends AbstractMigrator<D> implements Ba
     }
   }
 
-  public withPredicate(predicate: MigrationPredicate<D>): BatchMigrator<D> {
+  public withPredicate(
+    predicate: MigrationPredicate<AppModelType, DbModelType>
+  ): BatchMigrator<AppModelType, DbModelType> {
     return new BasicBatchMigratorImpl(this.traverser, this.registeredCallbacks, [
       ...this.migrationPredicates,
       predicate,
     ]);
   }
 
-  public withTraverser(traverser: Traverser<D>): BatchMigrator<D> {
+  public withTraverser(
+    traverser: Traverser<AppModelType, DbModelType>
+  ): BatchMigrator<AppModelType, DbModelType> {
     return new BasicBatchMigratorImpl(
       traverser,
       this.registeredCallbacks,
@@ -56,53 +66,57 @@ export class BasicBatchMigratorImpl<D> extends AbstractMigrator<D> implements Ba
   }
 
   public set(
-    data: firestore.PartialWithFieldValue<D>,
+    data: firestore.PartialWithFieldValue<AppModelType>,
     options: SetOptions
   ): Promise<MigrationResult>;
 
-  public set(data: firestore.WithFieldValue<D>): Promise<MigrationResult>;
+  public set(data: firestore.WithFieldValue<AppModelType>): Promise<MigrationResult>;
 
   public async set(
-    data: firestore.PartialWithFieldValue<D> | firestore.WithFieldValue<D>,
+    data: firestore.PartialWithFieldValue<AppModelType> | firestore.WithFieldValue<AppModelType>,
     options?: SetOptions
   ): Promise<MigrationResult> {
     return this.#migrate((writeBatch, doc) => {
       if (options === undefined) {
         // Signature 2
-        writeBatch.set(doc.ref, data as firestore.WithFieldValue<D>);
+        writeBatch.set(doc.ref, data as firestore.WithFieldValue<AppModelType>);
       } else {
         // Signature 1
-        writeBatch.set(doc.ref, data as firestore.PartialWithFieldValue<D>, options);
+        writeBatch.set(doc.ref, data as firestore.PartialWithFieldValue<AppModelType>, options);
       }
     });
   }
 
   public setWithDerivedData(
-    getData: SetPartialDataGetter<D>,
+    getData: SetPartialDataGetter<AppModelType, DbModelType>,
     options: SetOptions
   ): Promise<MigrationResult>;
 
-  public setWithDerivedData(getData: SetDataGetter<D>): Promise<MigrationResult>;
+  public setWithDerivedData(
+    getData: SetDataGetter<AppModelType, DbModelType>
+  ): Promise<MigrationResult>;
 
   public async setWithDerivedData(
-    getData: SetPartialDataGetter<D> | SetDataGetter<D>,
+    getData:
+      | SetPartialDataGetter<AppModelType, DbModelType>
+      | SetDataGetter<AppModelType, DbModelType>,
     options?: SetOptions
   ): Promise<MigrationResult> {
     return this.#migrate((writeBatch, doc) => {
       if (options === undefined) {
         // Signature 2
-        const data = (getData as SetDataGetter<D>)(doc);
+        const data = (getData as SetDataGetter<AppModelType, DbModelType>)(doc);
         writeBatch.set(doc.ref, data);
       } else {
         // Signature 1
-        const data = (getData as SetPartialDataGetter<D>)(doc);
+        const data = (getData as SetPartialDataGetter<AppModelType, DbModelType>)(doc);
         writeBatch.set(doc.ref, data, options);
       }
     });
   }
 
   public update(
-    data: firestore.UpdateData<D>,
+    data: firestore.UpdateData<AppModelType>,
     precondition?: firestore.Precondition
   ): Promise<MigrationResult>;
 
@@ -113,7 +127,7 @@ export class BasicBatchMigratorImpl<D> extends AbstractMigrator<D> implements Ba
   ): Promise<MigrationResult>;
 
   public update(
-    dataOrField: firestore.UpdateData<D> | string | firestore.FieldPath,
+    dataOrField: firestore.UpdateData<AppModelType> | string | firestore.FieldPath,
     preconditionOrValue?: any,
     ...moreFieldsOrPrecondition: any[]
   ): Promise<MigrationResult> {
@@ -144,16 +158,20 @@ export class BasicBatchMigratorImpl<D> extends AbstractMigrator<D> implements Ba
   }
 
   public updateWithDerivedData(
-    getData: UpdateDataGetter<D>,
+    getData: UpdateDataGetter<AppModelType, DbModelType>,
     precondition?: firestore.Precondition
   ): Promise<MigrationResult>;
 
-  public updateWithDerivedData(getData: UpdateFieldValueGetter<D>): Promise<MigrationResult>;
+  public updateWithDerivedData(
+    getData: UpdateFieldValueGetter<AppModelType, DbModelType>
+  ): Promise<MigrationResult>;
 
   public updateWithDerivedData(
     getData: (
-      doc: firestore.QueryDocumentSnapshot<D>
-    ) => ReturnType<UpdateDataGetter<D>> | ReturnType<UpdateFieldValueGetter<D>>,
+      doc: firestore.QueryDocumentSnapshot<AppModelType, DbModelType>
+    ) =>
+      | ReturnType<UpdateDataGetter<AppModelType, DbModelType>>
+      | ReturnType<UpdateFieldValueGetter<AppModelType, DbModelType>>,
     precondition?: firestore.Precondition
   ): Promise<MigrationResult> {
     return this.#migrate((writeBatch, doc) => {
@@ -177,7 +195,10 @@ export class BasicBatchMigratorImpl<D> extends AbstractMigrator<D> implements Ba
   }
 
   async #migrate(
-    migrateDoc: (writeBatch: firestore.WriteBatch, doc: firestore.QueryDocumentSnapshot<D>) => void
+    migrateDoc: (
+      writeBatch: firestore.WriteBatch,
+      doc: firestore.QueryDocumentSnapshot<AppModelType, DbModelType>
+    ) => void
   ): Promise<MigrationResult> {
     return this.migrateWithTraverser(async (batchDocs) => {
       let migratedDocCount = 0;

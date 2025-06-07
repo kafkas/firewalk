@@ -12,7 +12,12 @@ import {
 } from './config';
 
 export type MigratorImplClass = {
-  new <D>(traverser: Traverser<D>): Migrator<D>;
+  new <
+    AppModelType = firestore.DocumentData,
+    DbModelType extends firestore.DocumentData = firestore.DocumentData
+  >(
+    traverser: Traverser<AppModelType, DbModelType>
+  ): Migrator<AppModelType, DbModelType>;
 };
 
 export function describeMigratorMethodTest(
