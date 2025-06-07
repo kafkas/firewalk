@@ -326,7 +326,7 @@ export interface Migrator<
    * @returns A Promise resolving to an object representing the details of the migration.
    */
   update(
-    data: firestore.UpdateData<AppModelType>,
+    data: firestore.UpdateData<DbModelType>,
     precondition?: firestore.Precondition
   ): Promise<MigrationResult>;
 

@@ -8,4 +8,4 @@ export type UpdateDataGetter<
   DbModelType extends firestore.DocumentData = firestore.DocumentData
 > = (
   doc: firestore.QueryDocumentSnapshot<AppModelType, DbModelType>
-) => firestore.UpdateData<AppModelType>;
+) => firestore.UpdateData<DbModelType>;

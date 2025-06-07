@@ -98,7 +98,7 @@ export class BasicDefaultMigratorImpl<
   }
 
   public update(
-    data: firestore.UpdateData<AppModelType>,
+    data: firestore.UpdateData<DbModelType>,
     precondition?: firestore.Precondition
   ): Promise<MigrationResult>;
 
@@ -109,7 +109,7 @@ export class BasicDefaultMigratorImpl<
   ): Promise<MigrationResult>;
 
   public update(
-    dataOrField: firestore.UpdateData<AppModelType> | string | firestore.FieldPath,
+    dataOrField: firestore.UpdateData<DbModelType> | string | firestore.FieldPath,
     preconditionOrValue?: any,
     ...moreFieldsOrPrecondition: any[]
   ): Promise<MigrationResult> {

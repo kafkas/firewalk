@@ -142,7 +142,7 @@ export abstract class AbstractMigrator<
   ): Promise<MigrationResult>;
 
   public abstract update(
-    data: firestore.UpdateData<AppModelType>,
+    data: firestore.UpdateData<DbModelType>,
     precondition?: firestore.Precondition
   ): Promise<MigrationResult>;
 
