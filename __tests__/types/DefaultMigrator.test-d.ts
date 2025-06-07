@@ -52,7 +52,7 @@ defaultMigrator.set({ num: 0 }, { merge: true });
 
 expectError(
   defaultMigrator.setWithDerivedData((doc) => {
-    expectType<firestore.QueryDocumentSnapshot<D>>(doc);
+    expectType<firestore.QueryDocumentSnapshot<TestAppModelType, TestDbModelType>>(doc);
     return { num: 0 };
   })
 );
