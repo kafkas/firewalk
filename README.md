@@ -12,8 +12,6 @@
   A light, fast, and memory-efficient collection traversal library for Firestore and Node.js.
 </p>
 
----
-
 <p align="center">
     <a href="https://github.com/kafkas/firewalk/blob/main/LICENSE">
     <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="Firewalk is released under the MIT license." /></a>
