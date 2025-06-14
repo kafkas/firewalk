@@ -1,14 +1,16 @@
+<div align="center">
+  <img src="images/logo.png" width="240px" alt="header" />
+</div>
+
 <h1 align="center">
   <a href="https://kafkas.github.io/firewalk">
-    Firewalk
+    firewalk
   </a>
 </h1>
 
 <p align="center">
   A light, fast, and memory-efficient collection traversal library for Firestore and Node.js.
 </p>
-
----
 
 <p align="center">
     <a href="https://github.com/kafkas/firewalk/blob/main/LICENSE">
@@ -30,9 +32,6 @@ Firewalk is a Node.js library that _walks_ you through Firestore collections.
 When you have millions of documents in a collection and you need to make changes to them or just read them, you can't just retrieve all of them at once as your program's memory usage will explode. Firewalk's configurable traverser objects let you do this in a simple, intuitive and memory-efficient way using batch processing with concurrency control.
 
 Firewalk is an extremely light and well-typed library that is useful in a variety of scenarios. You can use it in database migration scripts (e.g. when you need to add a new field to all docs) or a scheduled Cloud Function that needs to check every doc in a collection periodically or even a locally run script that retrieves some data from a collection.
-
-**Note**: This library was previously known as Firecode. We're currently in the process of porting over the documentation from the
-previous site.
 
 [**Read the introductory blog post ▸**](https://anarkafkas.medium.com/traversing-firestore-collections-efficiently-6e43cea1eefd)
 
