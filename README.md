@@ -3,9 +3,7 @@
 </div>
 
 <h1 align="center">
-  <a href="https://kafkas.github.io/firewalk">
-    firewalk
-  </a>
+  firewalk
 </h1>
 
 <p align="center">
@@ -57,7 +55,7 @@ Firewalk is designed to work with the [Firebase Admin SDK](https://github.com/fi
 npm install firebase-admin
 ```
 
-### Compatibility Map
+### Compatibility Table
 
 Make sure to install the right version of Firewalk depending on the `firebase-admin` version your project is on.
 
@@ -78,7 +76,7 @@ npm install firewalk
 
 There are only 2 kinds of objects you need to be familiar with when using this library:
 
-1. **Traverser**: An object that walks you through a collection of documents (or more generally a [Traversable](https://kafkas.github.io/firewalk/types/Traversable.html)).
+1. **Traverser**: An object that walks you through a collection of documents (or more generally a [Traversable](https://kafkas.github.io/firewalk/v2/types/Traversable.html)).
 
 2. **Migrator**: A convenience object used for database migrations. It lets you easily write to the documents within a given traversable and uses a traverser to do that. You can easily write your own migration logic in the traverser callback if you don't want to use a migrator.
 
@@ -198,9 +196,9 @@ console.log(`Updated ${migratedDocCount} posts!`);
 
 You can find the full API reference for Firewalk [here](https://kafkas.github.io/firewalk). We maintain detailed docs for each major version. Here are some of the core functions that this library provides.
 
-### [createTraverser](https://kafkas.github.io/firewalk/functions/createTraverser.html)
+### [createTraverser](https://kafkas.github.io/firewalk/v2/functions/createTraverser.html)
 
-Creates an object which can be used to traverse a Firestore collection or, more generally, a [Traversable](https://kafkas.github.io/firewalk/types/Traversable.html).
+Creates an object which can be used to traverse a Firestore collection or, more generally, a [Traversable](https://kafkas.github.io/firewalk/v2/types/Traversable.html).
 
 For each batch of document snapshots in the traversable, the traverser invokes a specified async callback and immediately moves to the next batch. It does not wait for the callback Promise to resolve before moving to the next batch. That is, when `maxConcurrentBatchCount` > 1, there is no guarantee that any given batch will finish processing before a later batch.
 
@@ -220,7 +218,7 @@ where:
 - _D_: average document size
 - _S_: average extra space used by the callback
 
-### [createMigrator](https://kafkas.github.io/firewalk/functions/createMigrator.html)
+### [createMigrator](https://kafkas.github.io/firewalk/v2/functions/createMigrator.html)
 
 Creates a migrator that facilitates database migrations. The migrator accepts a custom traverser to traverse the collection. Otherwise it will create a default traverser with your desired traversal config. This migrator does not use atomic batch writes so it is possible that when a write fails other writes go through.
 
@@ -238,7 +236,7 @@ where:
 - _TC_(`traverser`): time complexity of the underlying traverser
 - _SC_(`traverser`): space complexity of the underlying traverser
 
-### [createBatchMigrator](https://kafkas.github.io/firewalk/functions/createBatchMigrator.html)
+### [createBatchMigrator](https://kafkas.github.io/firewalk/v2/functions/createBatchMigrator.html)
 
 Creates a migrator that facilitates database migrations. The migrator accepts a custom traverser to traverse the collection. Otherwise it will create a default traverser with your desired traversal config. This migrator uses atomic batch writes so the entire operation will fail if a single write isn't successful.
 
