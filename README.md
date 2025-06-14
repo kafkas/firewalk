@@ -1,6 +1,10 @@
+<div align="center">
+  <img src="images/logo.png" width="240px" alt="header" />
+</div>
+
 <h1 align="center">
   <a href="https://kafkas.github.io/firewalk">
-    Firewalk
+    firewalk
   </a>
 </h1>
 
