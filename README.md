@@ -57,7 +57,7 @@ Firewalk is designed to work with the [Firebase Admin SDK](https://github.com/fi
 npm install firebase-admin
 ```
 
-### Compatibility Map
+### Compatibility Table
 
 Make sure to install the right version of Firewalk depending on the `firebase-admin` version your project is on.
 
