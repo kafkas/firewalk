@@ -33,9 +33,6 @@ When you have millions of documents in a collection and you need to make changes
 
 Firewalk is an extremely light and well-typed library that is useful in a variety of scenarios. You can use it in database migration scripts (e.g. when you need to add a new field to all docs) or a scheduled Cloud Function that needs to check every doc in a collection periodically or even a locally run script that retrieves some data from a collection.
 
-**Note**: This library was previously known as Firecode. We're currently in the process of porting over the documentation from the
-previous site.
-
 [**Read the introductory blog post ▸**](https://anarkafkas.medium.com/traversing-firestore-collections-efficiently-6e43cea1eefd)
 
 [**View the full documentation (docs) ▸**](https://kafkas.github.io/firewalk)
