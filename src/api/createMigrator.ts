@@ -15,7 +15,7 @@ import { createTraverser } from './createTraverser';
  */
 export function createMigrator<
   AppModelType = firestore.DocumentData,
-  DbModelType extends firestore.DocumentData = firestore.DocumentData
+  DbModelType extends firestore.DocumentData = firestore.DocumentData,
 >(traverser: Traverser<AppModelType, DbModelType>): DefaultMigrator<AppModelType, DbModelType>;
 
 /**
@@ -30,7 +30,7 @@ export function createMigrator<
  */
 export function createMigrator<
   AppModelType = firestore.DocumentData,
-  DbModelType extends firestore.DocumentData = firestore.DocumentData
+  DbModelType extends firestore.DocumentData = firestore.DocumentData,
 >(
   traversable: Traversable<AppModelType, DbModelType>,
   traversalConfig?: Partial<TraversalConfig>
@@ -38,7 +38,7 @@ export function createMigrator<
 
 export function createMigrator<
   AppModelType = firestore.DocumentData,
-  DbModelType extends firestore.DocumentData = firestore.DocumentData
+  DbModelType extends firestore.DocumentData = firestore.DocumentData,
 >(
   traversableOrTraverser:
     | Traverser<AppModelType, DbModelType>

@@ -14,7 +14,7 @@ import {
 export type MigratorImplClass = {
   new <
     AppModelType = firestore.DocumentData,
-    DbModelType extends firestore.DocumentData = firestore.DocumentData
+    DbModelType extends firestore.DocumentData = firestore.DocumentData,
   >(
     traverser: Traverser<AppModelType, DbModelType>
   ): Migrator<AppModelType, DbModelType>;

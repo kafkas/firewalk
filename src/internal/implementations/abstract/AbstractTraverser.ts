@@ -22,7 +22,7 @@ export type OnAfterBatchProcess = () => void | Promise<void>;
 
 export type BatchProcessor<
   AppModelType = firestore.DocumentData,
-  DbModelType extends firestore.DocumentData = firestore.DocumentData
+  DbModelType extends firestore.DocumentData = firestore.DocumentData,
 > = (
   ...args: Parameters<BatchCallback<AppModelType, DbModelType>>
 ) => void | Promise<void> | OnAfterBatchProcess | Promise<OnAfterBatchProcess>;
@@ -36,7 +36,7 @@ type TraversalConfigRules = {
 
 export abstract class AbstractTraverser<
   AppModelType = firestore.DocumentData,
-  DbModelType extends firestore.DocumentData = firestore.DocumentData
+  DbModelType extends firestore.DocumentData = firestore.DocumentData,
 > implements Traverser<AppModelType, DbModelType>
 {
   protected static readonly baseConfig: TraversalConfig = {

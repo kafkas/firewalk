@@ -2,7 +2,7 @@ import type { firestore } from 'firebase-admin';
 
 interface CollectionPopulatorBuilder<
   AppModelType = firestore.DocumentData,
-  DbModelType extends firestore.DocumentData = firestore.DocumentData
+  DbModelType extends firestore.DocumentData = firestore.DocumentData,
 > {
   withData(
     dataOrGetData: AppModelType | (() => AppModelType)
@@ -11,7 +11,7 @@ interface CollectionPopulatorBuilder<
 
 interface CollectionPopulator<
   AppModelType = firestore.DocumentData,
-  DbModelType extends firestore.DocumentData = firestore.DocumentData
+  DbModelType extends firestore.DocumentData = firestore.DocumentData,
 > {
   populate(opts: {
     count: number;
@@ -20,7 +20,7 @@ interface CollectionPopulator<
 
 export function collectionPopulator<
   AppModelType = firestore.DocumentData,
-  DbModelType extends firestore.DocumentData = firestore.DocumentData
+  DbModelType extends firestore.DocumentData = firestore.DocumentData,
 >(
   collectionRef: firestore.CollectionReference<AppModelType, DbModelType>
 ): CollectionPopulatorBuilder<AppModelType, DbModelType> {

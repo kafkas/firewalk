@@ -15,7 +15,7 @@ import { IllegalArgumentError } from '../errors';
 
 export class BasicDefaultMigratorImpl<
     AppModelType = firestore.DocumentData,
-    DbModelType extends firestore.DocumentData = firestore.DocumentData
+    DbModelType extends firestore.DocumentData = firestore.DocumentData,
   >
   extends AbstractMigrator<AppModelType, DbModelType>
   implements DefaultMigrator<AppModelType, DbModelType>

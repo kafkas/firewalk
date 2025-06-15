@@ -5,7 +5,7 @@ import type { firestore } from 'firebase-admin';
  */
 export type SetDataGetter<
   AppModelType = firestore.DocumentData,
-  DbModelType extends firestore.DocumentData = firestore.DocumentData
+  DbModelType extends firestore.DocumentData = firestore.DocumentData,
 > = (
   doc: firestore.QueryDocumentSnapshot<AppModelType, DbModelType>
 ) => firestore.WithFieldValue<AppModelType>;

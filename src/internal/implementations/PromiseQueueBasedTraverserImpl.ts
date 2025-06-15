@@ -15,7 +15,7 @@ import { AbstractTraverser } from './abstract';
 
 export class PromiseQueueBasedTraverserImpl<
     AppModelType = firestore.DocumentData,
-    DbModelType extends firestore.DocumentData = firestore.DocumentData
+    DbModelType extends firestore.DocumentData = firestore.DocumentData,
   >
   extends AbstractTraverser<AppModelType, DbModelType>
   implements Traverser<AppModelType, DbModelType>

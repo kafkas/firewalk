@@ -14,7 +14,7 @@ import type {
 
 export type RegisteredCallbacks<
   AppModelType = firestore.DocumentData,
-  DbModelType extends firestore.DocumentData = firestore.DocumentData
+  DbModelType extends firestore.DocumentData = firestore.DocumentData,
 > = {
   onBeforeBatchStart?: BatchCallback<AppModelType, DbModelType>;
   onAfterBatchComplete?: BatchCallback<AppModelType, DbModelType>;
@@ -23,12 +23,12 @@ export type RegisteredCallbacks<
 type UpdateFieldValueArgs = [
   field: string | firestore.FieldPath,
   value: any,
-  ...moreFieldsOrPrecondition: any[]
+  ...moreFieldsOrPrecondition: any[],
 ];
 
 export abstract class AbstractMigrator<
   AppModelType = firestore.DocumentData,
-  DbModelType extends firestore.DocumentData = firestore.DocumentData
+  DbModelType extends firestore.DocumentData = firestore.DocumentData,
 > implements Migrator<AppModelType, DbModelType>
 {
   protected constructor(
@@ -57,10 +57,13 @@ export abstract class AbstractMigrator<
   }
 
   public deleteFields(...fields: (string | firestore.FieldPath)[]): Promise<MigrationResult> {
-    const updateFieldValuePairs = fields.reduce((acc, field) => {
-      acc.push(field, this.firestoreConstructor.FieldValue.delete());
-      return acc;
-    }, [] as unknown as UpdateFieldValueArgs);
+    const updateFieldValuePairs = fields.reduce(
+      (acc, field) => {
+        acc.push(field, this.firestoreConstructor.FieldValue.delete());
+        return acc;
+      },
+      [] as unknown as UpdateFieldValueArgs
+    );
     return this.update(...updateFieldValuePairs);
   }
 

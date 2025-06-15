@@ -5,7 +5,7 @@ import type { firestore } from 'firebase-admin';
  */
 export type BatchCallback<
   AppModelType = firestore.DocumentData,
-  DbModelType extends firestore.DocumentData = firestore.DocumentData
+  DbModelType extends firestore.DocumentData = firestore.DocumentData,
 > = (
   batchDocs: firestore.QueryDocumentSnapshot<AppModelType, DbModelType>[],
   batchIndex: number

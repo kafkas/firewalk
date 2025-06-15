@@ -16,7 +16,7 @@ import type {
  */
 export interface Migrator<
   AppModelType = firestore.DocumentData,
-  DbModelType extends firestore.DocumentData = firestore.DocumentData
+  DbModelType extends firestore.DocumentData = firestore.DocumentData,
 > {
   /**
    * The underlying traverser.
