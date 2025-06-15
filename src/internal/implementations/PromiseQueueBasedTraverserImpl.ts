@@ -135,7 +135,7 @@ export class PromiseQueueBasedTraverserImpl<
    * @param queueSize - The current size of the queue.
    * @returns A non-negative integer.
    */
-  #getProcessQueueInterval(queueSize: number): number {
+  #getProcessQueueInterval(_queueSize: number): number {
     // TODO: Implement using traversal config and queue size
     return 250;
   }
