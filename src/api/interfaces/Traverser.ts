@@ -14,7 +14,7 @@ import type {
  */
 export interface Traverser<
   AppModelType = firestore.DocumentData,
-  DbModelType extends firestore.DocumentData = firestore.DocumentData
+  DbModelType extends firestore.DocumentData = firestore.DocumentData,
 > {
   /**
    * The underlying traversable.

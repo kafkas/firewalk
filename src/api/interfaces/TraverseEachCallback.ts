@@ -6,7 +6,7 @@ import type { firestore } from 'firebase-admin';
  */
 export type TraverseEachCallback<
   AppModelType = firestore.DocumentData,
-  DbModelType extends firestore.DocumentData = firestore.DocumentData
+  DbModelType extends firestore.DocumentData = firestore.DocumentData,
 > = (
   doc: firestore.QueryDocumentSnapshot<AppModelType, DbModelType>,
   docIndex: number,

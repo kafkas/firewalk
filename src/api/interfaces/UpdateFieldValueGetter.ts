@@ -7,7 +7,7 @@ import type { firestore } from 'firebase-admin';
  */
 export type UpdateFieldValueGetter<
   AppModelType = firestore.DocumentData,
-  DbModelType extends firestore.DocumentData = firestore.DocumentData
+  DbModelType extends firestore.DocumentData = firestore.DocumentData,
 > = (
   doc: firestore.QueryDocumentSnapshot<AppModelType, DbModelType>
 ) => [string | firestore.FieldPath, any, ...any[]];

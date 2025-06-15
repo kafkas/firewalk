@@ -21,7 +21,7 @@ import { createTraverser } from './createTraverser';
  */
 export function createBatchMigrator<
   AppModelType = firestore.DocumentData,
-  DbModelType extends firestore.DocumentData = firestore.DocumentData
+  DbModelType extends firestore.DocumentData = firestore.DocumentData,
 >(traverser: Traverser<AppModelType, DbModelType>): BatchMigrator<AppModelType, DbModelType>;
 
 /**
@@ -41,7 +41,7 @@ export function createBatchMigrator<
  */
 export function createBatchMigrator<
   AppModelType = firestore.DocumentData,
-  DbModelType extends firestore.DocumentData = firestore.DocumentData
+  DbModelType extends firestore.DocumentData = firestore.DocumentData,
 >(
   traversable: Traversable<AppModelType, DbModelType>,
   traversalConfig?: Partial<TraversalConfig>
@@ -49,7 +49,7 @@ export function createBatchMigrator<
 
 export function createBatchMigrator<
   AppModelType = firestore.DocumentData,
-  DbModelType extends firestore.DocumentData = firestore.DocumentData
+  DbModelType extends firestore.DocumentData = firestore.DocumentData,
 >(
   traversableOrTraverser:
     | Traverser<AppModelType, DbModelType>

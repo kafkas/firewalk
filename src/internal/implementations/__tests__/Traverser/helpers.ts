@@ -13,7 +13,7 @@ import {
 export type TraverserImplClass = {
   new <
     AppModelType = firestore.DocumentData,
-    DbModelType extends firestore.DocumentData = firestore.DocumentData
+    DbModelType extends firestore.DocumentData = firestore.DocumentData,
   >(
     traversable: Traversable<AppModelType, DbModelType>
   ): Traverser<AppModelType, DbModelType>;

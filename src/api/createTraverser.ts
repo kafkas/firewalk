@@ -24,7 +24,7 @@ import type { Traversable, TraversalConfig, Traverser } from './interfaces';
  */
 export function createTraverser<
   AppModelType = firestore.DocumentData,
-  DbModelType extends firestore.DocumentData = firestore.DocumentData
+  DbModelType extends firestore.DocumentData = firestore.DocumentData,
 >(
   traversable: Traversable<AppModelType, DbModelType>,
   config?: Partial<TraversalConfig>

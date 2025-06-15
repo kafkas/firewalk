@@ -1,4 +1,5 @@
 import type { IllegalArgumentError } from '../errors'; /* eslint-disable-line */
+import { assertDefined } from '../utils/assert';
 import { SLLQueueExtended } from './SLLQueueExtended';
 
 export class PromiseQueue<T> {
@@ -48,7 +49,8 @@ export class PromiseQueue<T> {
     const promiseIds = this.#queue.dequeueFirst(promiseCount);
     const results = await Promise.all(
       promiseIds.map(async (id) => {
-        const promise = this.#map.get(id)!;
+        const promise = this.#map.get(id);
+        assertDefined(promise, 'Promise');
         const result = await promise;
         this.#map.delete(id);
         return result;

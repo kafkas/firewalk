@@ -7,5 +7,5 @@ import type { BatchCallback } from '.';
  */
 export type ExitEarlyPredicate<
   AppModelType = firestore.DocumentData,
-  DbModelType extends firestore.DocumentData = firestore.DocumentData
+  DbModelType extends firestore.DocumentData = firestore.DocumentData,
 > = (...args: Parameters<BatchCallback<AppModelType, DbModelType>>) => boolean;

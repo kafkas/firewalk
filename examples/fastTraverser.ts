@@ -9,7 +9,7 @@ const traverser = createTraverser(projectsColRef, {
   maxConcurrentBatchCount: 20,
 });
 const { docCount } = await traverser.traverse(async (_, batchIndex) => {
-  console.log(`Gonna process batch ${batchIndex} now!`);
-  // ...
+  console.log(`Processing batch ${batchIndex} now!`);
+  // Add batch processing logic here
 });
 console.log(`Traversed ${docCount} projects super-fast!`);

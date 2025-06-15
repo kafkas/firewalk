@@ -6,7 +6,7 @@ import type { MigrationPredicate, Migrator, Traverser } from '.';
  */
 export interface DefaultMigrator<
   AppModelType = firestore.DocumentData,
-  DbModelType extends firestore.DocumentData = firestore.DocumentData
+  DbModelType extends firestore.DocumentData = firestore.DocumentData,
 > extends Migrator<AppModelType, DbModelType> {
   /**
    * Applies a migration predicate that indicates whether to migrate the current document or not. By default, all

@@ -6,7 +6,7 @@ import type { firestore } from 'firebase-admin';
  */
 export type Traversable<
   AppModelType = firestore.DocumentData,
-  DbModelType extends firestore.DocumentData = firestore.DocumentData
+  DbModelType extends firestore.DocumentData = firestore.DocumentData,
 > =
   | firestore.CollectionReference<AppModelType, DbModelType>
   | firestore.CollectionGroup<AppModelType, DbModelType>

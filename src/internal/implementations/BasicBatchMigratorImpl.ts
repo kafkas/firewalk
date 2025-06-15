@@ -17,7 +17,7 @@ import { IllegalArgumentError } from '../errors';
 
 export class BasicBatchMigratorImpl<
     AppModelType = firestore.DocumentData,
-    DbModelType extends firestore.DocumentData = firestore.DocumentData
+    DbModelType extends firestore.DocumentData = firestore.DocumentData,
   >
   extends AbstractMigrator<AppModelType, DbModelType>
   implements BatchMigrator<AppModelType, DbModelType>
