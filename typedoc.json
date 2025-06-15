@@ -1,6 +1,6 @@
 {
   "entryPoints": ["src/index.ts"],
-  "tsconfig": "src/tsconfig.json",
+  "tsconfig": "tsconfig.build.json",
   "searchInComments": true,
   "navigation": {
     "includeCategories": true,
