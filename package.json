@@ -1,6 +1,6 @@
 {
   "name": "firewalk",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "A collection traversal library for Firestore",
   "keywords": [
     "Firewalk",
