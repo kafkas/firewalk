@@ -8,7 +8,7 @@ import type {
   TraversalResult,
   Traverser,
 } from '../../api';
-import { makeRetriable, sleep } from '../utils';
+import { makeRetriable } from '../utils';
 import { AbstractTraverser } from './abstract';
 
 export class TraverserImpl<
@@ -22,12 +22,15 @@ export class TraverserImpl<
     ...AbstractTraverser.baseConfig,
   };
 
+  readonly #limit: ReturnType<typeof pLimit>;
+
   public constructor(
     public readonly traversable: Traversable<AppModelType, DbModelType>,
     exitEarlyPredicates: ExitEarlyPredicate<AppModelType, DbModelType>[] = [],
     config?: Partial<TraversalConfig>
   ) {
     super({ ...TraverserImpl.#defaultConfig, ...config }, exitEarlyPredicates);
+    this.#limit = pLimit(this.traversalConfig.maxConcurrentBatchCount);
   }
 
   public withConfig(config: Partial<TraversalConfig>): Traverser<AppModelType, DbModelType> {
@@ -59,23 +62,16 @@ export class TraverserImpl<
       });
     }
 
-    const limit = pLimit(maxConcurrentBatchCount);
-    const pendingCallbacks: Promise<void>[] = [];
+    const callbackPromises: Promise<void>[] = [];
 
     const traversalResult = await this.runTraversal((batchDocs, batchIndex) => {
-      pendingCallbacks.push(
-        limit(async () => {
-          await (callback(batchDocs, batchIndex) ?? Promise.resolve());
-        })
+      const callbackPromise = this.#limit(
+        () => callback(batchDocs, batchIndex) ?? Promise.resolve()
       );
-      return async () => {
-        while (limit.activeCount + limit.pendingCount >= maxConcurrentBatchCount) {
-          await sleep(10);
-        }
-      };
+      callbackPromises.push(callbackPromise);
     });
 
-    await Promise.all(pendingCallbacks);
+    await Promise.all(callbackPromises);
     return traversalResult;
   }
 
