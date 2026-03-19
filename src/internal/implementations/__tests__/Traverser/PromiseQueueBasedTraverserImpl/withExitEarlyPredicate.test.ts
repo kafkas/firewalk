@@ -1,4 +1,4 @@
 import { testWithExitEarlyPredicate } from '../shared/withExitEarlyPredicate';
-import { describePromiseQueueBasedTraverserMethodTest } from './helpers';
+import { describeTraverserImplMethodTest } from './helpers';
 
-describePromiseQueueBasedTraverserMethodTest('withExitEarlyPredicate', testWithExitEarlyPredicate);
+describeTraverserImplMethodTest('withExitEarlyPredicate', testWithExitEarlyPredicate);

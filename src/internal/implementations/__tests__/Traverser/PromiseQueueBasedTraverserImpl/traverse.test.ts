@@ -1,4 +1,4 @@
 import { testTraverse } from '../shared/traverse';
-import { describePromiseQueueBasedTraverserMethodTest } from './helpers';
+import { describeTraverserImplMethodTest } from './helpers';
 
-describePromiseQueueBasedTraverserMethodTest('traverse', testTraverse);
+describeTraverserImplMethodTest('traverse', testTraverse);

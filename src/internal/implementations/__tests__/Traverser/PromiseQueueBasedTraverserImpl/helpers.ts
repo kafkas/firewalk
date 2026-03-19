@@ -1,10 +1,10 @@
-import { PromiseQueueBasedTraverserImpl } from '../../../PromiseQueueBasedTraverserImpl';
+import { TraverserImpl } from '../../../TraverserImpl';
 import { describeTraverserMethodTest } from '../helpers';
 import type { TraverserMethodTester } from '../config';
 
-export function describePromiseQueueBasedTraverserMethodTest(
+export function describeTraverserImplMethodTest(
   methodName: string,
   methodTester: TraverserMethodTester
 ): void {
-  describeTraverserMethodTest(PromiseQueueBasedTraverserImpl, methodName, methodTester);
+  describeTraverserMethodTest(TraverserImpl, methodName, methodTester);
 }
