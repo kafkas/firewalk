@@ -1,5 +1,5 @@
 import type { firestore } from 'firebase-admin';
-import { PromiseQueueBasedTraverserImpl } from '../internal/implementations';
+import { TraverserImpl } from '../internal/implementations';
 import type { InvalidConfigError } from '../errors'; /* eslint-disable-line */
 import type { Traversable, TraversalConfig, Traverser } from './interfaces';
 
@@ -29,5 +29,5 @@ export function createTraverser<
   traversable: Traversable<AppModelType, DbModelType>,
   config?: Partial<TraversalConfig>
 ): Traverser<AppModelType, DbModelType> {
-  return new PromiseQueueBasedTraverserImpl(traversable, [], config);
+  return new TraverserImpl(traversable, [], config);
 }

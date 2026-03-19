@@ -80,7 +80,7 @@
     "directory": "__tests__/types"
   },
   "dependencies": {
-    "@proficient/ds": "0.3.2",
-    "@proficient/util": "0.2.2"
+    "@proficient/util": "0.2.2",
+    "p-limit": "3.1.0"
   }
 }
